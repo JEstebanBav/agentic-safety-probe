@@ -149,9 +149,31 @@ def get_quantization_config() -> BitsAndBytesConfig:
     )
 
 
+def auto_detect_quantize(model_name: str) -> bool:
+    """
+    Automatically decide whether to quantize based on available VRAM.
+    
+    Mistral-7B FP16 needs ~14GB, so:
+      - >= 20GB VRAM → no quantize (better activation quality)
+      - < 20GB VRAM → 4-bit quantize
+    """
+    if not torch.cuda.is_available():
+        return True  # CPU fallback, quantize to save RAM
+    
+    vram_gb = torch.cuda.get_device_properties(0).total_mem / 1e9
+    # Rough estimate: 7B params * 2 bytes (FP16) = ~14GB
+    needs_gb = 14.0 if "7b" in model_name.lower() or "7B" in model_name else 16.0
+    
+    should_quantize = vram_gb < (needs_gb + 4)  # 4GB headroom for activations
+    print(f"  Available VRAM: {vram_gb:.1f} GB")
+    print(f"  Model needs ~{needs_gb:.0f} GB (FP16)")
+    print(f"  Auto-decision: {'4-bit quantize' if should_quantize else 'full FP16'}")
+    return should_quantize
+
+
 def load_model_and_tokenizer(
     model_name: str = "mistralai/Mistral-7B-Instruct-v0.3",
-    quantize: bool = True,
+    quantize: Optional[bool] = None,
     device_map: str = "auto",
 ) -> Tuple:
     """
@@ -159,14 +181,20 @@ def load_model_and_tokenizer(
 
     Args:
         model_name: HuggingFace model identifier.
-        quantize: Whether to use 4-bit quantization (recommended for 20GB GPU).
+        quantize: Whether to use 4-bit quantization.
+                  None = auto-detect based on available VRAM.
+                  True = force 4-bit. False = force FP16.
         device_map: Device placement strategy.
 
     Returns:
         Tuple of (model, tokenizer)
     """
     print(f"Loading model: {model_name}")
-    print(f"  Quantization: {'4-bit' if quantize else 'full precision'}")
+    
+    if quantize is None:
+        quantize = auto_detect_quantize(model_name)
+    
+    print(f"  Quantization: {'4-bit' if quantize else 'full FP16'}")
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     if tokenizer.pad_token is None:

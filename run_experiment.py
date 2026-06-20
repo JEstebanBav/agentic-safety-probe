@@ -419,9 +419,10 @@ def main():
     start_time = time.time()
 
     # 1. Load model
+    quantize_flag = None if not args.no_quantize else False  # None = auto-detect
     model, tokenizer = load_model_and_tokenizer(
         model_name=args.model,
-        quantize=not args.no_quantize,
+        quantize=quantize_flag,
     )
     model_info = get_model_info(model)
 
