@@ -8,7 +8,9 @@ This project provides a mechanistic interpretability framework to study whether 
 
 ## 📋 Research Question
 
-> Does the presence of agentic scaffolding (tool definitions, system prompts, multi-turn history) cause the refusal direction to deactivate in the model's residual stream, making harmful requests more likely to be complied with?
+> Does the presence of agentic scaffolding (tool definitions, system prompts, JSON output format) cause the refusal direction to deactivate in the model's residual stream, making harmful requests more likely to be complied with?
+
+> **And critically**: Which specific component of agentic formatting is responsible? The role framing? The tool definitions? Or the structured output format?
 
 ## 🧠 Core Hypothesis
 
@@ -21,19 +23,27 @@ When a harmful prompt is presented in **agentic format** (with tool definitions)
 ```
 agentic-safety-probe/
 ├── src/
-│   ├── __init__.py              # Package initialization
-│   ├── model_loader.py          # Model loading + prompt formatting (chat vs agent)
+│   ├── __init__.py              # Package exports
+│   ├── model_loader.py          # Model loading + prompt formatting (4 conditions)
 │   ├── activation_extractor.py  # Hook-based activation extraction from residual stream
-│   ├── refusal_direction.py     # Compute refusal direction (difference-in-means / PCA)
+│   ├── refusal_direction.py     # Refusal direction: diff-in-means + PCA validation
 │   ├── probes.py                # Linear & MLP probing classifiers
-│   ├── metrics.py               # Statistical tests (t-test, permutation, bootstrap, AUROC)
+│   ├── metrics.py               # Statistical tests + effect decomposition
+│   ├── validation.py            # Activation-space & behavioral validation
 │   ├── intervention.py          # Inference-time intervention to restore refusal
-│   └── visualizations.py        # All figures (violin plots, AUROC curves, PCA, etc.)
+│   └── visualizations.py        # All figures (waterfall, violin, AUROC, PCA, etc.)
 ├── data/
-│   └── build_dataset.py         # Dataset builder (harmful + benign × chat + agent)
-├── run_experiment.py            # Main pipeline orchestrator
-├── requirements.txt             # Dependencies
-└── README.md
+│   ├── __init__.py              # Data package exports
+│   ├── loader.py                # Unified data loaders (custom + HarmAgent)
+│   ├── build_dataset.py         # Custom paired dataset builder
+│   ├── dataset_full.jsonl       # 168 entries: same prompts in chat/agent (42 base × 4)
+│   ├── *_behaviors_*.json       # HarmAgent benchmark datasets
+│   └── chat_*.json              # HarmAgent chat-only subsets
+├── tool_definitions.json        # 26 canonical tool schemas
+├── run_experiment.py            # Main CLI pipeline
+├── run_experiment_runpod.ipynb  # Notebook for cloud execution (RunPod)
+├── runpod_setup.sh             # Cloud setup script
+└── requirements.txt
 ```
 
 ---
@@ -49,64 +59,79 @@ pip install -r requirements.txt
 ### 2. Run the full experiment
 
 ```bash
-python run_experiment.py --model mistralai/Mistral-7B-Instruct-v0.3
+# Standard analysis (chat vs agent)
+python run_experiment.py --dataset custom
+
+# With effect decomposition (4 conditions)
+python run_experiment.py --dataset custom --decompose
+
+# Quick test run
+python run_experiment.py --dataset custom --n-samples 5 --layers 10,14,18,22
 ```
 
-### 3. With options
+### 3. Cloud Execution (RunPod)
+
+For GPU access without local hardware:
 
 ```bash
-# Use Llama 3.1 without quantization (needs ~16GB VRAM)
-python run_experiment.py --model meta-llama/Llama-3.1-8B-Instruct --no-quantize
-
-# Skip slow steps for quick iteration
-python run_experiment.py --skip-intervention --skip-probes
-
-# Analyze specific layers
-python run_experiment.py --layers 10,12,14,16,18,20
-
-# Include multi-turn agentic history
-python run_experiment.py --include-history
-
-# Fewer samples for testing
-python run_experiment.py --n-samples 5
+# Upload project ZIP to RunPod JupyterLab, then:
+cd /workspace
+unzip agentic-safety-probe-runpod.zip
+pip install -r requirements.txt
+# Open run_experiment_runpod.ipynb
 ```
+
+Recommended GPU: RTX A5000 ($0.27/hr) or RTX 4090 ($0.69/hr) — 24GB VRAM.
 
 ---
 
 ## 📊 Experimental Design
 
-### Conditions (2×2 factorial)
+### Dataset: Paired Contrastive Design
+
+The custom dataset (`dataset_full.jsonl`) uses **identical prompts** across conditions, enabling direct paired comparison of activations:
 
 | | **Harmful Prompt** | **Benign Prompt** |
 |---|---|---|
-| **Chat Format** | chat_harmful (positive control) | chat_benign (negative control) |
-| **Agent Format** | agent_harmful (experimental) | agent_benign (negative control) |
+| **Chat Format** | chat_harmful | chat_benign |
+| **Agent Format** | agent_harmful | agent_benign |
+
+- **42 base prompts** × 4 variants = 168 entries
+- **7 harm categories**: fraud, cybercrime, harassment, disinformation, hate, drugs, copyright
+- **3 subtlety levels**: explicit, contextual, framed
+- **26 realistic tools** (email, search, terminal, crypto, social media, etc.)
+
+### Decomposition Conditions (with `--decompose`)
+
+To isolate which factor causes the effect, 4 intermediate conditions are tested:
+
+```
+chat → role_only → role_plus_tools → agent_full
+```
+
+| Condition | Role | Tools in context | JSON output |
+|-----------|------|-----------------|-------------|
+| `chat` | Assistant | ❌ | ❌ |
+| `role_only` | Autonomous agent | ❌ | ❌ |
+| `role_plus_tools` | Autonomous agent | ✅ | ❌ |
+| `agent_full` | Autonomous agent | ✅ | ✅ |
 
 ### Pipeline Steps
 
-1. **Load Model** — 4-bit quantized for memory efficiency
-2. **Build Dataset** — 80 harmful prompts (4 categories × 20) + 80 benign prompts (4 categories × 20) = 320 total entries (× 2 formats)
+1. **Load Model** — Mistral-7B-Instruct (auto-detects FP16 vs 4-bit based on VRAM)
+2. **Load Dataset** — Paired prompts from `dataset_full.jsonl`
 3. **Extract Activations** — Hook into residual stream at each layer
 4. **Compute Refusal Direction** — Difference-in-means between harmful/benign chat activations
-5. **Project & Compare** — Project agent activations onto refusal direction; compute ΔP
-6. **Statistical Tests** — Paired t-test, permutation test, bootstrap CI
-7. **Probing** — Linear and MLP classifiers to verify direction quality
-8. **Intervention** — Add refusal direction back at inference time; measure restored refusal
-9. **Visualize** — Generate all paper figures
-
-### Harm Categories
-- **Fraud** — Phishing, scams, impersonation
-- **Cybercrime** — Malware, hacking tools, exploits
-- **Harassment** — Threats, doxxing, stalking
-- **Disinformation** — Fake news, propaganda, conspiracy theories
-
-### Tools Simulated
-- `web_search` — Web information retrieval
-- `send_email` — Email composition and sending
-- `execute_code` — Code execution in sandbox
-- `file_operations` — Filesystem read/write/delete
-- `database_query` — SQL query execution
-- `post_social_media` — Social media posting
+5. **PCA Validation** — Confirm direction aligns with principal component (cosine > 0.8)
+6. **Project & Compare** — Compute ΔP with statistical significance:
+   - Permutation test (10,000 permutations, non-parametric)
+   - Welch's t-test (parametric comparison)
+   - Cohen's d (effect size)
+   - Bootstrap 95% CI
+7. **Decomposition** (optional) — Break total effect into role / tools / format components
+8. **Probing** — Linear and MLP classifiers to verify direction quality
+9. **Intervention** — Add refusal direction back at inference time
+10. **Visualize** — Waterfall decomposition, projections, AUROC curves
 
 ---
 
@@ -114,58 +139,43 @@ python run_experiment.py --n-samples 5
 
 | Metric | Description |
 |--------|-------------|
-| **ΔP** (Projection Gap) | Difference in mean projection between chat and agent format |
-| **Cohen's d** | Effect size of the gap |
+| **ΔP** (Projection Gap) | `mean(proj_chat) - mean(proj_agent)` — main metric |
+| **p-value (permutation)** | Non-parametric significance (no distribution assumptions) |
+| **Cohen's d** | Effect size (>0.8 large, >0.5 medium, >0.2 small) |
+| **PCA cosine similarity** | Validates diff-in-means direction against PC1 |
+| **Decomposition** | `role_effect + tools_effect + json_format_effect = total_effect` |
 | **AUROC** | Separability of harmful/benign in each format |
-| **Intervention Success Rate** | % of prompts where adding direction restores refusal |
-| **Minimum α** | Smallest scaling factor that restores refusal |
-
----
-
-## 📂 Output Structure
-
-After running the experiment:
-
-```
-results/
-├── results.json              # All numerical results
-├── dataset.jsonl             # Generated dataset
-└── figures/
-    ├── projection_distributions_layerN.png/.pdf
-    ├── layer_auroc_curve.png/.pdf
-    ├── gap_by_layer.png/.pdf
-    ├── pca_activations_layerN.png/.pdf
-    ├── intervention_dose_response.png/.pdf
-    ├── cross_tool_gap.png/.pdf
-    └── cosine_probe_vs_refusal.png/.pdf
-```
 
 ---
 
 ## 🖥️ Hardware Requirements
 
-| Configuration | VRAM | Notes |
-|--------------|------|-------|
-| 4-bit quantized (default) | ~8 GB | Works on RTX 3060/4060+ |
-| Full precision | ~16 GB | Needs RTX 4090 / A100 |
-| With intervention | +2 GB | Generation requires more memory |
+| Configuration | VRAM | Cost (RunPod) |
+|--------------|------|---------------|
+| 4-bit quantized | ~8 GB | RTX 3090 ($0.46/hr) |
+| FP16 (recommended) | ~14 GB | RTX A5000 ($0.27/hr) |
+| FP16 + intervention | ~18 GB | RTX 4090 ($0.69/hr) |
+
+**Budget estimate**: Full experiment (~35 min) costs ~$0.20 on RTX A5000.
 
 ---
 
-## 🔑 Key Findings (Expected)
+## 🔑 Expected Findings
 
-Based on prior work (Arditi et al. 2024, refusal in residual stream):
+Based on prior work (Arditi et al. 2024):
 
-1. **Projection Gap**: Agent-format harmful prompts have lower projection onto refusal direction than chat-format (~0.1-0.3 lower)
-2. **Layer Specificity**: Effect concentrates in middle layers (L12-L20 for 32-layer models)
-3. **Tool Independence**: Gap persists across different tool types
-4. **Intervention Works**: Adding α × d_refusal at the critical layer restores refusal behavior
+1. **Projection Gap (ΔP > 0)**: Agent-format harmful prompts have lower projection onto refusal direction
+2. **Statistical Significance**: p < 0.05 (permutation test), Cohen's d > 0.5
+3. **Layer Specificity**: Effect concentrates in middle layers (L12-L20)
+4. **Decomposition**: Identifies whether role, tools, or JSON format drives the effect
+5. **PCA Alignment**: cosine > 0.8 between diff-in-means and PC1
 
 ---
 
 ## 📚 References
 
 - Arditi, A. et al. (2024). "Refusal in Language Models Is Mediated by a Single Direction"
+- Andriushchenko, M. et al. (2024). "AgentHarm: A Benchmark for Measuring Harmfulness of LLM Agents"
 - Zou, A. et al. (2023). "Representation Engineering"
 - Turner, A. et al. (2023). "Activation Addition"
 
