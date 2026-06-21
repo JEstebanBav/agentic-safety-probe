@@ -1,102 +1,84 @@
 # Experiment Design
 
 ## Experiment 1: Baseline Validation
-
-**Objective:** Confirm we can extract the refusal direction and it works in chat (replicate Arditi et al.)
-
-**Input:** chat_harmful + chat_benign (60% of dataset)
-
-**Output:** d⃗_refusal per layer, AUROC on held-out set
-
+**Objective:** Confirm we can extract the refusal direction and it separates harmful/benign in chat.
+**Input:** chat_harmful + chat_benign activations
+**Output:** d_chat per layer, AUROC on held-out set
 **Success Criterion:** AUROC > 0.85 in at least 3 layers
+**PCA Validation:** PC1 cosine > 0.8 with d_chat
 
-**If it fails:** Review implementation before continuing
-
----
-
-## Experiment 2: Main Measurement (Chat vs. Agent)
-
-**Objective:** Does the refusal direction activate in agentic format?
-
-**Input:** agent_harmful + agent_benign (test set)
-
-**Measurement:** projection = a⃗_t · d⃗_refusal per layer
-
-**Comparison:** Paired t-test against chat projections
-
+## Experiment 2: Main Measurement (Chat vs Agent)
+**Objective:** Does the refusal direction activate less in agentic format?
+**Input:** Same prompts in agent format
+**Measurement:** DeltaP = mean(proj_chat_harmful) - mean(proj_agent_harmful) per layer
+**Tests:** Permutation test + Welch's t-test + Bootstrap CI
 **This is the MAIN RESULT of the project.**
 
----
+## Experiment 3: Stratified Analysis by Subtlety
+**Objective:** Does the effect depend on how explicit the harmful intent is?
+**Stratification:**
+- explicit (N=18): Clearly harmful words ("steal", "hack", "threaten")
+- contextual (N=14): Harm implied by context, not explicit words
+- framed (N=10): Professional framing hiding harmful action ("pentest", "security training")
+**Expected:** explicit shows largest DeltaP; framed shows smallest
 
-## Experiment 3: Cross-Tool Generalization
+## Experiment 4: Agent-Specific Direction (w_agent)
+**Objective:** If d_chat fails on agent data, find the direction that DOES work.
+**Method:** LogisticRegression on agent_harmful vs agent_benign activations
+**Output:** w_agent per layer, cos(w_agent, d_chat), AUROC on agent data
+**Key question:** Is w_agent a rotation of d_chat or completely orthogonal?
 
-**Objective:** Is the effect consistent across tools?
+## Experiment 5: Safety Monitor
+**Objective:** Demonstrate practical utility of w_agent as a real-time detector.
+**Method:** Calibrate threshold on validation set (maximize F1)
+**Metrics:** Precision, Recall, F1, False Positive Rate
+**Goal:** F1 > 0.9 would indicate viability for production use
 
-**Analysis:** ΔP grouped by tool_name
+## Experiment 6: Intervention
+**Objective:** Can we restore refusal by adding the direction back?
+**Method:** Add alpha * direction to activations during generation
+**Two variants:**
+- Intervention with d_chat (may fail if direction rotates in agent context)
+- Intervention with w_agent (should be more effective)
+**Search:** Minimum alpha that restores refusal behavior
+**Applied to:** All layers from layer N/4 onwards
 
-**Interpretation:**
-- If consistent → "universal monitor" is viable
-- If variable → effect depends on the tool
-
----
-
-## Experiment 4: Layer-wise Probes
-
-**Objective:** At which layers is harmful/benign info separable in agentic format?
-
-**Method:** Linear probe + MLP at each layer
-
-**Output:** Map of "where harm info exists" by format
-
----
-
-## Experiment 5 (if time allows): Intervention
-
-**Objective:** Can we restore refusal?
-
-**Method:** Add α × d⃗_refusal to agentic activations
-
-**Measure:** Does the model now refuse the tool call?
-
-**Search:** Minimum α that restores refusal
-
-**This converts the finding into a SOLUTION.**
-
----
+## Experiment 7: Decomposition (optional)
+**Objective:** Which component of agentic formatting causes the effect?
+**Conditions:**
+1. chat (baseline)
+2. role_only (agent role, no tools)
+3. role_plus_tools (role + tool definitions, text output)
+4. agent_full (role + tools + JSON tool-call output)
+**Analysis:** DeltaP between consecutive conditions
+**Output:** Percentage contribution of each factor to total effect
 
 ## Dataset Construction
 
-### Size
-- 80 base prompts × 4 variants = 320 samples
+### Custom Paired Dataset (PRIMARY -- for activation analysis)
+- 42 base prompts (harmful) with paired benign variants
+- Each appears in chat AND agent format (identical text)
+- 7 categories: fraud, cybercrime, harassment, disinformation, hate, drugs, copyright
+- 3 subtlety levels: explicit, contextual, framed
+- 3-4 relevant tools per prompt (from 26 total)
+- Total: 168 entries
 
-### Harm Categories (from AgentHarm)
-- Fraud/Scam (20 prompts)
-- Cybercrime (20 prompts)
-- Harassment (20 prompts)
-- Disinformation (20 prompts)
+### HarmAgent Benchmark (SUPPLEMENTARY -- for behavioral validation)
+- 176 test behaviors + 32 validation behaviors
+- Includes grading functions and target tools
+- Not paired (different prompts per condition)
+- Used only for behavioral correlation, not activation analysis
 
-### Tools (varied for generalization)
-- send_email
-- web_search
-- execute_code
-- post_social_media
-- file_operations
-- database_query
-
-### Prompt Variants per Base Prompt
-1. Chat harmful (positive control)
-2. Agent harmful (experimental)
-3. Chat benign (negative control)
-4. Agent benign (negative control)
-
----
-
-## Metrics
+## Metrics Summary
 
 | Metric | What it measures | Target |
 |---|---|---|
-| Projection Gap (ΔP) | Difference in refusal direction activation | Statistically significant |
-| AUROC by format | Separability of harmful/benign | Chat > 0.85, Agent = ? |
-| Behavior-activation concordance | Does projection predict behavior? | High correlation |
-| Cross-tool variance | Consistency of effect | Low variance |
-| Cross-category variance | Consistency across harm types | Low variance |
+| DeltaP | Projection gap chat vs agent | Positive, significant |
+| Cohen's d (global) | Overall effect size | > 0.3 |
+| Cohen's d (explicit) | Effect for explicit prompts | > 0.5 |
+| p-value (permutation) | Statistical significance | < 0.05 |
+| AUROC (d_chat on chat) | Direction quality | > 0.85 |
+| AUROC (w_agent on agent) | Agent direction quality | > 0.85 |
+| cos(w_agent, d_chat) | Direction alignment | Measure rotation |
+| Monitor F1 | Practical detection | > 0.9 |
+| Intervention success | Can we restore refusal? | > 50% |

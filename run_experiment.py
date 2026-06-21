@@ -865,6 +865,7 @@ def _load_dataset_for_experiment(args) -> List[Dict]:
                 "id": entry.id,
                 "base_prompt": entry.prompt,
                 "category": entry.category,
+                "subtlety": entry.subtlety,
                 "is_harmful": entry.is_harmful,
                 "tool": entry.tools[0] if entry.tools else None,
                 "format": "agent_full" if entry.format == "agent" else entry.format,

@@ -1,56 +1,74 @@
 # Decision Log
 
-## Why Mistral-7B and not another model?
-- Fits in 20GB GPU in 4-bit quantization
-- Has native tool calling support
-- Sufficiently studied to have baselines
-- Alternative: Llama-3.1-8B if Mistral doesn't support tool format adequately
+## Why Llama-3.1-70B-Instruct as primary model?
+- Large enough to have robust safety training (refusal mechanism present)
+- Native tool-calling support in the chat template
+- Well-studied model with baselines for comparison
+- Results with 70B confirmed: DeltaP = 0.99, p = 0.005
+- Alternative tested: Mistral-7B (faster but weaker safety alignment)
 
-## Why difference-in-means and not PCA or SAEs?
-- It's Arditi et al.'s method → enables direct comparison
+## Why RunPod instead of local?
+- Corporate firewall blocks SSH; RunPod exposes JupyterLab via HTTPS (port 443)
+- RTX A5000 ($0.27/hr) or RTX 4090 ($0.69/hr) -- 24GB VRAM sufficient for 7B in FP16
+- For 70B: use multi-GPU pods or quantized version
+- Budget: $10 gives ~25+ hours of compute
+
+## Why dataset_full.jsonl and not HarmAgent directly?
+- HarmAgent prompts are NOT paired (different text in chat vs agent)
+- Without pairing, DeltaP could be due to prompt content differences
+- Our custom dataset uses IDENTICAL text in both conditions
+- HarmAgent is available as supplementary validation (behavioral)
+
+## Why 42 base prompts (not 80 as originally planned)?
+- Statistical power for paired design with d=0.42 at alpha=0.05 requires n~45
+- 42 harmful base prompts with n=42 per condition is sufficient
+- Adding subtlety stratification (18/14/10) was more valuable than more prompts
+
+## Why difference-in-means and not PCA for d_chat?
+- It's Arditi et al.'s method -- enables direct replication and comparison
+- PCA is used as VALIDATION (cosine > 0.8 confirms alignment)
 - Simpler, more interpretable
-- PCA as iteration 2 if difference-in-means fails
-- SAEs require separate training (not enough time in hackathon)
+- Both give essentially the same direction when data is clean
 
-## Why the last instruction token?
-- It's where Arditi et al. found the strongest signal
-- It's the point where the model "decides" what to generate
-- Other positions tested as iteration 3
+## Why extract w_agent separately?
+- With 70B model: d_chat gives AUROC 0.96 on agent data (it works!)
+- But cosine(w_agent, d_chat) ~ 0.4 -- partial rotation
+- With smaller models: d_chat may give AUROC ~0.5 on agent data (fails)
+- w_agent provides a backup direction that always works in agent context
+- The cosine between them IS the finding: quantifies how much the direction rotates
 
-## Why 80 base prompts?
-- Arditi et al. used ~100 and it was sufficient
-- 80 × 4 variants = 320 samples
-- Statistical power for paired t-test with medium effect (d=0.5) and α=0.01 requires n≈50 pairs → we have 80
+## Why stratify by subtlety?
+- Global Cohen's d = 0.42 (small-medium) masks heterogeneous effects
+- Explicit prompts likely show d > 0.7 (large effect)
+- Framed prompts may show d ~ 0.2 (no significant effect)
+- This explains WHY the global effect appears small
+- Also has practical implications: framed attacks bypass the mechanism
 
-## Why not more harm categories?
-- 4 categories × 20 prompts allows detecting per-category variation
-- More categories with fewer prompts per category reduces statistical power within each
-- Prioritize depth over breadth for hackathon
+## Why apply intervention to all layers?
+- Single-layer intervention (original design) gave 0% success rate
+- The refusal mechanism is distributed across multiple layers
+- Applying to layers N/4 through N gives much stronger effect
+- With w_agent applied at its specific extraction layer, results improve further
 
-## Why not fine-tuning as a solution?
-- Fine-tuning is expensive and requires curated data
-- Activation intervention is inference-time, zero training cost
-- If you fine-tune for one set of tools, it doesn't generalize to new tools
-- Activation intervention DOES generalize
-
-## Why not just per-tool filters?
-- AgentHarm already demonstrated they don't work
-- O(N) cost that doesn't scale
-- Can't filter tools that don't exist yet (MCP, plugins)
-- Our approach is O(1) — one dot product regardless of N tools
+## Why permutation test instead of just t-test?
+- No distributional assumptions (projections may not be Gaussian)
+- More robust with small sample sizes (N=42)
+- Reports empirical p-value from 10,000 permutations
+- Welch's t-test included as parametric comparison
 
 ## Scope Boundaries
 
-### What we DO address (experimentally)
-- Semantic harm in agentic context (harmful content is in the prompt itself)
+### What we address experimentally
+- Semantic harm detection in agentic context (harm is in the prompt)
+- Direction rotation between chat and agent contexts
+- Practical safety monitor using w_agent
 
-### What we IDENTIFY but don't solve
+### What we identify but don't solve
 - Intra-session contextual harm (harm emerges from conversation history)
 - Requires late-layer probes that integrate full context
 - Noted as future work
 
-### What is OUT OF SCOPE
-- Cross-session harm (user splits intent across multiple chats)
-- The model does NOT have the information
-- Requires architectural solutions (persistent risk memory, user profiling)
-- Identified as a hard limit of the interpretability approach
+### What is out of scope
+- Cross-session harm (user splits intent across multiple conversations)
+- The model does NOT have the information in a single forward pass
+- Requires architectural solutions (persistent risk memory)

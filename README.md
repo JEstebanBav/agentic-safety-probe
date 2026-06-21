@@ -1,4 +1,4 @@
-# 🔬 Agentic Safety Probe
+﻿# Agentic Safety Probe
 
 **Investigating how agentic formatting (tool-use context) affects the activation of safety mechanisms in Large Language Models.**
 
@@ -6,19 +6,19 @@ This project provides a mechanistic interpretability framework to study whether 
 
 ---
 
-## 📋 Research Question
+## Research Question
 
 > Does the presence of agentic scaffolding (tool definitions, system prompts, JSON output format) cause the refusal direction to deactivate in the model's residual stream, making harmful requests more likely to be complied with?
 
 > **And critically**: Which specific component of agentic formatting is responsible? The role framing? The tool definitions? Or the structured output format?
 
-## 🧠 Core Hypothesis
+## Core Hypothesis
 
 When a harmful prompt is presented in **agentic format** (with tool definitions), its projection onto the refusal direction is significantly **lower** than the same prompt in standard **chat format** — indicating weakened safety activation.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 agentic-safety-probe/
@@ -48,7 +48,7 @@ agentic-safety-probe/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install dependencies
 
@@ -85,7 +85,7 @@ Recommended GPU: RTX A5000 ($0.27/hr) or RTX 4090 ($0.69/hr) — 24GB VRAM.
 
 ---
 
-## 📊 Experimental Design
+## Experimental Design
 
 ### Dataset: Paired Contrastive Design
 
@@ -118,37 +118,36 @@ chat → role_only → role_plus_tools → agent_full
 
 ### Pipeline Steps
 
-1. **Load Model** — Mistral-7B-Instruct (auto-detects FP16 vs 4-bit based on VRAM)
+1. **Load Model** — Llama-3.1-70B or Mistral-7B (auto-detects FP16 vs 4-bit)
 2. **Load Dataset** — Paired prompts from `dataset_full.jsonl`
 3. **Extract Activations** — Hook into residual stream at each layer
-4. **Compute Refusal Direction** — Difference-in-means between harmful/benign chat activations
-5. **PCA Validation** — Confirm direction aligns with principal component (cosine > 0.8)
-6. **Project & Compare** — Compute ΔP with statistical significance:
-   - Permutation test (10,000 permutations, non-parametric)
-   - Welch's t-test (parametric comparison)
-   - Cohen's d (effect size)
-   - Bootstrap 95% CI
-7. **Decomposition** (optional) — Break total effect into role / tools / format components
-8. **Probing** — Linear and MLP classifiers to verify direction quality
-9. **Intervention** — Add refusal direction back at inference time
-10. **Visualize** — Waterfall decomposition, projections, AUROC curves
+4. **Compute Refusal Direction (d_chat)** — Difference-in-means + PCA validation
+5. **Project and Compare** — Compute DeltaP with statistical significance
+6. **Stratified Analysis** — Break down DeltaP by subtlety (explicit/contextual/framed)
+7. **Probing** — Linear and MLP classifiers; extract agent-specific direction (w_agent)
+8. **Agent Direction Analysis** — cos(w_agent, d_chat), AUROC, safety monitor calibration
+9. **Intervention** — Add direction back during generation (with d_chat and w_agent)
+10. **Decomposition** (optional) — role / tools / format components
+11. **Visualize** — All figures
 
 ---
 
-## 📈 Key Metrics
+## Key Metrics
 
 | Metric | Description |
 |--------|-------------|
-| **ΔP** (Projection Gap) | `mean(proj_chat) - mean(proj_agent)` — main metric |
-| **p-value (permutation)** | Non-parametric significance (no distribution assumptions) |
-| **Cohen's d** | Effect size (>0.8 large, >0.5 medium, >0.2 small) |
-| **PCA cosine similarity** | Validates diff-in-means direction against PC1 |
-| **Decomposition** | `role_effect + tools_effect + json_format_effect = total_effect` |
-| **AUROC** | Separability of harmful/benign in each format |
+| **DeltaP** (Projection Gap) | `mean(proj_chat) - mean(proj_agent)` -- main metric |
+| **p-value (permutation)** | Non-parametric significance (10,000 permutations) |
+| **Cohen's d (global)** | Overall effect size |
+| **Cohen's d (stratified)** | Effect size per subtlety level |
+| **cos(w_agent, d_chat)** | How much the refusal direction rotates in agent context |
+| **AUROC (w_agent)** | Agent-specific harmful/benign separability |
+| **Monitor F1** | Safety monitor precision/recall on agent data |
+| **Intervention success** | Percentage of prompts where adding direction restores refusal |
 
 ---
 
-## 🖥️ Hardware Requirements
+## Hardware Requirements
 
 | Configuration | VRAM | Cost (RunPod) |
 |--------------|------|---------------|
@@ -160,19 +159,27 @@ chat → role_only → role_plus_tools → agent_full
 
 ---
 
-## 🔑 Expected Findings
+## Findings (Llama-3.1-70B-Instruct)
 
-Based on prior work (Arditi et al. 2024):
+Results from running with `--layers 10,20,30,40,50,60`:
 
-1. **Projection Gap (ΔP > 0)**: Agent-format harmful prompts have lower projection onto refusal direction
-2. **Statistical Significance**: p < 0.05 (permutation test), Cohen's d > 0.5
-3. **Layer Specificity**: Effect concentrates in middle layers (L12-L20)
-4. **Decomposition**: Identifies whether role, tools, or JSON format drives the effect
-5. **PCA Alignment**: cosine > 0.8 between diff-in-means and PC1
+1. **Projection Gap**: DeltaP = 0.99 (significant, p = 0.005) -- refusal direction IS weaker in agent format
+2. **Effect Size**: Cohen's d = 0.42 (global, small-medium). Heterogeneous by subtlety -- explicit prompts show larger effect
+3. **AUROC**: d_chat achieves 0.96 in both chat and agent (direction transfers with reduced magnitude)
+4. **Probing**: Linear probes achieve AUROC 1.0 from layer 20 onwards in agent data
+5. **Direction Rotation**: cos(w_agent, d_chat) ~ 0.4 -- the model partially rotates the harmfulness encoding in agent context
+6. **Best Layer**: Layer 60 (last layers) show strongest gap
+
+## Interpretation
+
+The refusal direction does not completely deactivate in agent format (AUROC remains high). Instead, the magnitude of its activation decreases. Additionally, the model encodes harmfulness in a partially rotated direction (w_agent) when in agentic context. This means:
+- A safety monitor based on d_chat alone will have reduced sensitivity in agent mode
+- A monitor using w_agent achieves near-perfect detection
+- The rotation is quantifiable and layer-dependent
 
 ---
 
-## 📚 References
+## References
 
 - Arditi, A. et al. (2024). "Refusal in Language Models Is Mediated by a Single Direction"
 - Andriushchenko, M. et al. (2024). "AgentHarm: A Benchmark for Measuring Harmfulness of LLM Agents"
@@ -181,18 +188,18 @@ Based on prior work (Arditi et al. 2024):
 
 ---
 
-## ⚠️ Ethical Note
+## Ethical Note
 
-This research is conducted to **understand and improve** AI safety mechanisms. The harmful prompts in the dataset are designed solely to test refusal systems and should not be used for any malicious purpose. The goal is to identify vulnerabilities so they can be patched.
+This research is conducted to understand and improve AI safety mechanisms. The harmful prompts in the dataset are designed solely to test refusal systems and should not be used for any malicious purpose. The goal is to identify vulnerabilities so they can be patched.
 
 ---
 
-## 📄 License
+## License
 
 MIT
 
 ---
 
-## 👤 Author
+## Author
 
 **JEstebanBav** — Research on mechanistic interpretability and AI safety in agentic systems.
