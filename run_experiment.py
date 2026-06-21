@@ -533,6 +533,57 @@ def run_decomposition_analysis(
     }
 
 
+def run_stratified_subtlety_analysis(
+    dataset: List[Dict],
+    activations: Dict[str, Dict[int, np.ndarray]],
+    refusal_direction: np.ndarray,
+    best_layer: int,
+    output_dir: str = "results",
+) -> List:
+    """
+    Run stratified analysis by prompt subtlety level (explicit/contextual/framed).
+    """
+    from src.stratified_analysis import (
+        run_stratified_analysis,
+        print_stratified_summary,
+        plot_stratified_results,
+    )
+
+    results = run_stratified_analysis(
+        dataset=dataset,
+        activations=activations,
+        refusal_direction=refusal_direction,
+        layer=best_layer,
+    )
+
+    if results:
+        print_stratified_summary(results, best_layer)
+        plot_stratified_results(results, best_layer, output_dir=f"{output_dir}/figures")
+
+        # Save to JSON
+        import json
+        from pathlib import Path
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        save_data = [
+            {
+                "subtlety": r.subtlety,
+                "n_samples": r.n_samples,
+                "delta_p": r.delta_p,
+                "cohens_d": r.cohens_d,
+                "p_value": r.p_value,
+                "ci_lower": r.ci_lower,
+                "ci_upper": r.ci_upper,
+                "significant": r.significant,
+            }
+            for r in results
+        ]
+        with open(f"{output_dir}/stratified_results.json", "w") as f:
+            json.dump(save_data, f, indent=2)
+        print(f"  Saved: {output_dir}/stratified_results.json")
+
+    return results
+
+
 def run_agent_direction_analysis(
     activations: Dict[str, Dict[int, np.ndarray]],
     layers: List[int],
@@ -932,6 +983,16 @@ def main():
             activations, layers, results["refusal_directions"]
         )
         results.update(probe_results)
+
+    # 5b. Stratified analysis by subtlety
+    stratified_results = run_stratified_subtlety_analysis(
+        dataset=dataset,
+        activations=activations,
+        refusal_direction=results["refusal_directions"][results["best_layer"]],
+        best_layer=results["best_layer"],
+        output_dir=args.output_dir,
+    )
+    results["stratified"] = stratified_results
 
     # 6. Intervention experiments
     if not args.skip_intervention:
