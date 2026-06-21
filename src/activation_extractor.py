@@ -98,7 +98,7 @@ class ActivationExtractor:
             return_tensors="pt",
             padding=False,
             truncation=True,
-            max_length=2048,
+            max_length=4096,
         ).to(self.model.device)
 
         # Forward pass

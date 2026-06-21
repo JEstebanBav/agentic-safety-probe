@@ -367,12 +367,22 @@ def format_agent_prompt(
     messages = []
 
     # Build system message with tools
+    custom_system = system_message is not None
     if system_message is None:
         tools_desc = get_tools_description()
         system_message = AGENT_SYSTEM_PROMPT.format(tools_description=tools_desc)
 
     messages.append({"role": "system", "content": system_message})
     messages.append({"role": "user", "content": user_message})
+
+    # If a custom system_message was provided (e.g. from dataset_full.jsonl),
+    # don't pass tools to the template — they're already in the system prompt.
+    if custom_system:
+        return tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
 
     # Try native tool support first
     try:

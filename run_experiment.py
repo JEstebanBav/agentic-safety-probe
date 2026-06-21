@@ -172,21 +172,19 @@ def extract_all_activations(
                 prompt = format_role_only_prompt(tokenizer, entry["base_prompt"])
             elif fmt == "role_plus_tools":
                 prompt = format_role_plus_tools_prompt(tokenizer, entry["base_prompt"])
-            elif fmt == "agent_full":
+            elif fmt in ("agent_full", "agent"):
+                # Use entry-specific system_prompt and tools if available
+                # This avoids injecting ALL 26 tools (which causes truncation)
+                sys_prompt = entry.get("system_prompt") or None
                 if include_history:
                     prompt = format_agent_prompt_with_history(
                         tokenizer, entry["base_prompt"]
                     )
                 else:
-                    prompt = format_agent_prompt(tokenizer, entry["base_prompt"])
-            elif fmt == "agent":
-                # Backward compatibility for old datasets
-                if include_history:
-                    prompt = format_agent_prompt_with_history(
-                        tokenizer, entry["base_prompt"]
+                    prompt = format_agent_prompt(
+                        tokenizer, entry["base_prompt"],
+                        system_message=sys_prompt,
                     )
-                else:
-                    prompt = format_agent_prompt(tokenizer, entry["base_prompt"])
             else:
                 prompt = format_chat_prompt(tokenizer, entry["base_prompt"])
             prompts.append(prompt)
@@ -198,7 +196,7 @@ def extract_all_activations(
             if (i + 1) % 10 == 0:
                 print(f"    {i + 1}/{len(prompts)}")
 
-            acts = extractor.extract(prompt, layers=layers)
+            acts = extractor.extract_single(prompt, layers=layers)
             for layer in layers:
                 variant_activations[layer].append(acts[layer])
 
@@ -261,12 +259,16 @@ def run_main_analysis(
     results["projections_by_layer"] = projections
 
     # Compute gap at each layer (chat vs agent_full)
-    gaps = compute_gap_by_layer(
-        chat_harmful={l: activations["chat_harmful"][l] for l in layers},
-        agent_harmful={l: activations[agent_harmful_key][l] for l in layers},
-        refusal_directions=refusal_directions,
+    layer_results = compute_gap_by_layer(
+        harmful_activations={l: activations["chat_harmful"][l] for l in layers},
+        benign_activations={l: activations["chat_benign"][l] for l in layers},
+        chat_harmful_acts={l: activations["chat_harmful"][l] for l in layers},
+        agent_harmful_acts={l: activations[agent_harmful_key][l] for l in layers},
     )
+    # Extract gaps from layer results
+    gaps = {l: r["gap_analysis"]["delta_p"] for l, r in layer_results.items()}
     results["gaps_by_layer"] = gaps
+    results["layer_results"] = layer_results
     print(f"  Gaps computed. Max gap at layer {max(gaps, key=gaps.get)}: {max(gaps.values()):.4f}")
 
     # Find best layer (largest gap)
