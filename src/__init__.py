@@ -22,7 +22,13 @@ from src.refusal_direction import (
     full_refusal_analysis,
     compute_gap_by_layer,
 )
-from src.probes import LinearProbe, MLPProbe, run_probing_suite
+from src.probes import (
+    train_linear_probe,
+    train_mlp_probe,
+    run_probing_suite,
+    ProbeResult,
+    ProbingSuiteResult,
+)
 from src.metrics import (
     paired_ttest,
     permutation_test,
