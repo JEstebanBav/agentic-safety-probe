@@ -533,6 +533,266 @@ def run_decomposition_analysis(
     }
 
 
+def run_agent_direction_analysis(
+    activations: Dict[str, Dict[int, np.ndarray]],
+    layers: List[int],
+    refusal_directions: Dict[int, np.ndarray],
+    output_dir: str = "results",
+) -> Dict:
+    """
+    Run the agent-specific direction analysis.
+
+    1. Extract w_agent from linear probe on agent activations
+    2. Compare cos(w_agent, d_chat) per layer
+    3. Evaluate AUROC of w_agent on agent data
+    4. Run safety monitor with calibrated threshold
+    """
+    from src.agent_direction import (
+        extract_agent_directions_all_layers,
+        calibrate_threshold,
+        evaluate_monitor,
+        print_agent_direction_summary,
+    )
+
+    print("\n" + "=" * 60)
+    print("AGENT-SPECIFIC DIRECTION ANALYSIS")
+    print("=" * 60)
+
+    # Resolve agent keys
+    agent_harmful_key = "agent_harmful" if "agent_harmful" in activations else "agent_full_harmful"
+    agent_benign_key = "agent_benign" if "agent_benign" in activations else "agent_full_benign"
+
+    if agent_harmful_key not in activations or agent_benign_key not in activations:
+        print("  WARNING: Agent activations not found. Skipping.")
+        return {}
+
+    # Extract w_agent for all layers
+    layer_results = extract_agent_directions_all_layers(
+        agent_harmful_acts={l: activations[agent_harmful_key][l] for l in layers},
+        agent_benign_acts={l: activations[agent_benign_key][l] for l in layers},
+        d_chat_directions=refusal_directions,
+    )
+
+    # Find best layer (highest AUROC with w_agent)
+    best_layer = max(layer_results, key=lambda l: layer_results[l].auroc_agent_w_agent)
+    best = layer_results[best_layer]
+
+    # Safety monitor: calibrate threshold on agent data
+    proj_harmful = activations[agent_harmful_key][best_layer] @ best.w_agent
+    proj_benign = activations[agent_benign_key][best_layer] @ best.w_agent
+    threshold = calibrate_threshold(proj_harmful, proj_benign, metric="f1")
+
+    # Evaluate monitor
+    monitor_result = evaluate_monitor(
+        harmful_acts=activations[agent_harmful_key][best_layer],
+        benign_acts=activations[agent_benign_key][best_layer],
+        w_agent=best.w_agent,
+        threshold=threshold,
+    )
+
+    # Print summary
+    print_agent_direction_summary(layer_results, monitor_result)
+
+    # Save results
+    import json
+    from pathlib import Path
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    save_data = {
+        "best_layer": int(best_layer),
+        "best_auroc_w_agent": best.auroc_agent_w_agent,
+        "best_auroc_d_chat": best.auroc_agent_d_chat,
+        "best_cosine": best.cosine_similarity,
+        "monitor_threshold": threshold,
+        "monitor_precision": monitor_result.precision,
+        "monitor_recall": monitor_result.recall,
+        "monitor_f1": monitor_result.f1,
+        "monitor_fpr": monitor_result.false_positive_rate,
+        "per_layer": {
+            str(l): {
+                "cosine": r.cosine_similarity,
+                "auroc_w_agent": r.auroc_agent_w_agent,
+                "auroc_d_chat": r.auroc_agent_d_chat,
+            }
+            for l, r in layer_results.items()
+        },
+    }
+    with open(f"{output_dir}/agent_direction_results.json", "w") as f:
+        json.dump(save_data, f, indent=2)
+    print(f"\n  Saved to {output_dir}/agent_direction_results.json")
+
+    # Generate visualizations
+    _plot_agent_direction_figures(
+        layer_results=layer_results,
+        activations=activations,
+        best_layer=best_layer,
+        agent_harmful_key=agent_harmful_key,
+        agent_benign_key=agent_benign_key,
+        output_dir=output_dir,
+    )
+
+    return {
+        "layer_results": layer_results,
+        "best_layer": best_layer,
+        "best_w_agent": best.w_agent,
+        "monitor_threshold": threshold,
+        "monitor_result": monitor_result,
+    }
+
+
+def _plot_agent_direction_figures(
+    layer_results: Dict,
+    activations: Dict,
+    best_layer: int,
+    agent_harmful_key: str,
+    agent_benign_key: str,
+    output_dir: str,
+):
+    """Generate visualizations for agent direction analysis."""
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from pathlib import Path
+
+    fig_dir = Path(output_dir) / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+
+    layers_sorted = sorted(layer_results.keys())
+
+    # --- Figure 1: Cosine similarity d_chat vs w_agent per layer ---
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+    cosines = [layer_results[l].cosine_similarity for l in layers_sorted]
+    auroc_w = [layer_results[l].auroc_agent_w_agent for l in layers_sorted]
+    auroc_d = [layer_results[l].auroc_agent_d_chat for l in layers_sorted]
+
+    ax.plot(range(len(layers_sorted)), cosines, 'o-', color='#e74c3c', label='cos(w_agent, d_chat)')
+    ax.axhline(0, color='gray', linewidth=0.5, linestyle='--')
+    ax.set_xticks(range(len(layers_sorted)))
+    ax.set_xticklabels(layers_sorted, rotation=45, fontsize=8)
+    ax.set_xlabel('Layer')
+    ax.set_ylabel('Cosine Similarity')
+    ax.set_title('Direction Alignment: w_agent vs d_chat per Layer')
+    ax.legend()
+    ax.set_ylim(-1.05, 1.05)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(fig_dir / "cosine_w_agent_vs_d_chat.png", dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print(f"  Saved: {fig_dir}/cosine_w_agent_vs_d_chat.png")
+
+    # --- Figure 2: AUROC comparison per layer ---
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+    ax.plot(range(len(layers_sorted)), auroc_w, 'o-', color='#2ecc71', label='AUROC(w_agent) on agent')
+    ax.plot(range(len(layers_sorted)), auroc_d, 's--', color='#e74c3c', label='AUROC(d_chat) on agent')
+    ax.axhline(0.5, color='gray', linewidth=0.5, linestyle='--', label='Chance (0.5)')
+    ax.set_xticks(range(len(layers_sorted)))
+    ax.set_xticklabels(layers_sorted, rotation=45, fontsize=8)
+    ax.set_xlabel('Layer')
+    ax.set_ylabel('AUROC')
+    ax.set_title('Agent Harmful/Benign Separability: w_agent vs d_chat')
+    ax.legend()
+    ax.set_ylim(0.3, 1.05)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(fig_dir / "auroc_w_agent_vs_d_chat.png", dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print(f"  Saved: {fig_dir}/auroc_w_agent_vs_d_chat.png")
+
+    # --- Figure 3: Projection distributions using w_agent (4 conditions) ---
+    best = layer_results[best_layer]
+    w = best.w_agent
+
+    conditions = {}
+    if "chat_harmful" in activations and best_layer in activations["chat_harmful"]:
+        conditions["Chat Harmful"] = activations["chat_harmful"][best_layer] @ w
+    if "chat_benign" in activations and best_layer in activations["chat_benign"]:
+        conditions["Chat Benign"] = activations["chat_benign"][best_layer] @ w
+    if best_layer in activations.get(agent_harmful_key, {}):
+        conditions["Agent Harmful"] = activations[agent_harmful_key][best_layer] @ w
+    if best_layer in activations.get(agent_benign_key, {}):
+        conditions["Agent Benign"] = activations[agent_benign_key][best_layer] @ w
+
+    if conditions:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+        colors = ['#d62728', '#2ca02c', '#ff7f0e', '#1f77b4']
+        for i, (label, projs) in enumerate(conditions.items()):
+            sns.kdeplot(projs, ax=ax, label=label, color=colors[i % 4], fill=True, alpha=0.3)
+            ax.axvline(projs.mean(), color=colors[i % 4], linestyle='--', alpha=0.7)
+
+        ax.set_xlabel('Projection onto w_agent')
+        ax.set_ylabel('Density')
+        ax.set_title(f'Projection Distributions on Agent Direction (Layer {best_layer})')
+        ax.legend()
+        ax.grid(alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(fig_dir / "projection_distributions_w_agent.png", dpi=150, bbox_inches='tight')
+        plt.close(fig)
+        print(f"  Saved: {fig_dir}/projection_distributions_w_agent.png")
+
+
+def run_agent_intervention(
+    model,
+    tokenizer,
+    dataset: List[Dict],
+    w_agent: np.ndarray,
+    best_layer: int,
+    n_samples: int = 5,
+    output_dir: str = "results",
+):
+    """
+    Run intervention using w_agent instead of d_chat.
+
+    Applies w_agent at the layer where it was extracted,
+    NOT at all layers (since w_agent is layer-specific).
+    """
+    from src.intervention import ActivationIntervention, compute_intervention_success_rate
+
+    print("\n" + "=" * 60)
+    print(f"INTERVENTION WITH w_agent (Layer {best_layer})")
+    print("=" * 60)
+
+    # Get agent harmful prompts
+    agent_entries = [d for d in dataset if d.get("variant") in ("agent_harmful", "agent_full_harmful")]
+    agent_entries = agent_entries[:n_samples]
+
+    if not agent_entries:
+        print("  No agent harmful entries found. Skipping.")
+        return
+
+    # Format prompts
+    from src.model_loader import format_agent_prompt
+    prompts = []
+    for entry in agent_entries:
+        sys_prompt = entry.get("system_prompt") or None
+        prompt = format_agent_prompt(tokenizer, entry["base_prompt"], system_message=sys_prompt)
+        prompts.append(prompt)
+
+    # Run intervention with w_agent at its specific layer only
+    intervention = ActivationIntervention(model, tokenizer)
+    alphas = [0.5, 1.0, 2.0, 3.0, 5.0, 8.0, 10.0]
+
+    print(f"\n  Testing {len(prompts)} prompts with alphas: {alphas}")
+    print(f"  Direction: w_agent (layer {best_layer})")
+    print()
+
+    for alpha in alphas:
+        print(f"\n  --- Alpha = {alpha} ---")
+        results = intervention.batch_intervene(
+            prompts=prompts,
+            refusal_direction=w_agent,
+            layer_idx=best_layer,
+            alpha=alpha,
+            max_new_tokens=100,
+            apply_all_layers=False,  # Only at the layer where w_agent was trained
+        )
+
+        stats = compute_intervention_success_rate(results)
+        print(f"  Success rate: {stats['success_rate']:.1%} "
+              f"({stats['refused_after_intervention']}/{stats['complied_before_intervention']} "
+              f"restored, {stats['already_refusing']} already refusing)")
+
+    print("\n" + "=" * 60)
+
+
 def _load_dataset_for_experiment(args) -> List[Dict]:
     """
     Load dataset based on --dataset flag.
@@ -567,7 +827,7 @@ def _load_dataset_for_experiment(args) -> List[Dict]:
             })
 
         variants = Counter(d["variant"] for d in dataset)
-        print(f"  Source: dataset_full.jsonl (paired)")
+        print(f"  Source: dataset_full.jsonl (paired, 168 entries)")
         print(f"  Total entries: {len(dataset)}")
         for v, c in sorted(variants.items()):
             print(f"    {v}: {c}")
@@ -685,7 +945,28 @@ def main():
         )
         results.update(intervention_results)
 
-    # 7. Generate visualizations
+    # 7. Agent-specific direction analysis
+    agent_dir_results = run_agent_direction_analysis(
+        activations=activations,
+        layers=layers,
+        refusal_directions=results["refusal_directions"],
+        output_dir=args.output_dir,
+    )
+    results["agent_direction"] = agent_dir_results
+
+    # 7b. Intervention with w_agent (if intervention not skipped)
+    if not args.skip_intervention and agent_dir_results.get("best_w_agent") is not None:
+        run_agent_intervention(
+            model=model,
+            tokenizer=tokenizer,
+            dataset=dataset,
+            w_agent=agent_dir_results["best_w_agent"],
+            best_layer=agent_dir_results["best_layer"],
+            n_samples=min(5, args.n_samples),
+            output_dir=args.output_dir,
+        )
+
+    # 8. Generate visualizations
     generate_all_figures(results, output_dir=f"{args.output_dir}/figures")
 
     # 8. Save results
