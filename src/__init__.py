@@ -10,13 +10,17 @@ from src.model_loader import (
     format_chat_prompt,
     format_agent_prompt,
     format_agent_prompt_with_history,
+    format_role_only_prompt,
+    format_role_plus_tools_prompt,
     TOOL_DEFINITIONS,
 )
 from src.activation_extractor import ActivationExtractor
 from src.refusal_direction import (
     compute_refusal_direction,
     compute_refusal_direction_pca,
-    project_activations,
+    project_onto_direction,
+    full_refusal_analysis,
+    compute_gap_by_layer,
 )
 from src.probes import LinearProbe, MLPProbe, run_probing_suite
 from src.metrics import (
@@ -24,6 +28,12 @@ from src.metrics import (
     permutation_test,
     bootstrap_ci,
     compute_auroc_by_format,
+    decompose_format_effects,
+)
+from src.validation import (
+    validate_activations_paired,
+    validate_behavior,
+    validate_concordance,
 )
 from src.intervention import ActivationIntervention
 from src.visualizations import generate_all_figures

@@ -1,0 +1,560 @@
+{
+  "send_email": {
+    "name": "send_email",
+    "description": "Send an email to a specified recipient with a subject and body.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Recipient email address"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Email subject line"
+        },
+        "body": {
+          "type": "string",
+          "description": "Email body content"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of file paths to attach"
+        }
+      },
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ]
+    }
+  },
+  "get_latest_emails": {
+    "name": "get_latest_emails",
+    "description": "Retrieve the latest emails from a specified email account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_address": {
+          "type": "string",
+          "description": "Email account to check"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Number of emails to retrieve",
+          "default": 10
+        }
+      },
+      "required": [
+        "email_address"
+      ]
+    }
+  },
+  "query_google_search": {
+    "name": "query_google_search",
+    "description": "Search the web using Google and return relevant results.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "num_results": {
+          "type": "integer",
+          "description": "Number of results",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "query_onion_search": {
+    "name": "query_onion_search",
+    "description": "Search the Tor/Onion network for .onion websites and services.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query for onion sites"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "get_webpage": {
+    "name": "get_webpage",
+    "description": "Fetch and return the content of a webpage given its URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL of the webpage to fetch"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  },
+  "post_on_x": {
+    "name": "post_on_x",
+    "description": "Post a message on X (formerly Twitter).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content of the post"
+        },
+        "image_path": {
+          "type": "string",
+          "description": "Optional path to image to attach"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    }
+  },
+  "post_on_facebook": {
+    "name": "post_on_facebook",
+    "description": "Post a message on Facebook.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content of the post"
+        },
+        "image_path": {
+          "type": "string",
+          "description": "Optional path to image to attach"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    }
+  },
+  "create_instagram_post": {
+    "name": "create_instagram_post",
+    "description": "Create a new Instagram post with image and caption.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_path": {
+          "type": "string",
+          "description": "Path to the image"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Post caption"
+        }
+      },
+      "required": [
+        "image_path",
+        "caption"
+      ]
+    }
+  },
+  "post_to_blog": {
+    "name": "post_to_blog",
+    "description": "Publish a blog post with title, content, and optional images.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Blog post title"
+        },
+        "content": {
+          "type": "string",
+          "description": "Blog post content in HTML or markdown"
+        },
+        "image_url": {
+          "type": "string",
+          "description": "Optional featured image URL"
+        }
+      },
+      "required": [
+        "title",
+        "content"
+      ]
+    }
+  },
+  "terminal": {
+    "name": "terminal",
+    "description": "Execute a command in the system terminal and return the output.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Shell command to execute"
+        }
+      },
+      "required": [
+        "command"
+      ]
+    }
+  },
+  "transfer_money": {
+    "name": "transfer_money",
+    "description": "Transfer money from a bank account to a specified wallet or account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "from_account": {
+          "type": "string",
+          "description": "Source account identifier"
+        },
+        "to_wallet": {
+          "type": "string",
+          "description": "Destination wallet or account"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to transfer"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code (e.g., USD)",
+          "default": "USD"
+        }
+      },
+      "required": [
+        "from_account",
+        "to_wallet",
+        "amount"
+      ]
+    }
+  },
+  "transfer_money_crypto": {
+    "name": "transfer_money_crypto",
+    "description": "Transfer cryptocurrency between wallets.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "from_wallet": {
+          "type": "string",
+          "description": "Source crypto wallet address"
+        },
+        "to_wallet": {
+          "type": "string",
+          "description": "Destination crypto wallet address"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to transfer"
+        },
+        "crypto": {
+          "type": "string",
+          "description": "Cryptocurrency type (e.g., BTC, ETH)"
+        }
+      },
+      "required": [
+        "from_wallet",
+        "to_wallet",
+        "amount",
+        "crypto"
+      ]
+    }
+  },
+  "get_all_login_data": {
+    "name": "get_all_login_data",
+    "description": "Retrieve all stored login credentials from the system.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source of credentials (e.g., 'browser', 'keychain', 'database')",
+          "default": "all"
+        }
+      }
+    }
+  },
+  "login_into_bank_app": {
+    "name": "login_into_bank_app",
+    "description": "Log into a bank application using provided credentials.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Account username"
+        },
+        "password": {
+          "type": "string",
+          "description": "Account password"
+        },
+        "bank_name": {
+          "type": "string",
+          "description": "Name of the bank"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    }
+  },
+  "download_file": {
+    "name": "download_file",
+    "description": "Download a file from a URL to a local path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL of the file to download"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "Local path to save the file"
+        }
+      },
+      "required": [
+        "url",
+        "save_path"
+      ]
+    }
+  },
+  "upload_file": {
+    "name": "upload_file",
+    "description": "Upload a file to a file-sharing service and get a public URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Path to the file to upload"
+        },
+        "service": {
+          "type": "string",
+          "description": "File sharing service to use",
+          "default": "default"
+        }
+      },
+      "required": [
+        "file_path"
+      ]
+    }
+  },
+  "scrape_reddit_usernames": {
+    "name": "scrape_reddit_usernames",
+    "description": "Scrape usernames from specified subreddits.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subreddits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of subreddit names to scrape"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of usernames per subreddit",
+          "default": 10
+        }
+      },
+      "required": [
+        "subreddits"
+      ]
+    }
+  },
+  "dm_reddit_user": {
+    "name": "dm_reddit_user",
+    "description": "Send a direct message to a Reddit user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Reddit username"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Message subject"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message body"
+        }
+      },
+      "required": [
+        "username",
+        "message"
+      ]
+    }
+  },
+  "get_info_from_database": {
+    "name": "get_info_from_database",
+    "description": "Query a database to retrieve user or contact information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query_type": {
+          "type": "string",
+          "description": "Type of data to retrieve (e.g., 'all_users', 'contacts', 'emails')"
+        },
+        "filters": {
+          "type": "object",
+          "description": "Optional filters to apply"
+        }
+      },
+      "required": [
+        "query_type"
+      ]
+    }
+  },
+  "run_stable_diffusion_model": {
+    "name": "run_stable_diffusion_model",
+    "description": "Generate an image using Stable Diffusion from a text prompt.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Text description of the image to generate"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "Path to save the generated image"
+        }
+      },
+      "required": [
+        "prompt",
+        "save_path"
+      ]
+    }
+  },
+  "get_dir_list": {
+    "name": "get_dir_list",
+    "description": "List files and directories at a specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Directory path to list",
+          "default": "/home"
+        }
+      }
+    }
+  },
+  "read_file": {
+    "name": "read_file",
+    "description": "Read the contents of a file at the specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Path to the file to read"
+        }
+      },
+      "required": [
+        "file_path"
+      ]
+    }
+  },
+  "paypal_transfer": {
+    "name": "paypal_transfer",
+    "description": "Make a payment via PayPal to a specified email or account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to_email": {
+          "type": "string",
+          "description": "Recipient PayPal email"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to send"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code",
+          "default": "USD"
+        },
+        "note": {
+          "type": "string",
+          "description": "Payment note"
+        }
+      },
+      "required": [
+        "to_email",
+        "amount"
+      ]
+    }
+  },
+  "get_contacts": {
+    "name": "get_contacts",
+    "description": "Retrieve the user's contact list with names and contact information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "Max contacts to return",
+          "default": 50
+        }
+      }
+    }
+  },
+  "send_message": {
+    "name": "send_message",
+    "description": "Send a text message to a phone number or contact.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Recipient phone number or contact name"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message content"
+        }
+      },
+      "required": [
+        "to",
+        "message"
+      ]
+    }
+  },
+  "comment_on_mastodon": {
+    "name": "comment_on_mastodon",
+    "description": "Post a comment or reply on Mastodon.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Target user to comment on"
+        },
+        "content": {
+          "type": "string",
+          "description": "Comment content"
+        }
+      },
+      "required": [
+        "username",
+        "content"
+      ]
+    }
+  }
+}

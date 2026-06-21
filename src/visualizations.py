@@ -353,6 +353,102 @@ def plot_cosine_similarity_heatmap(
     save_fig(fig, "cosine_probe_vs_refusal", output_dir)
 
 
+def plot_decomposition_waterfall(
+    decomposition: Dict,
+    layer_idx: int,
+    output_dir: str = "results/figures",
+):
+    """
+    Waterfall chart showing how refusal projection drops across conditions.
+
+    Shows: chat → role_only → role_plus_tools → agent_full
+    with bars indicating how much each factor contributes to the total drop.
+
+    Args:
+        decomposition: Output of decompose_format_effects() containing
+                       per-effect delta_p, ci_lower, ci_upper.
+        layer_idx: Layer index for labeling.
+        output_dir: Where to save.
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    # --- Left: Waterfall (absolute projection means) ---
+    conditions = ["chat", "role_only", "role_plus_tools", "agent_full"]
+    condition_labels = ["Chat\n(baseline)", "Role Only\n(+agent role)",
+                        "Role+Tools\n(+tool defs)", "Agent Full\n(+JSON format)"]
+
+    means = [
+        decomposition["total_effect"]["mean_a"],  # chat mean
+        decomposition["role_effect"]["mean_b"],    # role_only mean
+        decomposition["tools_effect"]["mean_b"],   # role_plus_tools mean
+        decomposition["json_format_effect"]["mean_b"],  # agent_full mean
+    ]
+
+    colors_bar = ["#2ecc71", "#f39c12", "#e67e22", "#e74c3c"]
+    bars = ax1.bar(range(4), means, color=colors_bar, alpha=0.8, edgecolor="black", linewidth=0.5)
+
+    # Connect bars with arrows showing the drop
+    for i in range(3):
+        drop = means[i] - means[i + 1]
+        mid_x = i + 0.5
+        mid_y = (means[i] + means[i + 1]) / 2
+        ax1.annotate(
+            f"Δ={drop:.3f}",
+            xy=(mid_x, mid_y),
+            fontsize=9,
+            ha="center",
+            color="#c0392b" if drop > 0 else "#2980b9",
+            fontweight="bold",
+        )
+        ax1.plot([i + 0.4, i + 0.6], [means[i], means[i + 1]],
+                 color="#7f8c8d", linewidth=1.5, linestyle="--")
+
+    ax1.set_xticks(range(4))
+    ax1.set_xticklabels(condition_labels, fontsize=10)
+    ax1.set_ylabel("Mean Projection onto Refusal Direction", fontsize=11)
+    ax1.set_title(f"Refusal Activation by Condition (Layer {layer_idx})", fontsize=13)
+    ax1.grid(axis="y", alpha=0.3)
+
+    # --- Right: Effect size bars ---
+    effects = ["role_effect", "tools_effect", "json_format_effect"]
+    effect_labels = ["Role\n(chat→role_only)", "Tools\n(role_only→role+tools)",
+                     "JSON Format\n(role+tools→agent_full)"]
+    deltas = [decomposition[e]["delta_p"] for e in effects]
+    ci_lowers = [decomposition[e]["ci_lower"] for e in effects]
+    ci_uppers = [decomposition[e]["ci_upper"] for e in effects]
+    p_values = [decomposition[e]["p_value"] for e in effects]
+
+    # Error bars
+    errors = [[d - cl for d, cl in zip(deltas, ci_lowers)],
+              [cu - d for d, cu in zip(deltas, ci_uppers)]]
+
+    bar_colors = ["#f39c12" if p < 0.05 else "#bdc3c7" for p in p_values]
+    bars2 = ax2.bar(range(3), deltas, color=bar_colors, alpha=0.8,
+                    edgecolor="black", linewidth=0.5, yerr=errors, capsize=5)
+
+    # Add significance stars
+    for i, p in enumerate(p_values):
+        star = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else "ns"
+        ax2.text(i, deltas[i] + errors[1][i] + 0.01, star,
+                 ha="center", fontsize=11, color="#c0392b" if p < 0.05 else "#7f8c8d")
+
+    ax2.set_xticks(range(3))
+    ax2.set_xticklabels(effect_labels, fontsize=10)
+    ax2.set_ylabel("ΔP (drop in refusal projection)", fontsize=11)
+    ax2.set_title("Effect Decomposition\n(orange = p<0.05, gray = ns)", fontsize=13)
+    ax2.axhline(0, color="black", linewidth=0.5)
+    ax2.grid(axis="y", alpha=0.3)
+
+    # Add total effect annotation
+    total = decomposition["total_effect"]["delta_p"]
+    ax2.axhline(total, color="#e74c3c", linewidth=1, linestyle=":", alpha=0.7)
+    ax2.text(2.5, total, f"Total ΔP={total:.3f}", fontsize=9,
+             color="#e74c3c", ha="right", va="bottom")
+
+    plt.tight_layout()
+    save_fig(fig, "decomposition_waterfall", output_dir)
+
+
 def generate_all_figures(results: Dict, output_dir: str = "results/figures"):
     """
     Generate all figures from experiment results.
@@ -410,5 +506,15 @@ def generate_all_figures(results: Dict, output_dir: str = "results/figures"):
         plot_cosine_similarity_heatmap(
             results["cosines_by_layer"], output_dir=output_dir
         )
+
+    # 8. Decomposition waterfall (if decompose mode was used)
+    if "decomposition" in results and results["decomposition"]:
+        decomp = results["decomposition"]
+        if "best_layer" in decomp and decomp["best_layer"]:
+            plot_decomposition_waterfall(
+                decomp["best_layer"],
+                results.get("best_layer", 0),
+                output_dir=output_dir,
+            )
 
     print(f"\nAll figures saved to {output_dir}/")

@@ -31,6 +31,8 @@ from src.model_loader import (
     format_chat_prompt,
     format_agent_prompt,
     format_agent_prompt_with_history,
+    format_role_only_prompt,
+    format_role_plus_tools_prompt,
     get_model_info,
     TOOL_DEFINITIONS,
 )
@@ -38,7 +40,7 @@ from src.activation_extractor import ActivationExtractor
 from src.refusal_direction import (
     compute_refusal_direction,
     compute_refusal_direction_pca,
-    project_activations,
+    project_onto_direction,
     compute_gap_by_layer,
 )
 from src.probes import run_probing_suite, compare_probe_vs_direction, print_probing_summary
@@ -50,13 +52,16 @@ from src.metrics import (
     behavior_activation_concordance,
     cross_tool_analysis,
     print_full_report,
+    decompose_format_effects,
 )
+from src.validation import validate_activations_paired
 from src.intervention import (
     ActivationIntervention,
     compute_intervention_success_rate,
 )
 from src.visualizations import generate_all_figures
-from data.build_dataset import build_dataset, HARMFUL_PROMPTS, BENIGN_PROMPTS
+from data.loader import load_custom_dataset, load_harmagent_dataset, DatasetEntry
+from data.build_dataset import build_dataset, HARMFUL_PROMPTS
 
 
 def parse_args():
@@ -66,6 +71,15 @@ def parse_args():
         type=str,
         default="mistralai/Mistral-7B-Instruct-v0.3",
         help="HuggingFace model identifier",
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="custom",
+        choices=["custom", "harmagent", "both"],
+        help="Dataset source: 'custom' (paired, for activation analysis), "
+             "'harmagent' (benchmark, for behavioral validation), "
+             "'both' (run both pipelines)",
     )
     parser.add_argument(
         "--no-quantize",
@@ -106,6 +120,12 @@ def parse_args():
         help="Also test agent format with tool-use history",
     )
     parser.add_argument(
+        "--decompose",
+        action="store_true",
+        help="Run decomposition analysis with 4 intermediate conditions "
+             "(chat → role_only → role_plus_tools → agent_full)",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=42,
@@ -120,25 +140,23 @@ def extract_all_activations(
     dataset: List[Dict],
     layers: List[int],
     include_history: bool = False,
+    decompose: bool = False,
 ) -> Dict[str, Dict[int, np.ndarray]]:
     """
     Extract activations for all dataset entries.
     
     Returns:
-        Dict with keys 'chat_harmful', 'agent_harmful', 'chat_benign', 'agent_benign'
+        Dict with keys like 'chat_harmful', 'agent_harmful', etc.
+        In decompose mode also includes 'role_only_harmful', 'role_plus_tools_harmful', etc.
         Each value is a dict mapping layer_idx -> (n_samples, hidden_dim)
     """
     print("\n" + "=" * 60)
     print("EXTRACTING ACTIVATIONS")
     print("=" * 60)
 
-    # Group by variant
-    variants = {
-        "chat_harmful": [d for d in dataset if d["variant"] == "chat_harmful"],
-        "agent_harmful": [d for d in dataset if d["variant"] == "agent_harmful"],
-        "chat_benign": [d for d in dataset if d["variant"] == "chat_benign"],
-        "agent_benign": [d for d in dataset if d["variant"] == "agent_benign"],
-    }
+    # Determine variants present in dataset
+    variant_names = sorted(set(d["variant"] for d in dataset))
+    variants = {v: [d for d in dataset if d["variant"] == v] for v in variant_names}
 
     all_activations = {}
 
@@ -147,15 +165,30 @@ def extract_all_activations(
         prompts = []
 
         for entry in entries:
-            if entry["format"] == "chat":
+            fmt = entry["format"]
+            if fmt == "chat":
                 prompt = format_chat_prompt(tokenizer, entry["base_prompt"])
-            elif entry["format"] == "agent":
+            elif fmt == "role_only":
+                prompt = format_role_only_prompt(tokenizer, entry["base_prompt"])
+            elif fmt == "role_plus_tools":
+                prompt = format_role_plus_tools_prompt(tokenizer, entry["base_prompt"])
+            elif fmt == "agent_full":
                 if include_history:
                     prompt = format_agent_prompt_with_history(
                         tokenizer, entry["base_prompt"]
                     )
                 else:
                     prompt = format_agent_prompt(tokenizer, entry["base_prompt"])
+            elif fmt == "agent":
+                # Backward compatibility for old datasets
+                if include_history:
+                    prompt = format_agent_prompt_with_history(
+                        tokenizer, entry["base_prompt"]
+                    )
+                else:
+                    prompt = format_agent_prompt(tokenizer, entry["base_prompt"])
+            else:
+                prompt = format_chat_prompt(tokenizer, entry["base_prompt"])
             prompts.append(prompt)
 
         # Extract activations for all prompts in this variant
@@ -196,6 +229,10 @@ def run_main_analysis(
 
     results = {}
 
+    # Resolve variant names (backward compat: agent_harmful or agent_full_harmful)
+    agent_harmful_key = "agent_harmful" if "agent_harmful" in activations else "agent_full_harmful"
+    agent_benign_key = "agent_benign" if "agent_benign" in activations else "agent_full_benign"
+
     # Compute refusal direction at each layer
     refusal_directions = {}
     for layer in layers:
@@ -213,19 +250,20 @@ def run_main_analysis(
     projections = {}
     for layer in layers:
         projections[layer] = {}
-        for variant in ["chat_harmful", "agent_harmful", "chat_benign", "agent_benign"]:
-            proj = project_activations(
-                activations[variant][layer],
-                refusal_directions[layer],
-            )
-            projections[layer][variant] = proj
+        for variant in activations.keys():
+            if layer in activations[variant]:
+                proj = project_onto_direction(
+                    activations[variant][layer],
+                    refusal_directions[layer],
+                )
+                projections[layer][variant] = proj
 
     results["projections_by_layer"] = projections
 
-    # Compute gap at each layer
+    # Compute gap at each layer (chat vs agent_full)
     gaps = compute_gap_by_layer(
         chat_harmful={l: activations["chat_harmful"][l] for l in layers},
-        agent_harmful={l: activations["agent_harmful"][l] for l in layers},
+        agent_harmful={l: activations[agent_harmful_key][l] for l in layers},
         refusal_directions=refusal_directions,
     )
     results["gaps_by_layer"] = gaps
@@ -242,7 +280,8 @@ def run_main_analysis(
     print("=" * 60)
 
     proj_chat = projections[best_layer]["chat_harmful"]
-    proj_agent = projections[best_layer]["agent_harmful"]
+    proj_agent = projections[best_layer].get("agent_harmful",
+                 projections[best_layer].get("agent_full_harmful"))
 
     # Paired t-test
     ttest_result = paired_ttest(proj_chat, proj_agent)
@@ -403,6 +442,164 @@ def save_results(results: Dict, output_dir: str):
     print(f"\nResults saved to {output_dir}/results.json")
 
 
+def run_decomposition_analysis(
+    activations: Dict[str, Dict[int, np.ndarray]],
+    layers: List[int],
+    main_results: Dict,
+) -> Dict:
+    """
+    Run decomposition analysis: break down the total format effect
+    into role, tools, and JSON format components.
+
+    Requires all 4 conditions: chat, role_only, role_plus_tools, agent_full.
+    """
+    print("\n" + "=" * 60)
+    print("DECOMPOSITION ANALYSIS")
+    print("=" * 60)
+
+    refusal_directions = main_results["refusal_directions"]
+    best_layer = main_results["best_layer"]
+
+    # Project all 4 conditions onto refusal direction at best layer
+    conditions_order = ["chat_harmful", "role_only_harmful",
+                        "role_plus_tools_harmful", "agent_full_harmful"]
+
+    # Verify all conditions exist
+    missing = [c for c in conditions_order if c not in activations]
+    if missing:
+        print(f"  WARNING: Missing conditions: {missing}")
+        print(f"  Available: {list(activations.keys())}")
+        return {}
+
+    direction = refusal_directions[best_layer]
+
+    from src.refusal_direction import project_onto_direction
+
+    projections = {}
+    for cond in conditions_order:
+        projections[cond] = project_onto_direction(
+            activations[cond][best_layer], direction
+        )
+
+    # Decompose effects
+    decomp = decompose_format_effects(projections)
+
+    # Print results
+    print(f"\n  Layer: {best_layer}")
+    print(f"\n  Mean projections:")
+    for cond in conditions_order:
+        print(f"    {cond:<30} = {projections[cond].mean():.4f} (±{projections[cond].std():.4f})")
+
+    print(f"\n  Effect decomposition:")
+    print(f"    {'Effect':<25} {'ΔP':<10} {'p-value':<12} {'Cohen d':<10} {'Sig?'}")
+    print(f"    {'-'*67}")
+    for effect_name in ["role_effect", "tools_effect", "json_format_effect", "total_effect"]:
+        e = decomp[effect_name]
+        sig = "✓" if e["significant"] else "✗"
+        print(f"    {effect_name:<25} {e['delta_p']:<10.4f} {e['p_value']:<12.6f} "
+              f"{e['cohens_d']:<10.3f} {sig}")
+
+    # Verify additivity
+    sum_parts = (decomp["role_effect"]["delta_p"] +
+                 decomp["tools_effect"]["delta_p"] +
+                 decomp["json_format_effect"]["delta_p"])
+    total = decomp["total_effect"]["delta_p"]
+    print(f"\n  Additivity check:")
+    print(f"    Sum of parts: {sum_parts:.4f}")
+    print(f"    Total effect: {total:.4f}")
+    print(f"    Residual:     {total - sum_parts:.6f}")
+
+    # Per-layer decomposition
+    decomp_by_layer = {}
+    for layer in layers:
+        if layer not in refusal_directions:
+            continue
+        d = refusal_directions[layer]
+        layer_projs = {}
+        for cond in conditions_order:
+            if cond in activations and layer in activations[cond]:
+                layer_projs[cond] = project_onto_direction(
+                    activations[cond][layer], d
+                )
+        if len(layer_projs) == 4:
+            decomp_by_layer[layer] = decompose_format_effects(layer_projs)
+
+    return {
+        "best_layer": decomp,
+        "by_layer": decomp_by_layer,
+        "projections_best_layer": {k: v.tolist() for k, v in projections.items()},
+    }
+
+
+def _load_dataset_for_experiment(args) -> List[Dict]:
+    """
+    Load dataset based on --dataset flag.
+
+    - 'custom': Loads dataset_full.jsonl (paired prompts for activation analysis).
+    - 'harmagent': Loads HarmAgent test behaviors (for behavioral validation).
+    - 'both': Loads custom as primary, HarmAgent for supplementary validation.
+
+    Returns list of dicts compatible with extract_all_activations().
+    """
+    from collections import Counter
+
+    if args.dataset in ("custom", "both"):
+        # Load custom paired dataset
+        custom_entries = load_custom_dataset()
+        dataset = []
+        for entry in custom_entries:
+            dataset.append({
+                "id": entry.id,
+                "base_prompt": entry.prompt,
+                "category": entry.category,
+                "is_harmful": entry.is_harmful,
+                "tool": entry.tools[0] if entry.tools else None,
+                "format": "agent_full" if entry.format == "agent" else entry.format,
+                "variant": entry.variant.replace("agent_harmful", "agent_full_harmful")
+                           .replace("agent_benign", "agent_full_benign")
+                           if args.decompose else entry.variant,
+                "pair_id": entry.pair_id,
+                "system_prompt": entry.system_prompt,
+                "tools": entry.tools,
+                "tool_definitions": entry.tool_definitions,
+            })
+
+        variants = Counter(d["variant"] for d in dataset)
+        print(f"  Source: dataset_full.jsonl (paired)")
+        print(f"  Total entries: {len(dataset)}")
+        for v, c in sorted(variants.items()):
+            print(f"    {v}: {c}")
+
+    elif args.dataset == "harmagent":
+        # Load HarmAgent as primary (behavioral validation mode)
+        ha_entries = load_harmagent_dataset(split="test", condition="both")
+        dataset = []
+        for entry in ha_entries:
+            fmt = "agent_full" if entry.condition == "agent" else "chat"
+            variant_suffix = "harmful" if entry.is_harmful else "benign"
+            variant = f"{fmt}_{variant_suffix}" if fmt == "agent_full" else f"chat_{variant_suffix}"
+
+            dataset.append({
+                "id": entry.id,
+                "base_prompt": entry.prompt,
+                "category": entry.category,
+                "is_harmful": entry.is_harmful,
+                "tool": None,
+                "format": fmt,
+                "variant": variant,
+                "pair_id": entry.id_original,
+            })
+
+        variants = Counter(d["variant"] for d in dataset)
+        print(f"  Source: HarmAgent test (behavioral)")
+        print(f"  Total entries: {len(dataset)}")
+        for v, c in sorted(variants.items()):
+            print(f"    {v}: {c}")
+        print(f"  NOTE: HarmAgent prompts are NOT paired — activation gap analysis is approximate.")
+
+    return dataset
+
+
 def main():
     args = parse_args()
     np.random.seed(args.seed)
@@ -411,8 +608,10 @@ def main():
     print("AGENTIC SAFETY PROBE EXPERIMENT")
     print("=" * 60)
     print(f"Model: {args.model}")
+    print(f"Dataset: {args.dataset}")
     print(f"Quantize: {not args.no_quantize}")
     print(f"Samples per category: {args.n_samples}")
+    print(f"Decompose: {args.decompose}")
     print(f"Output: {args.output_dir}")
     print("=" * 60)
 
@@ -436,15 +635,12 @@ def main():
 
     print(f"\nAnalyzing layers: {layers}")
 
-    # 2. Build dataset
+    # 2. Load dataset
     print("\n" + "=" * 60)
-    print("BUILDING DATASET")
+    print("LOADING DATASET")
     print("=" * 60)
-    dataset = build_dataset(
-        output_path=f"{args.output_dir}/dataset.jsonl",
-        n_harmful_per_category=args.n_samples,
-        n_benign_per_category=args.n_samples,
-    )
+
+    dataset = _load_dataset_for_experiment(args)
 
     # 3. Extract activations
     extractor = ActivationExtractor(model, tokenizer)
@@ -454,12 +650,19 @@ def main():
         dataset=dataset,
         layers=layers,
         include_history=args.include_history,
+        decompose=args.decompose,
     )
 
     # 4. Main analysis (refusal direction + stats)
     results = run_main_analysis(activations, layers)
     results["model_info"] = model_info
     results["layers_analyzed"] = layers
+    results["decompose"] = args.decompose
+
+    # 4b. Decomposition analysis (if enabled)
+    if args.decompose:
+        decomp_results = run_decomposition_analysis(activations, layers, results)
+        results["decomposition"] = decomp_results
 
     # 5. Probing classifiers
     if not args.skip_probes:

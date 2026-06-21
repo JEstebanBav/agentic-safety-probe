@@ -367,3 +367,120 @@ def print_full_report(
         print("The refusal direction appears to activate similarly in both formats.")
         print("→ If model still complies in agent format, the problem is DOWNSTREAM.")
     print("=" * 70)
+
+
+def _compute_single_effect(
+    proj_a: np.ndarray,
+    proj_b: np.ndarray,
+    n_permutations: int = 10000,
+    seed: int = 42,
+) -> Dict:
+    """
+    Compute a single pairwise effect with statistical tests.
+
+    Args:
+        proj_a: Projections for condition A (higher expected).
+        proj_b: Projections for condition B (lower expected).
+        n_permutations: Permutation count.
+        seed: Random seed.
+
+    Returns:
+        Dict with delta_p, p_value, cohens_d, ci_lower, ci_upper, mean_a, mean_b.
+    """
+    rng = np.random.default_rng(seed)
+
+    delta_p = float(proj_a.mean() - proj_b.mean())
+    mean_a = float(proj_a.mean())
+    mean_b = float(proj_b.mean())
+
+    # Permutation test (two-sided)
+    combined = np.concatenate([proj_a, proj_b])
+    n_a = len(proj_a)
+
+    null_diffs = np.empty(n_permutations)
+    for i in range(n_permutations):
+        perm = rng.permutation(combined)
+        null_diffs[i] = perm[:n_a].mean() - perm[n_a:].mean()
+
+    p_value = float((np.abs(null_diffs) >= np.abs(delta_p)).mean())
+
+    # Cohen's d
+    pooled_std = np.sqrt(
+        (proj_a.std(ddof=1) ** 2 + proj_b.std(ddof=1) ** 2) / 2
+    )
+    cohens_d = delta_p / pooled_std if pooled_std > 1e-10 else 0.0
+
+    # Bootstrap CI for the difference
+    n_boot = 1000
+    boot_diffs = np.empty(n_boot)
+    for i in range(n_boot):
+        idx_a = rng.integers(0, len(proj_a), size=len(proj_a))
+        idx_b = rng.integers(0, len(proj_b), size=len(proj_b))
+        boot_diffs[i] = proj_a[idx_a].mean() - proj_b[idx_b].mean()
+
+    ci_lower = float(np.percentile(boot_diffs, 2.5))
+    ci_upper = float(np.percentile(boot_diffs, 97.5))
+
+    return {
+        "delta_p": delta_p,
+        "mean_a": mean_a,
+        "mean_b": mean_b,
+        "p_value": p_value,
+        "cohens_d": float(cohens_d),
+        "ci_lower": ci_lower,
+        "ci_upper": ci_upper,
+        "significant": bool(p_value < 0.05),
+    }
+
+
+def decompose_format_effects(
+    projections: Dict[str, np.ndarray],
+    n_permutations: int = 10000,
+    seed: int = 42,
+) -> Dict[str, Dict]:
+    """
+    Decompose the total format effect into 3 components.
+
+    Requires projections for all 4 conditions:
+    - chat_harmful
+    - role_only_harmful
+    - role_plus_tools_harmful
+    - agent_full_harmful
+
+    Computes:
+    - role_effect = mean(chat) - mean(role_only)
+    - tools_effect = mean(role_only) - mean(role_plus_tools)
+    - json_format_effect = mean(role_plus_tools) - mean(agent_full)
+    - total_effect = mean(chat) - mean(agent_full)
+
+    Each effect includes: delta_p, p_value, cohens_d, ci_lower, ci_upper.
+
+    Args:
+        projections: Dict with keys 'chat_harmful', 'role_only_harmful',
+                     'role_plus_tools_harmful', 'agent_full_harmful'.
+        n_permutations: Permutations for significance tests.
+        seed: Random seed.
+
+    Returns:
+        Dict with keys 'role_effect', 'tools_effect', 'json_format_effect',
+        'total_effect', each containing statistical measures.
+    """
+    chat = projections["chat_harmful"]
+    role_only = projections["role_only_harmful"]
+    role_plus_tools = projections["role_plus_tools_harmful"]
+    agent_full = projections["agent_full_harmful"]
+
+    return {
+        "role_effect": _compute_single_effect(
+            chat, role_only, n_permutations, seed
+        ),
+        "tools_effect": _compute_single_effect(
+            role_only, role_plus_tools, n_permutations, seed + 1
+        ),
+        "json_format_effect": _compute_single_effect(
+            role_plus_tools, agent_full, n_permutations, seed + 2
+        ),
+        "total_effect": _compute_single_effect(
+            chat, agent_full, n_permutations, seed + 3
+        ),
+    }
