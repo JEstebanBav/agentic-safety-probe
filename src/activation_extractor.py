@@ -24,16 +24,32 @@ class ActivationExtractor:
         )
     """
 
-    def __init__(self, model, tokenizer):
+    def __init__(
+        self,
+        model,
+        tokenizer,
+        max_length: int = 4096,
+        strict_truncation: bool = True,
+    ):
         """
         Args:
             model: HuggingFace model with accessible hidden layers.
             tokenizer: Corresponding tokenizer.
+            max_length: Token budget per prompt.
+            strict_truncation: Raise instead of silently recording the
+                activation of a truncated prompt, whose final token is not the
+                end of the instruction.
         """
         self.model = model
         self.tokenizer = tokenizer
+        self.max_length = max_length
+        self.strict_truncation = strict_truncation
         self.hooks = []
         self.activations = {}
+        self._hooked_layers: Optional[Tuple[int, ...]] = None
+        # When set, hooks keep only this token position and copy a single
+        # hidden_dim vector to host memory instead of the whole sequence.
+        self._capture_position: Optional[int] = None
 
     def _get_layer_module(self, layer_idx: int):
         """Get the residual stream output of a specific layer."""
@@ -55,16 +71,38 @@ class ActivationExtractor:
                 hidden_states = output[0]
             else:
                 hidden_states = output
-            self.activations[layer_idx] = hidden_states.detach().cpu()
+
+            # Slice on-device before the host copy. Moving the full
+            # (1, seq_len, hidden_dim) tensor across the PCIe bus to keep one
+            # row of it dominated extraction time: at 8192 dims and a
+            # thousand-token agentic prompt that is ~16 MB per layer per
+            # prompt, of which 8 KB is used.
+            if self._capture_position is not None:
+                hidden_states = hidden_states[:, self._capture_position, :]
+
+            self.activations[layer_idx] = hidden_states.detach().to(
+                "cpu", non_blocking=True
+            )
         return hook
 
     def _register_hooks(self, layers: List[int]):
-        """Register forward hooks on specified layers."""
+        """
+        Register forward hooks on the given layers, reusing them when possible.
+
+        Hooks used to be torn down and rebuilt for every prompt. The set of
+        layers is fixed for a whole run, so the churn bought nothing.
+        """
+        key = tuple(layers)
+        if self._hooked_layers == key and self.hooks:
+            self.activations = {}
+            return
+
         self._remove_hooks()
         for layer_idx in layers:
             module = self._get_layer_module(layer_idx)
             hook = module.register_forward_hook(self._hook_fn(layer_idx))
             self.hooks.append(hook)
+        self._hooked_layers = key
 
     def _remove_hooks(self):
         """Remove all registered hooks."""
@@ -72,6 +110,18 @@ class ActivationExtractor:
             hook.remove()
         self.hooks = []
         self.activations = {}
+        self._hooked_layers = None
+
+    def close(self):
+        """Release hooks. Safe to call repeatedly."""
+        self._remove_hooks()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+        return False
 
     def extract_single(
         self,
@@ -90,37 +140,43 @@ class ActivationExtractor:
         Returns:
             Dict mapping layer_idx -> activation tensor of shape (hidden_dim,)
         """
-        self._register_hooks(layers)
-
-        # Tokenize
+        # Tokenize first: the capture position must be known before the forward
+        # pass so the hooks can slice on-device.
         inputs = self.tokenizer(
             prompt,
             return_tensors="pt",
             padding=False,
             truncation=True,
-            max_length=4096,
+            max_length=self.max_length,
         ).to(self.model.device)
 
-        # Forward pass
-        with torch.no_grad():
+        seq_len = inputs["input_ids"].shape[1]
+        pos = seq_len + position if position < 0 else min(position, seq_len - 1)
+
+        # A truncated prompt no longer ends where the instruction ends, so the
+        # "last token" would be an arbitrary interior token and the activation
+        # would not mean what the analysis assumes. Fail rather than record it.
+        if self.strict_truncation and seq_len >= self.max_length:
+            raise ValueError(
+                f"Prompt hit the {self.max_length}-token limit and was truncated; "
+                "the final-token activation is no longer the end of the "
+                "instruction. Raise max_length or shorten the prompt."
+            )
+
+        self._capture_position = pos
+        self._register_hooks(layers)
+
+        with torch.inference_mode():
             self.model(**inputs)
 
-        # Extract activations at specified position
-        result = {}
-        seq_len = inputs["input_ids"].shape[1]
+        # Hooks already reduced each layer to (1, hidden_dim).
+        result = {
+            layer_idx: self.activations[layer_idx][0].float()
+            for layer_idx in layers
+        }
 
-        # Handle negative indexing
-        if position < 0:
-            pos = seq_len + position
-        else:
-            pos = min(position, seq_len - 1)
-
-        for layer_idx in layers:
-            # activations[layer_idx] shape: (1, seq_len, hidden_dim)
-            act = self.activations[layer_idx][0, pos, :]
-            result[layer_idx] = act.float()  # Convert to float32 for analysis
-
-        self._remove_hooks()
+        self._capture_position = None
+        self.activations = {}
         return result
 
     def extract_batch(
@@ -209,6 +265,8 @@ class ActivationExtractor:
         Returns:
             Dict mapping (layer_idx, position) -> activation tensor
         """
+        # Full-sequence capture: this method needs every requested position.
+        self._capture_position = None
         self._register_hooks(layers)
 
         inputs = self.tokenizer(
@@ -216,10 +274,10 @@ class ActivationExtractor:
             return_tensors="pt",
             padding=False,
             truncation=True,
-            max_length=2048,
+            max_length=self.max_length,
         ).to(self.model.device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             self.model(**inputs)
 
         seq_len = inputs["input_ids"].shape[1]
@@ -232,5 +290,5 @@ class ActivationExtractor:
                 act = self.activations[layer_idx][0, actual_pos, :]
                 result[(layer_idx, pos)] = act.float()
 
-        self._remove_hooks()
+        self.activations = {}
         return result

@@ -35,7 +35,7 @@ class StratifiedResult:
 
 
 def run_stratified_analysis(
-    dataset: List[Dict],
+    strata: List[str],
     activations: Dict[str, Dict[int, np.ndarray]],
     refusal_direction: np.ndarray,
     layer: int,
@@ -46,7 +46,14 @@ def run_stratified_analysis(
     Run stratified projection gap analysis by subtlety level.
 
     Args:
-        dataset: Full dataset list (must have 'subtlety' field).
+        strata: Per-row subtlety label, ALIGNED with the rows of
+            activations['chat_harmful'] (and therefore with the agent arm,
+            which the extraction stage guarantees is row-aligned by pair_id).
+            This used to be re-derived by re-filtering the raw dataset, which
+            silently assumed the file's variant ordering matched the
+            activation ordering; when it did not, the routine compared one
+            prompt's chat activation against a different prompt's agent
+            activation and reported the result without complaint.
         activations: Dict of variant -> {layer -> (n, hidden_dim)}.
         refusal_direction: Direction vector for the target layer.
         layer: Layer index to analyze.
@@ -56,12 +63,12 @@ def run_stratified_analysis(
     Returns:
         List of StratifiedResult, one per subtlety level.
     """
-    # Build index mapping: for each variant, which entries have which subtlety
-    # We need to map dataset indices to activation indices
-    chat_harmful_entries = [d for d in dataset if d["variant"] in ("chat_harmful", "chat_full_harmful")]
-    agent_harmful_entries = [d for d in dataset if d["variant"] in ("agent_harmful", "agent_full_harmful")]
+    from .robust_estimation import (
+        paired_bootstrap_ci,
+        paired_permutation_test,
+        pooled_cohens_d,
+    )
 
-    # Resolve activation keys
     agent_key = "agent_harmful" if "agent_harmful" in activations else "agent_full_harmful"
 
     if "chat_harmful" not in activations or agent_key not in activations:
@@ -71,84 +78,54 @@ def run_stratified_analysis(
     chat_acts = activations["chat_harmful"][layer]  # (n, hidden_dim)
     agent_acts = activations[agent_key][layer]      # (n, hidden_dim)
 
-    # Get subtlety for each index (assuming order is preserved from dataset)
-    chat_subtleties = [e.get("subtlety", "unknown") for e in chat_harmful_entries]
-    agent_subtleties = [e.get("subtlety", "unknown") for e in agent_harmful_entries]
-
-    # Verify lengths match
-    if len(chat_subtleties) != len(chat_acts):
-        print(f"  WARNING: chat entries ({len(chat_subtleties)}) != activations ({len(chat_acts)})")
-        # Try to use min
-        n = min(len(chat_subtleties), len(chat_acts))
-        chat_subtleties = chat_subtleties[:n]
-        chat_acts = chat_acts[:n]
-
-    if len(agent_subtleties) != len(agent_acts):
-        n = min(len(agent_subtleties), len(agent_acts))
-        agent_subtleties = agent_subtleties[:n]
-        agent_acts = agent_acts[:n]
+    if len(chat_acts) != len(agent_acts):
+        raise ValueError(
+            f"chat ({len(chat_acts)}) and agent ({len(agent_acts)}) arms are not "
+            "paired row-wise; stratified DeltaP would be meaningless."
+        )
+    if len(strata) != len(chat_acts):
+        raise ValueError(
+            f"{len(strata)} stratum labels for {len(chat_acts)} activations; "
+            "the labels must be row-aligned, not merely the same multiset."
+        )
 
     # Project all onto refusal direction
     proj_chat = chat_acts @ refusal_direction
     proj_agent = agent_acts @ refusal_direction
 
-    # Stratify
-    subtlety_levels = sorted(set(chat_subtleties))
-    rng = np.random.default_rng(seed)
     results = []
-
-    for subtlety in subtlety_levels:
-        # Get indices for this subtlety
-        chat_idx = [i for i, s in enumerate(chat_subtleties) if s == subtlety]
-        agent_idx = [i for i, s in enumerate(agent_subtleties) if s == subtlety]
-
-        if not chat_idx or not agent_idx:
+    for subtlety in sorted(set(strata)):
+        idx = np.array([i for i, s in enumerate(strata) if s == subtlety])
+        if len(idx) < 2:
             continue
 
-        proj_c = proj_chat[chat_idx]
-        proj_a = proj_agent[agent_idx]
+        # One index vector: within a stratum the two conditions are the SAME
+        # prompts, so the pairing is preserved by construction.
+        proj_c, proj_a = proj_chat[idx], proj_agent[idx]
 
-        n = min(len(proj_c), len(proj_a))
-        proj_c = proj_c[:n]
-        proj_a = proj_a[:n]
-
-        # Compute gap
         delta_p = float(proj_c.mean() - proj_a.mean())
 
-        # Cohen's d
-        pooled_std = np.sqrt((proj_c.std(ddof=1)**2 + proj_a.std(ddof=1)**2) / 2)
-        cohens_d = delta_p / pooled_std if pooled_std > 1e-10 else 0.0
-
-        # Permutation test
-        combined = np.concatenate([proj_c, proj_a])
-        n_c = len(proj_c)
-        null_gaps = np.empty(n_permutations)
-        for i in range(n_permutations):
-            perm = rng.permutation(combined)
-            null_gaps[i] = perm[:n_c].mean() - perm[n_c:].mean()
-        p_value = float((np.abs(null_gaps) >= np.abs(delta_p)).mean())
-
-        # Bootstrap CI
-        n_boot = 1000
-        boot_diffs = np.empty(n_boot)
-        for i in range(n_boot):
-            idx_c = rng.integers(0, len(proj_c), size=len(proj_c))
-            idx_a = rng.integers(0, len(proj_a), size=len(proj_a))
-            boot_diffs[i] = proj_c[idx_c].mean() - proj_a[idx_a].mean()
+        # Sign-flip null (exchangeable within pair) and a paired bootstrap that
+        # resamples prompts, not conditions independently.
+        perm = paired_permutation_test(
+            proj_c, proj_a, n_permutations=n_permutations,
+            alternative="two-sided", seed=seed,
+        )
+        boot = paired_bootstrap_ci(proj_c, proj_a, n_boot=10000, seed=seed)
 
         results.append(StratifiedResult(
             subtlety=subtlety,
-            n_samples=n,
+            n_samples=len(idx),
             delta_p=delta_p,
-            cohens_d=float(cohens_d),
-            p_value=p_value,
-            ci_lower=float(np.percentile(boot_diffs, 2.5)),
-            ci_upper=float(np.percentile(boot_diffs, 97.5)),
+            cohens_d=pooled_cohens_d(proj_c, proj_a),
+            p_value=perm["p_value"],
+            ci_lower=boot["ci_lower"],
+            ci_upper=boot["ci_upper"],
             mean_chat=float(proj_c.mean()),
             mean_agent=float(proj_a.mean()),
-            std_chat=float(proj_c.std()),
-            std_agent=float(proj_a.std()),
-            significant=p_value < 0.05,
+            std_chat=float(proj_c.std(ddof=1)),
+            std_agent=float(proj_a.std(ddof=1)),
+            significant=perm["p_value"] < 0.05,
         ))
 
     return results
@@ -179,17 +156,27 @@ def print_stratified_summary(results: List[StratifiedResult], layer: int):
     else:
         print(f"  → No subtlety level shows significant effect individually")
 
-    # Check if explicit > contextual > framed
+    # Is the gap monotone in explicitness? Check the whole ordering, not just
+    # its endpoints: comparing explicit against framed and then announcing
+    # "explicit > contextual > framed" asserts an ordering the test never
+    # examined, and the middle stratum can sit anywhere.
+    order = ["explicit", "contextual", "framed"]
+    present = [s for s in order if s in {r.subtlety for r in results}]
     by_sub = {r.subtlety: r for r in results}
-    if "explicit" in by_sub and "framed" in by_sub:
-        if by_sub["explicit"].delta_p > by_sub["framed"].delta_p:
-            print(f"  → Pattern: explicit > contextual > framed (as expected)")
-            print(f"    This confirms that the global d={sum(r.cohens_d for r in results)/len(results):.3f} "
-                  f"is diluted by averaging heterogeneous effects.")
+    if len(present) >= 2:
+        deltas = [by_sub[s].delta_p for s in present]
+        if all(a >= b for a, b in zip(deltas, deltas[1:])):
+            print(f"  → Monotone in explicitness: "
+                  f"{' > '.join(present)} ({', '.join(f'{d:.3f}' for d in deltas)})")
+            print( "    The gap shrinks as harm becomes less explicit, so a pooled")
+            print( "    effect size averages heterogeneous strata.")
         else:
-            print(f"  → Unexpected: framed prompts show larger gap than explicit")
-            print(f"    The model may find professionally-framed harmful requests harder to refuse in agent mode")
+            print(f"  → NOT monotone: {', '.join(f'{s}={by_sub[s].delta_p:.3f}' for s in present)}")
+            print( "    The gap does not track explicitness in the expected order.")
 
+    print("  NOTE: DeltaP measures INTENSITY of the projection, not detection.")
+    print("        Objective 4 asks about detection capability, which is AUROC.")
+    print("        See format_effect_results.json -> by_stratum.")
     print("=" * 70)
 
 

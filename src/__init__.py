@@ -25,9 +25,32 @@ from src.refusal_direction import (
 from src.probes import (
     train_linear_probe,
     train_mlp_probe,
+    cross_validate_probe,
     run_probing_suite,
+    compare_probe_vs_direction,
+    print_probing_summary,
     ProbeResult,
     ProbingSuiteResult,
+)
+from src.robust_estimation import (
+    cross_fitted_projection_gap,
+    cross_validated_agent_direction,
+    cross_validated_monitor,
+    crossfit_condition_projections,
+    held_out_detection,
+    paired_bootstrap_ci,
+    paired_permutation_test,
+    paired_sign_test,
+    run_paired_suite,
+    select_layer_and_test,
+)
+from src.format_effect import (
+    format_effect_specificity,
+    format_effect_scale,
+    detection_by_stratum,
+    specificity_from_projections,
+    scale_from_projections,
+    stratum_detection_from_projections,
 )
 from src.metrics import (
     paired_ttest,
