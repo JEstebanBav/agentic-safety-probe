@@ -25,7 +25,7 @@ We ran the full pipeline on two models and found:
 | Cohen's d | 0.42 | Small-medium effect (global, see stratified below) |
 | AUROC (d_chat on chat) | 0.96 | Direction separates harmful/benign well in chat |
 | AUROC (d_chat on agent) | 0.96 | Direction ALSO works in agent (large model) |
-| Probe AUROC (agent) | 1.00 | Harmfulness info is perfectly separable from layer 20 |
+| Probe AUROC (agent) | 1.00 **(in-sample)** | Guaranteed at n=84 in d=8192 by Cover's theorem; **not** evidence. See [Guarding Against Overfitting](#guarding-against-overfitting) — re-run reports the cross-validated value |
 | cos(w_agent, d_chat) | ~0.4 | Direction ROTATES ~66 degrees in agent context |
 | Best layer | 60 | Effect strongest in final layers |
 
@@ -35,7 +35,7 @@ We ran the full pipeline on two models and found:
 |--------|-------|---------|
 | AUROC (d_chat on chat) | High | Direction works in chat |
 | AUROC (d_chat on agent) | ~0.5 | Direction FAILS in agent (smaller model) |
-| Probe AUROC (agent) | 1.00 | But a probe finds the info in a different direction |
+| Probe AUROC (agent) | 1.00 **(in-sample)** | Same caveat as above; report the out-of-fold value |
 | cos(w_agent, d_chat) | Low | Near-orthogonal rotation |
 
 ### The Key Insight
@@ -100,11 +100,25 @@ cos(d_chat, w_agent) = 1.0  -->  no rotation (same direction)
 
 All claims are backed by:
 
-- **Permutation test** (10,000 permutations): non-parametric, no distributional assumptions
-- **Welch's t-test**: parametric comparison
-- **Cohen's d**: standardized effect size (0.2 small, 0.5 medium, 0.8 large)
-- **Bootstrap 95% CI**: resampling-based confidence interval
-- **PCA validation**: confirms d_chat aligns with PC1 of the contrast matrix (cosine > 0.8)
+- **Sign-flip permutation test** (10,000 permutations): non-parametric, and the correct null for a paired design (labels are exchangeable *within* a pair, not across prompts)
+- **Paired t-test**, one-sided and sign-aware
+- **Cohen's d**, both paired (d_z) and pooled: they answer different questions and are reported together
+- **Paired bootstrap 95% CI** (10,000 resamples): percentile and BCa. One index vector is applied to both conditions, so a prompt's chat and agent observations travel together
+- **Exact sign test**: uses only the direction of each within-pair change, so no critique of magnitudes or of direction estimation touches it
+- **PCA validation**: checks whether d_chat is the dominant axis of the contrast matrix
+- **Benign control (difference-in-differences)**: every one of the tests above is run a second time on the benign arm, and the reported effect is the **interaction** between the two arms. A shift measured on harmful prompts alone cannot distinguish a weakened refusal representation from an agentic format that displaces *every* representation along d_chat — and the run says which of the two it is found, rather than leaving it to be inferred. Experiment F of `validate_corrections.py` builds both ground truths with the same DeltaP and shows that only the interaction separates them
+
+### Guarding Against Overfitting
+
+With n = 84 samples in d = 8192 dimensions, Cover's theorem guarantees that **any** labelling is linearly separable. An in-sample probe AUROC of 1.00 is a property of the geometry, not a finding — `validate_corrections.py` reproduces it from pure noise. Two consequences run through the pipeline:
+
+- **Probes are K-fold cross-validated** (`src/probes.py`), with the standardiser, the probe **and the difference-in-means direction** all refitted inside each fold. Cross-validating the classifier while estimating the direction over the full sample is the failure mode that looks validated and is not: experiment E of `validate_corrections.py` gets AUROC 1.00 out of pure noise that way, versus 0.50 when the direction is refitted per fold.
+- **A label-permutation control** re-runs the whole K-fold pass on shuffled labels, giving the empirical chance level at this n and d. A cross-validated AUROC is evidence only insofar as it clears that floor.
+- **Repeated K-fold** (`--n-repeats`) averages over several random partitions, because at n = 84 a single split puts ~17 samples per fold and the estimate moves with the seed. The reported interval uses the **Nadeau-Bengio correction**: K-fold training sets overlap, so the naive standard error is too small — typically by a factor of 3-4 at this geometry.
+
+- **AUROC of d_chat is scored out-of-fold** (`--skip-heldout` disables it). d_chat *is* the difference between the chat_harmful and chat_benign centroids, so asking how well it separates those two groups asks how well a line fits the points it was fitted to. Prompt **pairs** are split into K folds — a pair's harmful and benign variants are built from the same seed, so they are always held out together — the direction is fitted on K-1 folds, and only the held-out fold is scored. Both numbers are reported and their difference is the **optimism**. Experiment G of `validate_corrections.py` puts the in-sample figure at 1.00 with nothing at all to detect.
+
+`DeltaP` is unaffected by the *classifier* critique: it is a direct measurement, not a trained model, so there is no in-sample fit to mistake for generalisation. Its own bias — the direction is estimated from the same chat activations it is projected onto — is corrected separately by cross-fitting in `src/robust_estimation.py`. The AUROCs quoted alongside it are not exempt, which is what the held-out evaluation above exists to fix.
 
 ### Stratified Analysis
 
@@ -228,12 +242,52 @@ Recommended GPU: RTX A5000 ($0.27/hr, 24GB). Full experiment costs ~$0.20.
 | `--model` | HuggingFace model ID |
 | `--dataset custom` | Use paired dataset (default) |
 | `--layers 10,20,30` | Specific layers to analyze |
-| `--n-samples N` | Prompts per category |
+| `--n-samples N` | Prompts for the **intervention stage only** — does not reduce extraction |
+| `--limit-pairs N` | Keep only N prompt pairs across all variants. The flag that makes a dry run cheap |
 | `--no-quantize` | Force FP16 |
 | `--decompose` | Enable 4-condition decomposition |
 | `--skip-probes` | Skip probing classifiers |
 | `--skip-intervention` | Skip generation-based intervention |
 | `--include-history` | Add multi-turn tool-use history |
+| `--n-folds N` | Folds for cross-validation and cross-fitting (default 5) |
+| `--n-repeats N` | Random partitions to average the probe CV over (default 1; use 10 for a reported run) |
+| `--mlp-n-repeats N` | Separate repeat count for the MLP, which is far costlier per fit |
+| `--n-bootstrap N` | Resamples for the DeltaP confidence interval (default 10,000) |
+| `--n-label-permutations N` | Repeats of the shuffled-label control (default 10, 0 disables) |
+| `--no-probe-cv` | Restore the old single 80/20 split, for comparison only |
+| `--skip-robust` | Skip the cross-fitted / out-of-fold re-analysis |
+| `--skip-heldout` | Skip the held-out evaluation of d_chat. Without it every AUROC in the main analysis is scored with a direction fitted on the same prompts (debugging only) |
+
+### Statistical Re-analysis Without a GPU
+
+Two of the validity checks run on a laptop, from results already on disk:
+
+```bash
+# Bootstrap CIs for DeltaP at every layer, from the saved projections.
+# Percentile + BCa, paired resampling, sign test. No model needed.
+python bootstrap_delta_p.py --n-boot 10000
+
+# Controlled proof that the estimators do what they claim, on synthetic data
+# with known ground truth. Includes the fold-hygiene experiment (E), the
+# benign control (F: two ground truths with the same DeltaP, separated only by
+# the interaction) and the held-out AUROC of d_chat (G: 1.00 in-sample with
+# nothing to detect, 0.50 out-of-fold).
+python validate_corrections.py --trials 20
+```
+
+The probe cross-validation needs the full `(n, 8192)` activations, which are not
+saved, so it requires a GPU pass of `run_experiment.py`.
+
+### Running a Larger Model
+
+See **[docs/runpod_large_models.md](docs/runpod_large_models.md)** for choosing
+a third model, pod sizing, and the two traps that cost real money (4-bit does
+not reduce *download* size; MoE expert routing is a confound for the rotation
+claim). Model options with their disk and VRAM requirements:
+
+```bash
+python -c "from src.model_loader import print_model_options; print_model_options()"
+```
 
 ---
 
@@ -247,7 +301,8 @@ agentic-safety-probe/
 │   ├── refusal_direction.py     # d_chat: diff-in-means + PCA validation
 │   ├── agent_direction.py       # w_agent: probe-based direction + safety monitor
 │   ├── stratified_analysis.py   # Breakdown by subtlety level
-│   ├── probes.py                # LogisticRegression + MLP probing
+│   ├── probes.py                # Cross-validated LogisticRegression + MLP probing
+│   ├── robust_estimation.py     # Cross-fitting, out-of-fold evaluation, paired stats
 │   ├── metrics.py               # Permutation test, bootstrap CI, decomposition
 │   ├── intervention.py          # Add direction during autoregressive generation
 │   ├── validation.py            # Activation-space + behavioral validation
@@ -262,10 +317,13 @@ agentic-safety-probe/
 │   ├── methodology.md           # Full methodology
 │   ├── experiment_design.md     # 7 experiments detailed
 │   ├── problem_statement.md     # Research question and variables
+│   ├── runpod_large_models.md   # Choosing and running a bigger model
 │   └── decision_log.md          # Design decisions and rationale
 ├── tool_definitions.json        # 26 tool schemas
 ├── run_experiment.py            # Main CLI pipeline
 ├── run_experiment_runpod.ipynb   # Cloud notebook
+├── bootstrap_delta_p.py         # DeltaP CIs from saved results (no GPU)
+├── validate_corrections.py      # Ground-truth checks of the estimators (no GPU)
 └── requirements.txt
 ```
 

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Archives
+*.zip
+*.tar.gz
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

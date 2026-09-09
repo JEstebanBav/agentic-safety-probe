@@ -1,0 +1,87 @@
+# Minimal dependency set for a GPU run on RunPod.
+#
+# WHY THIS FILE EXISTS, SEPARATE FROM requirements.txt
+#
+# The full requirements.txt pins `transformer-lens`, which is not imported
+# anywhere in this project (only `gradio`, and only by app.py, the demo).
+# Installing it on a RunPod image is actively harmful: transformer-lens
+# declares its own torch range and pip will happily DOWNGRADE the CUDA-matched
+# torch that the RunPod PyTorch template ships with. The result is a torch
+# build that no longer matches the driver, and the failure surfaces much later
+# as a CUDA error during model loading — after the weights have downloaded.
+#
+# The RunPod PyTorch template already provides torch. It is deliberately NOT
+# listed here so pip cannot replace it.
+#
+# Usage on the pod:
+#     pip install -r requirements_runpod.txt
+
+# --- Model loading and inference ---
+#
+# TORCH / TRANSFORMERS COMPATIBILITY — read before changing these pins.
+#
+# Recent transformers releases require torch >= 2.5. When the installed torch
+# is older, transformers does NOT fail loudly: it prints
+#
+#     [transformers] Disabling PyTorch because PyTorch >= 2.5 is required
+#     [transformers] PyTorch was not found. Models won't be available
+#
+# and continues with its torch backend disabled. The run then dies much later
+# with `NameError: name 'torch' is not defined` raised from inside
+# transformers' own quantization_config.py, which looks like a bug in this
+# project and is not.
+#
+# The RunPod "PyTorch 2.4.x" templates ship torch 2.4.1, which trips this. Two
+# ways out, in order of preference:
+#
+#   1. Upgrade torch on the pod (keeps the newest Qwen3 support). Upgrade
+#      torchvision and torchaudio IN THE SAME COMMAND — they ship compiled
+#      extensions built against a specific torch, and bumping torch alone
+#      leaves them unable to register their operators:
+#        pip install --upgrade torch torchvision torchaudio \
+#            --index-url https://download.pytorch.org/whl/cu124
+#
+#      The symptom of forgetting them is a misleading two-part failure:
+#        RuntimeError: operator torchvision::nms does not exist
+#        ModuleNotFoundError: Could not import module 'Qwen3MoeForCausalLM'
+#      The second line is the one you see at the bottom and it is NOT true —
+#      transformers supports Qwen3-MoE fine. It imports torchvision while
+#      resolving any architecture, and reports that crash as a missing model
+#      class. Chasing it by downgrading transformers makes things worse.
+#
+#      This project uses no vision models at all, so `pip uninstall -y
+#      torchvision torchaudio` is also a valid fix: transformers detects their
+#      absence and skips the import cleanly. A BROKEN torchvision is worse
+#      than an absent one.
+#
+#   2. Pin transformers down instead. Qwen3 support landed in 4.51.0, so that
+#      is the floor; `transformers==4.51.3` works against torch 2.4.
+#
+# Always verify after installing, BEFORE downloading weights:
+#     python -c "import torch, transformers; print(torch.__version__, transformers.__version__)"
+# and confirm no "Disabling PyTorch" line appears.
+transformers>=4.51.0        # Qwen3 / Llama-3.3 architectures and chat templates
+accelerate>=0.27.0          # device_map="auto" sharding across GPUs
+bitsandbytes>=0.43.0        # 4-bit / 8-bit quantization
+sentencepiece>=0.2.0        # tokenizers for several model families
+protobuf>=4.25.0            # required by some slow tokenizer conversions
+
+# --- Weight download ---
+# Recent huggingface_hub replaced hf_transfer with Xet for accelerated
+# downloads, so `hf_transfer` is no longer installed here and
+# HF_HUB_ENABLE_HF_TRANSFER is ignored (it warns). Use HF_XET_HIGH_PERFORMANCE=1
+# instead. The CLI entry point was also renamed: `huggingface-cli` is dead,
+# the command is now `hf`.
+huggingface_hub>=0.23.0
+
+# --- Analysis (all CPU-side; also what you need locally) ---
+scikit-learn>=1.4.0
+scipy>=1.12.0
+numpy>=1.26.0
+
+# --- Figures ---
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# --- Progress bars ---
+tqdm>=4.66.0

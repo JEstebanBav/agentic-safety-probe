@@ -57,19 +57,29 @@ def compute_refusal_direction_pca(
     """
     Compute the refusal direction using PCA on the contrast matrix.
     
-    Validates that the difference-in-means direction aligns with the
-    principal component of variation between harmful and benign activations.
-    
+    Validates that the harmful/benign contrast is the DOMINANT axis of
+    variation, rather than one direction among many of comparable size.
+
     Method:
-        1. Center each group by its own mean.
-        2. Concatenate and apply PCA to the contrast (harmful - benign centroid).
-        3. PC1 of the between-group difference should align with diff-in-means.
-    
+        1. Pool both groups and centre by the GLOBAL mean, which retains the
+           between-group displacement (centring each group by its own mean
+           would remove exactly the signal under test).
+        2. Take PC1 of the pooled, globally centred matrix.
+        3. Compare it with the difference-in-means direction.
+
+    A high cosine means the contrast dominates the total variance and the
+    difference-in-means direction is recovering the principal axis. A LOW
+    cosine is not evidence that difference-in-means failed: it means
+    within-class variance exceeds between-class variance, which is common in
+    activation space and says nothing about whether the contrast is real.
+    Read `explained_variance_ratio_pc1` alongside the cosine before drawing
+    any conclusion from it.
+
     Args:
         harmful_activations: Array of shape (n_harmful, hidden_dim)
         benign_activations: Array of shape (n_benign, hidden_dim)
         n_components: Number of principal components to compute.
-        
+
     Returns:
         Tuple of:
           - PC1 direction (hidden_dim,), normalized
@@ -92,9 +102,10 @@ def compute_refusal_direction_pca(
         [harmful_centered, benign_centered], axis=0
     )
     
-    # PCA
+    # PCA. Randomized SVD: n_components (~5) is tiny next to hidden_dim (8192),
+    # so the full solver spends its time on components that are then discarded.
     n_components = min(n_components, min(contrast_matrix.shape) - 1)
-    pca = PCA(n_components=n_components)
+    pca = PCA(n_components=n_components, svd_solver="randomized", random_state=0)
     pca.fit(contrast_matrix)
     
     pc1 = pca.components_[0]
@@ -189,46 +200,60 @@ def compute_projection_gap(
     Returns:
         Dict with gap statistics and significance measures.
     """
+    from .robust_estimation import (
+        paired_cohens_d,
+        paired_permutation_test,
+        paired_sign_test,
+        paired_ttest_directional,
+        pooled_cohens_d,
+    )
+
     proj_chat = project_onto_direction(chat_harmful_acts, direction)
     proj_agent = project_onto_direction(agent_harmful_acts, direction)
-    
+
+    if len(proj_chat) != len(proj_agent):
+        raise ValueError(
+            "chat and agent activations must be paired row-wise; got "
+            f"{len(proj_chat)} vs {len(proj_agent)}"
+        )
+
     observed_gap = proj_chat.mean() - proj_agent.mean()
-    
-    # --- Permutation test ---
-    rng = np.random.default_rng(seed)
-    combined = np.concatenate([proj_chat, proj_agent])
-    n_chat = len(proj_chat)
-    
-    null_gaps = np.empty(n_permutations)
-    for i in range(n_permutations):
-        perm = rng.permutation(combined)
-        null_gaps[i] = perm[:n_chat].mean() - perm[n_chat:].mean()
-    
-    # Two-sided p-value
-    p_value_perm = (np.abs(null_gaps) >= np.abs(observed_gap)).mean()
-    
-    # --- Welch's t-test (parametric comparison) ---
-    t_stat, p_value_ttest = stats.ttest_ind(
-        proj_chat, proj_agent, equal_var=False
+
+    # A prompt contributes one observation to EACH condition, so the labels are
+    # exchangeable within a pair, not across prompts. The previous global
+    # shuffle of the concatenated samples tested the wrong null: it destroyed
+    # the pairing, inflated the null variance, and cost power. Sign-flip is the
+    # null this design licenses, and it is vectorised rather than looped.
+    perm = paired_permutation_test(
+        proj_chat, proj_agent, n_permutations=n_permutations,
+        alternative="two-sided", seed=seed,
     )
-    
-    # --- Effect size: Cohen's d ---
-    pooled_std = np.sqrt(
-        (proj_chat.std(ddof=1) ** 2 + proj_agent.std(ddof=1) ** 2) / 2
+    p_value_perm = perm["p_value"]
+
+    # Paired t-test, sign-aware one-sided. Welch's test treated the two
+    # conditions as independent groups, discarding the pairing again.
+    t_stat, p_value_ttest = paired_ttest_directional(
+        proj_chat, proj_agent, alternative="greater"
     )
-    cohens_d = observed_gap / pooled_std if pooled_std > 1e-10 else 0.0
-    
+
+    n_dec, p_sign = paired_sign_test(proj_chat, proj_agent)
+
     return {
         "delta_p": float(observed_gap),
         "mean_chat_harmful": float(proj_chat.mean()),
-        "std_chat_harmful": float(proj_chat.std()),
+        "std_chat_harmful": float(proj_chat.std(ddof=1)),
         "mean_agent_harmful": float(proj_agent.mean()),
-        "std_agent_harmful": float(proj_agent.std()),
+        "std_agent_harmful": float(proj_agent.std(ddof=1)),
         # Statistical significance
         "p_value_permutation": float(p_value_perm),
-        "p_value_ttest_welch": float(p_value_ttest),
+        "p_value_floor": perm["p_value_floor"],
+        "p_value_ttest_paired": float(p_value_ttest),
         "t_statistic": float(t_stat),
-        "cohens_d": float(cohens_d),
+        "cohens_d": pooled_cohens_d(proj_chat, proj_agent),
+        "cohens_d_paired": paired_cohens_d(proj_chat, proj_agent),
+        "n_decreasing": n_dec,
+        "n_pairs": len(proj_chat),
+        "sign_test_p": p_sign,
         "n_permutations": n_permutations,
         "is_significant_005": bool(p_value_perm < 0.05),
         "is_significant_001": bool(p_value_perm < 0.01),
@@ -344,15 +369,16 @@ def full_refusal_analysis(
     agent_harmful_acts: np.ndarray,
     n_permutations: int = 10000,
     seed: int = 42,
+    run_pca: bool = True,
 ) -> Dict:
     """
     Run the complete refusal direction analysis pipeline for a single layer.
-    
+
     Combines:
     1. Difference-in-means direction extraction
     2. PCA validation (checks alignment between methods)
     3. Projection gap with statistical significance
-    
+
     Args:
         harmful_activations: Harmful prompts activations (n, hidden_dim)
             used to define the refusal direction.
@@ -373,12 +399,17 @@ def full_refusal_analysis(
     direction = compute_refusal_direction(
         harmful_activations, benign_activations, normalize=True
     )
-    
-    # 2. PCA validation
-    pca_direction, pca_validation = compute_refusal_direction_pca(
-        harmful_activations, benign_activations
-    )
-    
+
+    # 2. PCA validation. Optional: it is an SVD on an (n, 8192) matrix repeated
+    # once per layer, and nothing downstream consumes it during the layer
+    # sweep. Skip it there, run it at the layer actually reported.
+    if run_pca:
+        pca_direction, pca_validation = compute_refusal_direction_pca(
+            harmful_activations, benign_activations
+        )
+    else:
+        pca_direction, pca_validation = None, None
+
     # 3. Projection gap with significance
     gap_analysis = compute_projection_gap(
         chat_harmful_acts,
@@ -403,10 +434,14 @@ def compute_gap_by_layer(
     agent_harmful_acts: Dict[int, np.ndarray],
     n_permutations: int = 10000,
     seed: int = 42,
+    run_pca: bool = False,
 ) -> Dict[int, Dict]:
     """
     Run full_refusal_analysis for each layer and return results per layer.
-    
+
+    PCA validation is off by default here: it costs one SVD per layer and no
+    caller consumes its output during the sweep.
+
     Args:
         harmful_activations: Dict layer_idx -> (n, hidden_dim)
         benign_activations: Dict layer_idx -> (n, hidden_dim)
@@ -434,6 +469,7 @@ def compute_gap_by_layer(
             agent_harmful_acts[layer_idx],
             n_permutations=n_permutations,
             seed=seed,
+            run_pca=run_pca,
         )
     
     return results

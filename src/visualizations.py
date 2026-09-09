@@ -50,6 +50,7 @@ def plot_projection_distributions(
     layer_idx: int,
     title: Optional[str] = None,
     output_dir: str = "results/figures",
+    name_suffix: str = "",
 ):
     """
     Plot violin/box plots comparing projections across conditions.
@@ -61,6 +62,9 @@ def plot_projection_distributions(
         layer_idx: Layer index for labeling.
         title: Optional custom title.
         output_dir: Where to save.
+        name_suffix: appended to the filename, e.g. "_heldout", so the same
+            figure can be produced from in-sample and out-of-fold projections
+            without one overwriting the other.
     """
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
 
@@ -88,7 +92,10 @@ def plot_projection_distributions(
     else:
         ax.set_title(f"Projection Distributions (Layer {layer_idx})", fontsize=14)
 
-    # Add gap annotation
+    # Add gap annotation. The benign shift is annotated alongside whenever
+    # the benign arm is present: a reader who sees only the harmful ΔP cannot
+    # tell a weakened refusal representation from a format that displaced
+    # every prompt by the same amount.
     if "chat_harmful" in projections and "agent_harmful" in projections:
         gap = projections["chat_harmful"].mean() - projections["agent_harmful"].mean()
         ax.annotate(
@@ -101,26 +108,54 @@ def plot_projection_distributions(
             bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.5),
         )
 
+    if "chat_benign" in projections and "agent_benign" in projections:
+        gap_b = projections["chat_benign"].mean() - projections["agent_benign"].mean()
+        ax.annotate(
+            f"ΔP benign = {gap_b:.3f}\n(interaction = {gap - gap_b:+.3f})",
+            xy=(3.5, max(projections["chat_benign"].mean(),
+                         projections["agent_benign"].mean())),
+            fontsize=11,
+            ha="center",
+            color="black",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="#cfe8cf", alpha=0.6),
+        )
+
     ax.axhline(y=0, color="gray", linestyle="--", alpha=0.5)
     ax.grid(axis="y", alpha=0.3)
 
-    save_fig(fig, f"projection_distributions_layer{layer_idx}", output_dir)
+    save_fig(fig, f"projection_distributions_layer{layer_idx}{name_suffix}",
+             output_dir)
 
 
 def plot_layer_auroc_curve(
     linear_aurocs: Dict[int, float],
     mlp_aurocs: Dict[int, float],
     output_dir: str = "results/figures",
+    linear_std: Optional[Dict[int, float]] = None,
+    mlp_std: Optional[Dict[int, float]] = None,
+    linear_in_sample: Optional[Dict[int, float]] = None,
+    permuted: Optional[Dict[int, float]] = None,
 ):
     """
     Plot AUROC as a function of layer depth.
-    
+
     Shows where in the network harmful/benign separation emerges.
-    
+
+    When the suite was cross-validated, the standard deviations across folds
+    are drawn as error bars. A cross-validated point without its spread invites
+    the same over-reading as the bare 1.0 it replaced: at K = 5 and n = 84 a
+    fold holds ~17 samples, so the sd is often wide enough to change the
+    reading. The in-sample curve and the shuffled-label control are drawn
+    faintly alongside when supplied — the first shows the inflation, the second
+    shows the floor the CV curve has to clear.
+
     Args:
-        linear_aurocs: Dict layer_idx -> linear probe AUROC
+        linear_aurocs: Dict layer_idx -> linear probe AUROC (CV mean if available)
         mlp_aurocs: Dict layer_idx -> MLP probe AUROC
         output_dir: Where to save.
+        linear_std / mlp_std: across-fold sd, drawn as error bars.
+        linear_in_sample: in-sample AUROC per layer, drawn as a reference line.
+        permuted: shuffled-label CV AUROC per layer, drawn as the chance floor.
     """
     fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 
@@ -128,15 +163,47 @@ def plot_layer_auroc_curve(
     lin_vals = [linear_aurocs[l] for l in layers]
     mlp_vals = [mlp_aurocs[l] for l in layers]
 
-    ax.plot(layers, lin_vals, "o-", color="#d62728", label="Linear Probe", linewidth=2)
-    ax.plot(layers, mlp_vals, "s--", color="#1f77b4", label="MLP Probe", linewidth=2)
-    ax.axhline(y=0.5, color="gray", linestyle=":", alpha=0.5, label="Chance")
+    def _errs(src):
+        if not src:
+            return None
+        vals = [src.get(l) for l in layers]
+        if any(v is None or not np.isfinite(v) for v in vals):
+            return None
+        return vals
+
+    lin_err, mlp_err = _errs(linear_std), _errs(mlp_std)
+    cv = lin_err is not None
+
+    ax.errorbar(layers, lin_vals, yerr=lin_err, fmt="o-", color="#d62728",
+                label="Linear probe" + (" (CV mean ± sd)" if cv else ""),
+                linewidth=2, capsize=4)
+    ax.errorbar(layers, mlp_vals, yerr=mlp_err, fmt="s--", color="#1f77b4",
+                label="MLP probe" + (" (CV mean ± sd)" if mlp_err else ""),
+                linewidth=2, capsize=4)
+
+    ins = _errs(linear_in_sample) if linear_in_sample else None
+    if linear_in_sample:
+        ins_vals = [linear_in_sample.get(l) for l in layers]
+        if all(v is not None and np.isfinite(v) for v in ins_vals):
+            ax.plot(layers, ins_vals, ":", color="#d62728", alpha=0.45,
+                    linewidth=1.5, label="Linear, in-sample (inflated)")
+
+    if permuted:
+        perm_vals = [permuted.get(l) for l in layers]
+        if all(v is not None and np.isfinite(v) for v in perm_vals):
+            ax.plot(layers, perm_vals, "-", color="#7f7f7f", alpha=0.7,
+                    linewidth=1.5, label="Shuffled labels (empirical chance)")
+
+    ax.axhline(y=0.5, color="gray", linestyle=":", alpha=0.5, label="Chance (0.5)")
 
     ax.set_xlabel("Layer Index", fontsize=12)
     ax.set_ylabel("AUROC", fontsize=12)
-    ax.set_title("Probing Accuracy by Layer", fontsize=14)
-    ax.legend(fontsize=11)
-    ax.set_ylim(0.4, 1.05)
+    ax.set_title(
+        "Probing Accuracy by Layer" + (" (5-fold cross-validated)" if cv else ""),
+        fontsize=14,
+    )
+    ax.legend(fontsize=9)
+    ax.set_ylim(0.3, 1.05)
     ax.grid(alpha=0.3)
 
     # Highlight best layer
@@ -156,14 +223,25 @@ def plot_layer_auroc_curve(
 def plot_gap_by_layer(
     gaps: Dict[int, float],
     output_dir: str = "results/figures",
+    gaps_benign: Optional[Dict[int, float]] = None,
+    name_suffix: str = "",
 ):
     """
     Plot the projection gap (ΔP) as a function of layer.
-    
+
     Shows which layers have the largest format-dependent difference.
-    
+
+    When the benign control is supplied, the two arms are drawn side by side
+    and their difference — the part of the shift that is specific to harmful
+    requests — is drawn as a line on top. A harmful-only version of this
+    figure cannot distinguish a weakened refusal representation from a rigid
+    displacement of every representation, which is the first thing a reader
+    will ask of it.
+
     Args:
-        gaps: Dict layer_idx -> ΔP value
+        gaps: Dict layer_idx -> ΔP on the harmful arm.
+        gaps_benign: Dict layer_idx -> ΔP on the benign arm (the control).
+        name_suffix: appended to the filename, e.g. "_heldout".
         output_dir: Where to save.
     """
     fig, ax = plt.subplots(1, 1, figsize=(10, 5))
@@ -171,7 +249,26 @@ def plot_gap_by_layer(
     layers = sorted(gaps.keys())
     values = [gaps[l] for l in layers]
 
-    bars = ax.bar(layers, values, color=["#d62728" if v > 0 else "#1f77b4" for v in values], alpha=0.7)
+    if gaps_benign:
+        shared = [l for l in layers if l in gaps_benign]
+        values = [gaps[l] for l in shared]
+        benign_values = [gaps_benign[l] for l in shared]
+        interaction = [h - b for h, b in zip(values, benign_values)]
+        width = max(0.4, (shared[1] - shared[0]) / 2.6) if len(shared) > 1 else 0.4
+
+        ax.bar([l - width / 2 for l in shared], values, width=width,
+               color=COLORS["chat_harmful"], alpha=0.75, label="harmful arm")
+        ax.bar([l + width / 2 for l in shared], benign_values, width=width,
+               color=COLORS["chat_benign"], alpha=0.75, label="benign arm (control)")
+        ax.plot(shared, interaction, color="black", linewidth=1.6, marker="o",
+                markersize=3, label="interaction (harmful - benign)")
+        ax.legend(fontsize=9, loc="best")
+        layers = shared
+    else:
+        ax.bar(layers, values,
+               color=["#d62728" if v > 0 else "#1f77b4" for v in values],
+               alpha=0.7)
+
     ax.axhline(y=0, color="black", linewidth=0.5)
     ax.set_xlabel("Layer Index", fontsize=12)
     ax.set_ylabel("ΔP (Chat - Agent)", fontsize=12)
@@ -189,7 +286,73 @@ def plot_gap_by_layer(
         arrowprops=dict(arrowstyle="->"),
     )
 
-    save_fig(fig, "gap_by_layer", output_dir)
+    save_fig(fig, f"gap_by_layer{name_suffix}", output_dir)
+
+
+def plot_auroc_in_sample_vs_heldout(
+    detection: Dict[str, float],
+    layer_idx: int,
+    output_dir: str = "results/figures",
+):
+    """
+    Detection with d_chat, scored on the prompts that defined it and on prompts
+    that did not.
+
+    The bars are paired per format so the optimism is read off vertically: the
+    drop from the in-sample bar to the held-out one is the part of the AUROC
+    that came from fitting and scoring on the same prompts. Error bars are the
+    paired bootstrap interval over prompt pairs, which exists only for the
+    held-out estimate — an in-sample interval would describe the precision of
+    a quantity that is biased to begin with.
+
+    Args:
+        detection: the `detection` dict produced by run_heldout_evaluation.
+    """
+    fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+
+    formats = ["chat", "agent"]
+    in_sample = [detection["auroc_chat_in_sample"], detection["auroc_agent_in_sample"]]
+    held_out = [detection["auroc_chat_heldout"], detection["auroc_agent_heldout"]]
+    cis = [detection.get("auroc_chat_ci"), detection.get("auroc_agent_ci")]
+
+    x = np.arange(len(formats))
+    width = 0.35
+
+    ax.bar(x - width / 2, in_sample, width, color="#bbbbbb", alpha=0.9,
+           label="in-sample (direction fitted on these prompts)")
+
+    yerr = None
+    if all(ci is not None for ci in cis):
+        lower = [max(0.0, ho - ci[0]) for ho, ci in zip(held_out, cis)]
+        upper = [max(0.0, ci[1] - ho) for ho, ci in zip(held_out, cis)]
+        yerr = np.array([lower, upper])
+
+    # One colour for the held-out bars: the formats are already separated on
+    # the x-axis, and colouring them per format made the legend swatch match
+    # only one of the two bars it labelled.
+    ax.bar(x + width / 2, held_out, width, color=COLORS["chat_harmful"],
+           alpha=0.85, yerr=yerr, capsize=4,
+           label="held-out (fitted without them)")
+
+    for xi, (ins, ho) in enumerate(zip(in_sample, held_out)):
+        ax.annotate(f"optimism {ins - ho:+.3f}", xy=(xi, max(ins, ho) + 0.03),
+                    ha="center", fontsize=9)
+
+    ax.axhline(0.5, color="gray", linestyle="--", linewidth=1, alpha=0.7)
+    ax.text(len(formats) - 0.5, 0.51, "chance", fontsize=8, color="gray",
+            ha="right")
+    ax.set_xticks(x)
+    ax.set_xticklabels(["Chat", "Agent"], fontsize=11)
+    ax.set_ylabel("AUROC (harmful vs benign)", fontsize=12)
+    ax.set_ylim(0.4, 1.08)
+    ax.set_title(f"Detection with d_chat, layer {layer_idx}", fontsize=14)
+    # Below the axes: the bars start at the bottom of the y-range, so any
+    # in-axes legend sits on top of them.
+    ax.legend(fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.08),
+              ncol=2, frameon=False)
+    ax.grid(axis="y", alpha=0.3)
+
+    save_fig(fig, "auroc_in_sample_vs_heldout", output_dir)
 
 
 def plot_pca_activations(
@@ -449,6 +612,23 @@ def plot_decomposition_waterfall(
     save_fig(fig, "decomposition_waterfall", output_dir)
 
 
+def _canonical_conditions(projections: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+    """
+    Rename agent_full_* to agent_* for the plotting helpers.
+
+    In --decompose mode the pipeline calls the full agentic condition
+    `agent_full_*`, and the figure helpers key off the plain names. Renaming a
+    copy here keeps the held-out figures working in both modes without giving
+    the plotting code a second naming convention to know about.
+    """
+    out = dict(projections)
+    for arm in ("harmful", "benign"):
+        full, plain = f"agent_full_{arm}", f"agent_{arm}"
+        if plain not in out and full in out:
+            out[plain] = out[full]
+    return out
+
+
 def generate_all_figures(results: Dict, output_dir: str = "results/figures"):
     """
     Generate all figures from experiment results.
@@ -469,17 +649,55 @@ def generate_all_figures(results: Dict, output_dir: str = "results/figures"):
             output_dir=output_dir,
         )
 
+    # 1b. The same distributions from out-of-fold projections, where no prompt
+    # was scored by a direction fitted on it.
+    heldout = results.get("heldout") or {}
+    if heldout.get("projections") and "best_layer" in results:
+        plot_projection_distributions(
+            _canonical_conditions(heldout["projections"]),
+            results["best_layer"],
+            title=f"Projection Distributions, held-out "
+                  f"(Layer {results['best_layer']})",
+            output_dir=output_dir,
+            name_suffix="_heldout",
+        )
+
+    # 1c. Detection in-sample vs held-out
+    if heldout.get("detection"):
+        plot_auroc_in_sample_vs_heldout(
+            heldout["detection"],
+            heldout.get("best_layer", results.get("best_layer", 0)),
+            output_dir=output_dir,
+        )
+
     # 2. Layer AUROC curves
     if "linear_aurocs" in results and "mlp_aurocs" in results:
         plot_layer_auroc_curve(
             results["linear_aurocs"],
             results["mlp_aurocs"],
             output_dir=output_dir,
+            # Present only when the probing suite was cross-validated.
+            linear_std=results.get("linear_aurocs_std"),
+            mlp_std=results.get("mlp_aurocs_std"),
+            linear_in_sample=results.get("linear_aurocs_in_sample"),
+            permuted=results.get("linear_aurocs_permuted"),
         )
 
-    # 3. Gap by layer
+    # 3. Gap by layer, harmful arm against the benign control
     if "gaps_by_layer" in results:
-        plot_gap_by_layer(results["gaps_by_layer"], output_dir=output_dir)
+        plot_gap_by_layer(
+            results["gaps_by_layer"],
+            output_dir=output_dir,
+            gaps_benign=results.get("gaps_by_layer_benign"),
+        )
+
+    # 3b. The same comparison on out-of-fold projections
+    ho_layers = heldout.get("per_layer") or {}
+    if ho_layers:
+        gaps_h = {int(l): r["delta_p_harmful"] for l, r in ho_layers.items()}
+        gaps_b = {int(l): r["delta_p_benign"] for l, r in ho_layers.items()}
+        plot_gap_by_layer(gaps_h, output_dir=output_dir, gaps_benign=gaps_b,
+                          name_suffix="_heldout")
 
     # 4. PCA
     if "activations" in results and "best_layer" in results:

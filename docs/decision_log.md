@@ -50,6 +50,42 @@
 - Applying to layers N/4 through N gives much stronger effect
 - With w_agent applied at its specific extraction layer, results improve further
 
+## Why measure the benign arm with the same statistics as the harmful one?
+- DeltaP on harmful prompts alone has three explanations, not one: refusal
+  weakens, the format displaces every representation by a common offset, or the
+  projection scale contracts
+- The agentic prompt is longer, carries a tool schema and a different system
+  message; any of that can translate the whole residual stream along d_chat
+- The corpus already contains the benign arm, so the control costs nothing
+- The INTERACTION (harmful shift minus benign shift) is the quantity specific to
+  harmfulness; `common_shift_fraction` reports how much of the headline number
+  the benign arm reproduces
+- Run at every layer, not only the reported one: a common shift is a property of
+  the format and should be visible across depth
+- The verdict is stated in the conclusion block. A significant DeltaP with a null
+  interaction now prints "the format DISPLACES the representation; it does not
+  selectively weaken refusal" instead of the old "STRONG EVIDENCE"
+
+## Why split the prompts that build d_chat from those that score AUROC?
+- d_chat IS the difference between the chat_harmful and chat_benign centroids, so
+  AUROC on those same prompts measures how well a line fits the points it was
+  fitted to
+- At n=42 in d=8192 the direction absorbs a large amount of sample-specific
+  noise, and projecting the same prompts back recovers it. On synthetic data with
+  NO real signal the in-sample AUROC is 0.998 while the truth is 0.5
+- The inflation is asymmetric: the agent condition never enters the estimation,
+  so the chat format is flattered and the chat-vs-agent comparison is biased
+  before any format effect is measured
+- K-fold cross-fitting rather than a single held-out split: at this n a 50/50
+  split would fit the direction on 21 pairs and score 21, and every prompt still
+  contributing a score matters more than the simplicity of one split
+- Folds are assigned over PAIRS, never over rows. A pair's harmful and benign
+  variants are built from the same seed, so holding one out while training on the
+  other would leak the contrast the direction encodes
+- Both numbers are reported. The optimism (in-sample minus held-out) is the
+  quantity that says how much the old figure was worth, and hiding it would
+  replace one unexamined number with another
+
 ## Why permutation test instead of just t-test?
 - No distributional assumptions (projections may not be Gaussian)
 - More robust with small sample sizes (N=42)

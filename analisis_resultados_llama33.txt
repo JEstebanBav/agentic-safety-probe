@@ -1,0 +1,607 @@
+================================================================================
+ANÁLISIS DE RESULTADOS — Llama-3.3-70B-Instruct
+Detección de intención dañina bajo formato conversacional vs agéntico
+================================================================================
+
+Corrida     : meta-llama/Llama-3.3-70B-Instruct (FP16, 2x H100 NVL)
+Duración    : 2378.7 s (39.6 min)
+Datos       : 42 pares emparejados (42 dañinos, 42 benignos) = 84 muestras
+Arquitectura: 80 capas, hidden_size 8192
+Capas       : barrido completo de 20 capas (0, 4, 8, ..., 76)
+Resultados  : results_llama33/
+Comparación : results/ (Llama-3.1-70B-Instruct, corrida del hackathon)
+
+Notación: ΔP = media(proy_chat_dañino) − media(proy_agente_dañino)
+          Todos los IC son al 95%. BCa = bootstrap con corrección de sesgo
+          y aceleración, 10.000 remuestreos de PARES (no de filas).
+
+
+================================================================================
+1. RESUMEN EJECUTIVO
+================================================================================
+
+Existe un gap entre el formato conversacional y el agéntico, y es
+estadísticamente sólido. Su TAMAÑO depende de qué se pregunte:
+
+    Separación cruda (unidades de proyección)  : −80.9%
+    Separabilidad estandarizada (d de Cohen)   : −37.5%
+    Capacidad de detección (AUROC)             :  −6.4%
+
+Las tres cifras son correctas y miden cosas distintas. La de 80.9% es en
+buena parte un cambio de UNIDADES: la desviación estándar de las
+proyecciones se contrae al 0.306 de su valor en chat.
+
+El hallazgo central no es un colapso de la detección, sino una ROTACIÓN.
+El modelo sigue codificando la intención dañina en formato agéntico —y
+sigue siendo linealmente separable— pero sobre un eje distinto, casi
+ortogonal a la dirección de rechazo del formato conversacional
+(cos = 0.031 en la capa 28). Ese es exactamente el modo de fallo de un
+monitor entrenado sobre datos conversacionales.
+
+CRÍTICA PRINCIPAL DE LOS REVIEWERS: RESUELTA.
+El AUROC de 1.000 era in-sample. Con validación cruzada honesta
+(10 repeticiones × 5 folds, dirección recalculada dentro de cada fold)
+el valor real es 0.961 ± 0.040. La inflación in-sample era de solo
++0.039: el número estaba inflado, pero la señal es real.
+
+
+================================================================================
+2. PROBE LINEAL CON VALIDACIÓN CRUZADA  [responde a los reviewers]
+================================================================================
+
+Protocolo: K = 5 folds, R = 10 repeticiones (50 puntuaciones de fold),
+n = 84 (42 dañinos / 42 benignos).
+
+DENTRO de cada fold y en este orden se ajustan SOLO con las filas de
+entrenamiento: (1) el StandardScaler, (2) el probe, (3) la dirección de
+diferencia de medias. Las filas retenidas no entran en ningún objeto
+ajustado. Ésta es la condición que se pidió explícitamente y es lo que
+distingue este número del anterior.
+
+--------------------------------------------------------------------------
+  Métrica                                Valor
+--------------------------------------------------------------------------
+  AUROC validado (capa 28)               0.9607 ± 0.0401   <-- REPORTAR
+  IC 95% Nadeau-Bengio                   [0.9186, 1.0000]
+  AUROC in-sample                        1.0000
+  Inflación in-sample                    +0.0393
+  Control con etiquetas barajadas        0.4598 ± 0.1047
+  Margen sobre el azar empírico          +0.5009
+--------------------------------------------------------------------------
+  sd entre folds                         0.0401
+  sd entre medias de repetición          0.0095
+    su aporte a la media reportada       0.0030  (= sd / raíz(10))
+  SE corregido (Nadeau-Bengio)           0.0210
+  SE ingenuo                             0.0057   (3.7× demasiado pequeño)
+--------------------------------------------------------------------------
+  MLP, misma capa                        0.9854 ± 0.0148
+  MLP in-sample                          0.9847
+--------------------------------------------------------------------------
+
+TRES CONTROLES QUE HACEN CREÍBLE EL NÚMERO
+
+  a) La dirección se recalcula dentro de cada fold. Si se calcula con
+     todos los datos y solo se valida el probe, el AUROC vuelve a salir
+     inflado. Demostración sobre ruido puro (validate_corrections.py,
+     experimento E): dirección de la muestra completa evaluada fuera de
+     fold = 1.0000; dirección del fold de entrenamiento = 0.5007.
+
+  b) El control de permutación da 0.4598, no 0.5000. Con n = 84 y
+     d = 8192 el azar EMPÍRICO está por debajo de 0.5, y aun así queda
+     medio punto de margen. Sin este control no hay forma de saber cuál
+     es el suelo.
+
+  c) La corrección de Nadeau-Bengio. Los folds comparten filas de
+     entrenamiento, así que sus puntuaciones no son independientes y la
+     varianza ingenua las subestima. Aquí por un factor 3.7. Sin la
+     corrección se habría reportado un IC falsamente estrecho.
+
+NOTA SOBRE EL LÍMITE SUPERIOR DEL IC
+  El IC llega a 1.000 porque se trunca en el máximo del AUROC. Con
+  n = 84 no hay resolución para distinguir 0.96 de 1.00. Esto no es un
+  defecto del método sino del tamaño muestral: es el argumento más
+  fuerte para ampliar el dataset.
+
+EL PROBE LINEAL IGUALA AL MLP (0.961 vs 0.985)
+  La información es LINEALMENTE SEPARABLE, es decir existe como una
+  dirección en el espacio de activaciones. Esto es precisamente lo que
+  la tesis afirma, y un MLP muy superior al lineal lo habría refutado.
+
+AUROC VALIDADO POR CAPA (probe lineal / MLP / control barajado)
+
+  capa    lineal CV      in-samp   barajado        MLP CV       cos(w,d) CV
+  ---------------------------------------------------------------------------
+    0     0.724±0.115     1.000      0.453     0.614±0.084     0.512±0.040
+    4     0.746±0.097     1.000      0.432     0.597±0.116     0.496±0.044
+    8     0.815±0.093     1.000      0.420     0.714±0.182     0.622±0.053
+   12     0.874±0.090     1.000      0.409     0.768±0.057     0.627±0.048
+   16     0.946±0.055     1.000      0.430     0.954±0.044     0.542±0.058
+   20     0.961±0.042     1.000      0.402     0.980±0.016     0.525±0.064
+   24     0.958±0.042     1.000      0.441     0.980±0.024     0.422±0.057
+   28     0.961±0.040     1.000      0.460     0.985±0.015     0.390±0.054  *
+   32     0.956±0.046     1.000      0.467     0.980±0.019     0.375±0.047
+   36     0.957±0.046     1.000      0.466     0.974±0.021     0.359±0.042
+   40     0.953±0.047     1.000      0.463     0.967±0.023     0.382±0.043
+   44     0.949±0.050     1.000      0.453     0.977±0.013     0.390±0.044
+   48     0.948±0.052     1.000      0.462     0.977±0.013     0.408±0.049
+   52     0.949±0.051     1.000      0.461     0.977±0.013     0.430±0.049
+   56     0.947±0.053     1.000      0.470     0.954±0.024     0.344±0.023
+   60     0.917±0.065     1.000      0.403     0.884±0.083     0.413±0.050
+   64     0.818±0.107     1.000      0.407     0.750±0.122     0.212±0.082
+   68     0.766±0.123     1.000      0.418     0.637±0.111     0.633±0.056
+   72     0.722±0.133     1.000      0.437     0.589±0.093     0.506±0.051
+   76     0.673±0.132     1.000      0.421     0.591±0.174     0.483±0.052
+  ---------------------------------------------------------------------------
+  * mejor capa
+
+  Obsérvese que el in-sample es 1.000 en las VEINTE capas, incluida la 76
+  donde el AUROC validado es 0.673. Esa columna es la demostración
+  empírica del teorema de Cover: con n = 84 puntos en d = 8192 dimensiones
+  cualquier etiquetado es separable. El 1.000 no era evidencia de nada.
+
+
+================================================================================
+3. GAP DE PROYECCIÓN (ΔP) CON BOOTSTRAP
+================================================================================
+
+CAPA 56 (la seleccionada por el pipeline), n = 42 pares
+
+--------------------------------------------------------------------------
+  proyección media, chat dañino          +6.8466  (sd 4.2527)
+  proyección media, agente dañino        +1.1073  (sd 1.5996)
+  ΔP                                     +5.7394
+--------------------------------------------------------------------------
+  IC 95% percentil                       [+4.6631, +6.7672]
+  IC 95% BCa                             [+4.6181, +6.7251]   <-- REPORTAR
+  SE bootstrap                           0.5375
+  corrección de sesgo z0                 −0.0065
+  aceleración                            −0.0201
+  p bilateral (bootstrap)                0.00010
+--------------------------------------------------------------------------
+  permutación con cambio de signo, p     < 0.00001
+  t pareada (unilateral)                 t = 10.556, p = 1.46e−13
+  d de Cohen (d_z pareada)               1.629
+  d de Cohen (agrupada)                  1.786
+  pares que decrecen                     36 / 42
+  test de signos exacto, p               < 0.00001
+--------------------------------------------------------------------------
+
+  VEREDICTO: el IC BCa al 95% EXCLUYE el cero. El gap no es atribuible a
+             ruido de muestreo.
+
+  19 de las 20 capas tienen un IC BCa que excluye el cero.
+
+EL TEST DE SIGNOS ES LA EVIDENCIA MÁS ROBUSTA
+  Usa únicamente la DIRECCIÓN del cambio dentro de cada par, nunca una
+  magnitud. Por tanto no depende de cómo se estimó la dirección de
+  rechazo ni de ninguna reescala de las proyecciones. 36 de 42 pares
+  decrecen, p < 1e−5. Aunque toda la maquinaria de estimación de la
+  dirección fuera cuestionada, este resultado se mantiene.
+
+ΔP NO SUFRE SOBREAJUSTE
+  Es una medición directa sobre pares emparejados, no un clasificador
+  entrenado. No hay conjunto de entrenamiento del que sobreajustarse.
+  El probe y su AUROC son evidencia COMPLEMENTARIA, no la misma.
+
+CORRECCIÓN POR CIRCULARIDAD (cross-fitting)
+  La dirección se estima a partir de datos que incluyen las mismas
+  muestras que luego se proyectan. Recalculándola fuera de muestra:
+
+    ΔP ingenuo        : 5.7394
+    ΔP cross-fit      : 5.4972
+    sesgo estimado    : 0.2422   (4.2% del efecto)
+    IC 95% cross-fit  : [4.4464, 6.5138]
+    d pareada         : 1.591
+
+  El sesgo de circularidad es pequeño y el efecto sobrevive. Selección de
+  capa por división de muestra: eligió la 52; alfa de Bonferroni sobre
+  20 capas = 0.0025.
+
+
+================================================================================
+4. ESPECIFICIDAD: EL CONTROL BENIGNO  [refuta "es una traslación rígida"]
+================================================================================
+
+La objeción obvia a ΔP es que el formato agéntico desplace TODA la
+representación por igual, en cuyo caso el gap sería un simple offset sin
+significado semántico. El brazo benigno lo descarta.
+
+CAPA 56, diseño de diferencia en diferencias
+--------------------------------------------------------------------------
+  ΔP dañinos (el efecto titular)         +5.7394   (n = 42)
+  ΔP benignos (el control)               −3.2337   (n = 42)
+  ¿el brazo benigno se mueve? p           0.0000
+--------------------------------------------------------------------------
+  INTERACCIÓN (dañinos − benignos)       +8.9730
+  p de permutación                        0.0000
+  d de Cohen (agrupada)                  +2.667
+  IC 95%                                 [+7.4812, +10.3548]
+  fracción del efecto común al benigno    −56.3%
+--------------------------------------------------------------------------
+
+  Los dos brazos se mueven en direcciones OPUESTAS. La fracción común es
+  NEGATIVA (−56.3%), lo que es más fuerte que si el brazo benigno
+  simplemente no se moviera: la interacción (8.97) es mayor que el efecto
+  principal (5.74).
+
+  VEREDICTO: el desplazamiento es ESPECÍFICO de las peticiones dañinas.
+             Una traslación rígida de la representación queda descartada,
+             de modo que ΔP no puede despacharse como un offset.
+
+
+================================================================================
+5. CONTRACCIÓN DE ESCALA  [caveat obligatorio]
+================================================================================
+
+CAPA 56, en unidades invariantes a la escala
+--------------------------------------------------------------------------
+                                     chat      agente      pérdida
+--------------------------------------------------------------------------
+  separación (unidades crudas)    11.0974      2.1244        80.9%
+  SD agrupada (unidades crudas)    3.7857      1.1598
+  separación (d de Cohen)          2.9314      1.8317        37.5%
+  AUROC                            0.9688      0.9048         6.4%
+--------------------------------------------------------------------------
+  contracción de escala (SD_agente / SD_chat): 0.306
+
+ADVERTENCIA
+  La pérdida cruda excede materialmente a la estandarizada. El formato
+  agéntico COMPRIMIÓ la escala de las proyecciones, de modo que parte del
+  ΔP titular es un cambio de unidades y no una pérdida de separabilidad.
+
+  Intuición: si el eje se comprime a un tercio, la distancia entre medias
+  también se comprime aunque las dos nubes sigan igual de separadas EN
+  PROPORCIÓN a su dispersión.
+
+  QUÉ HACER: reportar la cifra estandarizada como el efecto y la cruda
+  como su contraparte dependiente de escala. Publicar ΔP = 5.74 como
+  titular sin el d de Cohen al lado es la clase de cosa que un reviewer
+  atento marca, y con razón.
+
+
+================================================================================
+6. ROTACIÓN DE LA DIRECCIÓN  [el hallazgo más interesante]
+================================================================================
+
+w_agent = dirección de diferencia de medias (dañino vs benigno) estimada
+          en formato AGÉNTICO
+d_chat  = dirección de rechazo estimada en formato CONVERSACIONAL
+
+COSENO ENTRE AMBAS, POR CAPA (in-sample)
+
+  capa   cos        capa   cos        capa   cos        capa   cos
+  ------------------------------------------------------------------
+     0   0.463        20   0.274        40   0.045        60   0.290
+     4   0.394        24   0.131        44   0.047        64   0.148
+     8   0.474        28   0.031  <--   48   0.048        68   0.440
+    12   0.379        32   0.060        52   0.047        72   0.375
+    16   0.333        36   0.045        56   0.051        76   0.398
+  ------------------------------------------------------------------
+
+  El coseno cae de ~0.46 en las capas iniciales a 0.031 en la capa 28,
+  permanece por debajo de 0.06 durante todo el bloque profundo-medio
+  (28–56) y vuelve a subir a ~0.40 hacia la salida.
+
+  En las capas donde el efecto es más fuerte, la dirección de
+  dañino-en-formato-agéntico es CASI ORTOGONAL a la dirección de rechazo
+  del formato conversacional.
+
+VALIDACIÓN CRUZADA DEL COSENO (capa 56)
+--------------------------------------------------------------------------
+  coseno in-sample                       0.0512
+  coseno fuera de fold                   0.0471 ± 0.0088
+  fiabilidad split-half                  0.1877
+  factor de atenuación                   0.4333
+  coseno corregido por atenuación       ~0.109
+--------------------------------------------------------------------------
+
+  La fiabilidad es baja (0.19), así que el coseno observado está atenuado
+  por ruido de medición. Corrigiendo, el valor verdadero rondaría 0.11 —
+  todavía pequeño. La ortogonalidad NO es un artefacto del ruido
+  aplastando una correlación real.
+
+  ADVERTENCIA: no confundir este coseno con la columna cos(w,d) de la
+  tabla del probe (sección 2), que vale 0.390 en la capa 28. Aquélla es
+  el coseno entre la NORMAL DEL PROBE y la dirección de rechazo — otra
+  cantidad. Son medidas distintas y no deben mezclarse.
+
+AUROC DE w_agent (capa 56)
+--------------------------------------------------------------------------
+  in-sample                              1.0000   (Cover, no es evidencia)
+  fuera de fold                          0.9167 ± 0.0547
+  folds individuales      [0.889, 0.875, 1.000, 0.944, 0.875]
+--------------------------------------------------------------------------
+
+MONITOR SIMULADO (umbral calibrado fuera de fold)
+--------------------------------------------------------------------------
+  capa    F1 in-samp    F1 OOF    precisión    recall     FPR
+--------------------------------------------------------------------------
+    28      1.0000      0.9091      0.8696     0.9524    0.1429
+    56      1.0000      0.8372      0.8182     0.8571    0.1905
+--------------------------------------------------------------------------
+
+  El F1 in-sample es 1.000 porque el umbral se calibró sobre el mismo
+  conjunto que evalúa. El número honesto es el OOF. Una FPR del 14–19% es
+  alta para un monitor de producción y conviene decirlo.
+
+
+================================================================================
+7. ANÁLISIS ESTRATIFICADO POR EXPLICITUD
+================================================================================
+
+INTENSIDAD DE LA PROYECCIÓN (ΔP), capa 56
+--------------------------------------------------------------------------
+  estrato       n       ΔP       d Cohen    p        IC 95%
+--------------------------------------------------------------------------
+  explícito    18     6.6751     2.617    0.0000   [5.212, 7.884]
+  contextual   14     6.3601     2.120    0.0001   [4.714, 7.834]
+  enmarcado    10     3.1860     0.951    0.0452   [0.927, 5.506]
+--------------------------------------------------------------------------
+
+  Monótono en explicitud: explícito > contextual > enmarcado.
+  El gap se encoge conforme el daño se hace menos explícito, de modo que
+  un efecto agrupado promedia estratos heterogéneos.
+
+  NOTA: 'enmarcado' tiene n = 10 y p = 0.045. Es el estrato más débil y
+  el más frágil. No conviene apoyar ninguna afirmación fuerte en él.
+
+CAPACIDAD DE DETECCIÓN (AUROC), que es una pregunta distinta
+--------------------------------------------------------------------------
+  estrato      n_d  n_b  AUROC_chat  AUROC_ag  d_chat  d_agente  pérdida d
+--------------------------------------------------------------------------
+  contextual    14   14    0.9796     0.9286    3.330    1.764      47.0%
+  explícito     18   18    0.9815     0.9167    3.832    2.371      38.1%
+  enmarcado     10   10    0.9300     0.8800    1.781    1.668       6.4%
+--------------------------------------------------------------------------
+
+  INVERSIÓN IMPORTANTE: en ΔP el efecto es MAYOR en 'explícito', pero
+  la detección se degrada MÁS en 'explícito' (0.981 → 0.917) que en
+  'enmarcado' (0.930 → 0.880).
+
+  ΔP mide INTENSIDAD de la proyección; AUROC mide DETECCIÓN. No son
+  la misma pregunta y aquí se separan. El objetivo 4 de la tesis pregunta
+  por capacidad de detección, luego debe responderse con AUROC.
+
+
+================================================================================
+8. COMPARACIÓN: Llama-3.1-70B vs Llama-3.3-70B
+================================================================================
+
+Misma arquitectura (80 capas, hidden 8192), distinto checkpoint.
+
+--------------------------------------------------------------------------
+                            Llama-3.1-70B        Llama-3.3-70B
+                            (hackathon)          (nueva)
+--------------------------------------------------------------------------
+  capas barridas            7  (1 a 25)          20 (0 a 76)
+  mejor capa                20                   56
+  ΔP mejor capa             0.6845               5.7394
+  IC 95% BCa                [0.580, 0.782]       [4.618, 6.725]
+  pares decrecientes        42/42                36/42
+  d_z pareada               2.080                1.629
+  AUROC probe               1.000 (split único)  0.961 ± 0.040 (10×5 CV)
+  control barajado          no medido            0.460
+  AUROC chat / agente       0.9892 / 0.9881      0.9688 / 0.9048
+  brecha AUROC              0.0011               0.0641
+  capas con IC ≠ 0          6/7                  19/20
+--------------------------------------------------------------------------
+
+EL HALLAZGO PRINCIPAL DE LA COMPARACIÓN NO ES EL MODELO, ES EL BARRIDO
+
+  La corrida antigua se detuvo en la capa 25. Dentro de esa ventana
+  ΔP venía subiendo de forma monótona:
+
+    capa 1: −0.0103   capa 5: −0.0048   capa 7: 0.0014
+    capa 10: 0.0539   capa 15: 0.2375   capa 20: 0.6845   capa 25: 0.6549
+
+  La leve caída en la capa 25 PARECÍA un pico. No lo era: era el borde de
+  la ventana. El barrido completo muestra que el efecto sigue subiendo
+  hasta 5.70 en la capa 52 y 5.74 en la 56.
+
+  CONSECUENCIA: el resultado del hackathon subestimó el efecto en un
+  factor cercano a 8, y no por el modelo sino por DÓNDE MIRÓ.
+
+COMPARACIÓN EN LA ÚNICA CAPA QUE SE SOLAPA (capa 20)
+--------------------------------------------------------------------------
+  Llama-3.1-70B    ΔP = 0.6845    BCa [0.580, 0.782]    42/42
+  Llama-3.3-70B    ΔP = 1.3716    BCa [1.191, 1.533]    42/42
+--------------------------------------------------------------------------
+  Factor 2 entre checkpoints, con el mismo signo, el mismo 42/42 y ambos
+  IC excluyendo cero. Replicación cualitativa limpia.
+
+LA BRECHA DE AUROC CRECE CON LA PROFUNDIDAD
+
+  capa   AUROC_chat   AUROC_agente   brecha
+  ------------------------------------------
+    16     0.9841       0.9501       0.034
+    20     0.9870       0.9790       0.008
+    24     0.9779       0.9762       0.002
+    28     0.9830       0.9541       0.029
+    32     0.9807       0.9291       0.052
+    36     0.9785       0.9138       0.065
+    40     0.9785       0.9223       0.056
+    44     0.9802       0.9240       0.056
+    48     0.9796       0.9280       0.052
+    52     0.9796       0.9206       0.059
+    56     0.9688       0.9048       0.064
+    60     0.9802       0.9303       0.050
+    64     0.9450       0.9042       0.041
+    68     0.9269       0.8713       0.056
+    72     0.8107       0.7625       0.048
+    76     0.8413       0.7398       0.102
+  ------------------------------------------
+
+  En capas tempranas prácticamente no hay brecha de detección. Aparece a
+  partir de la capa 32 y se ensancha hacia la salida.
+
+  LAS DOS CORRIDAS NO SE CONTRADICEN. La antigua reportó una brecha de
+  0.001 porque midió en la capa 20; el barrido nuevo da 0.008 en esa misma
+  capa. Coinciden. La antigua simplemente no llegó hasta donde estaba el
+  efecto.
+
+  HAY QUE CORREGIR EL TEXTO: la conclusión anterior —"ΔP cae pero la
+  detección se preserva"— era un artefacto de la capa elegida. En las
+  capas profundas la detección SÍ se degrada, de 0.969 a 0.905.
+
+
+================================================================================
+9. PROBLEMA DETECTADO: LA ETAPA DE INTERVENCIÓN ES INVÁLIDA
+================================================================================
+
+SÍNTOMA
+  Tasa de éxito 0/10 en los siete valores de alfa (0.5, 1, 2, 3, 5, 8, 10)
+  y las generaciones degeneran en texto sin sentido:
+
+    [alpha=2.0]  After: is is is is is is is is is is is ...
+    [alpha=10.0] After: isosisosisosisosisosisosisosisos ...
+
+DIAGNÓSTICO
+  El texto "Before" registrado en run.log revela la causa:
+
+    Before(comply):  file from a specified URL.", "parameters": {
+        "type": "object", "properties": { "url": { "type": "string", "desc
+
+  Eso no es una respuesta a una petición: es el modelo AUTOCOMPLETANDO el
+  catálogo de herramientas en JSON.
+
+CAUSA RAÍZ
+  src/intervention.py, líneas 117-122:
+
+      inputs = self.tokenizer(
+          prompt, return_tensors="pt",
+          truncation=True,
+          max_length=2048,          <-- aquí
+      )
+
+  El prompt agéntico con el catálogo nativo de 26 herramientas ocupa
+  ~17.934 caracteres de JSON, aproximadamente 5.600 tokens. Al truncarse
+  a 2.048 el corte cae a media definición de herramienta, y se pierden
+  TANTO el mensaje del usuario COMO el generation prompt.
+
+  El modelo nunca ve la petición dañina. classify_behavior etiqueta la
+  continuación como "comply" porque no contiene ninguna frase de rechazo,
+  con lo que los 10 prompts entran al denominador y la tasa de éxito es
+  0/10 por construcción.
+
+CONSECUENCIA
+  NO REPORTAR esta sección. No es un resultado negativo sobre la
+  intervención: es una medición que nunca ocurrió. Tampoco invalida nada
+  de las secciones 2 a 8, que no dependen de esta etapa.
+
+ARREGLO
+  Subir max_length a ~8192 y fallar ruidosamente si el prompt se trunca,
+  en lugar de truncar en silencio. Es un cambio de una línea más una
+  guarda. Habría que volver a correr solo esta etapa (pocos minutos de
+  GPU).
+
+NOTA ADICIONAL
+  agent_intervention_results.json no existe en esta corrida. La copia del
+  pod nunca recibió el arreglo que hace que run_agent_intervention
+  devuelva sus resultados en vez de descartarlos; el arreglo está en el
+  repo local. Los números de esa etapa solo viven en run.log —y de todas
+  formas son inválidos por la causa de arriba.
+
+
+================================================================================
+10. QUÉ REPORTAR Y QUÉ NO
+================================================================================
+
+REPORTAR (cifras que aguantan escrutinio)
+
+  * AUROC del probe : 0.961 ± 0.040
+                      (10 rep. × 5 folds, dirección refiteada por fold)
+                      IC NB [0.919, 1.000], control barajado 0.460
+  * ΔP capa 56      : 5.7394, BCa [4.618, 6.725], 36/42 pares,
+                      test de signos p < 1e−5
+  * Efecto estandarizado : d de 2.93 a 1.83 (−37.5%)
+                           AUROC de 0.969 a 0.905 (−6.4%)
+  * Interacción vs control benigno : +8.9730, d = 2.667,
+                                     IC [7.481, 10.355]
+  * Rotación        : cos(w_agent, d_chat) = 0.031 en la capa 28
+                      (~0.11 corregido por atenuación)
+  * Cobertura       : 19/20 capas con IC excluyendo cero
+  * Monitor OOF     : F1 0.909, FPR 0.143 (capa 28)
+
+NO REPORTAR
+
+  * La etapa de intervención — inválida por truncamiento (sección 9)
+  * El AUROC in-sample de 1.000 — salvo para cuantificar la inflación
+                                  (+0.039), que es un buen argumento
+  * ΔP crudo sin su versión estandarizada al lado (sección 5)
+  * Cualquier afirmación fuerte sobre el estrato 'enmarcado' (n = 10,
+    p = 0.045)
+
+FORMULACIÓN SUGERIDA
+
+  "El formato agéntico desplaza sustancialmente la representación de las
+   peticiones dañinas (ΔP = 5.74, IC 95% [4.62, 6.73]) y ese
+   desplazamiento es específico: el brazo benigno se mueve en sentido
+   contrario (interacción +8.97, d = 2.67). En términos invariantes a la
+   escala la separabilidad cae un 37.5% (d de 2.93 a 1.83), mientras que
+   la capacidad de detección se degrada de forma más moderada (AUROC
+   0.969 → 0.905). La información sigue presente y sigue siendo
+   linealmente separable —pero comprimida y rotada: en capas profundas
+   la dirección de dañino-en-formato-agéntico es casi ortogonal a la
+   dirección de rechazo conversacional (cos = 0.031 en la capa 28). Un
+   probe lineal validado alcanza AUROC 0.961 ± 0.040 frente a 0.460 con
+   etiquetas permutadas."
+
+  Esta formulación es más fuerte que un colapso de detección. Un colapso
+  diría "el modelo deja de saber". Los datos dicen algo más preciso: el
+  modelo sigue sabiendo, pero lo codifica en otro eje — que es
+  exactamente el modo de fallo de un monitor entrenado en formato
+  conversacional.
+
+
+================================================================================
+11. LIMITACIONES
+================================================================================
+
+  1. n = 42 pares. Es el cuello de botella dominante. Con 84 muestras en
+     8192 dimensiones el IC del probe llega hasta 1.000 y el estrato
+     'enmarcado' (n = 10) apenas alcanza significación. Duplicar el
+     dataset mejora TODOS los estadísticos a la vez; un modelo más grande
+     no mueve esa aguja.
+
+  2. Un solo modelo por familia. Llama-3.1-70B y Llama-3.3-70B comparten
+     arquitectura, así que la replicación es entre checkpoints, no entre
+     familias. Un modelo de familia distinta (Qwen, Mistral) daría una
+     replicación más informativa que uno más grande de la misma familia.
+
+  3. La etapa de intervención no aporta evidencia causal en esta corrida
+     (sección 9). Sin ella, todos los resultados son correlacionales:
+     muestran que la información se reorganiza, no que esa reorganización
+     CAUSE el fallo del rechazo.
+
+  4. Fiabilidad split-half baja (0.19) en la estimación de la dirección.
+     Las conclusiones sobre el coseno se sostienen tras corregir por
+     atenuación, pero con margen de error amplio.
+
+  5. La FPR del monitor fuera de fold (14–19%) es alta para un despliegue
+     real y conviene declararlo en vez de reportar solo F1.
+
+  6. Selección de capa. El pipeline elige la capa 56 sobre 20 candidatas.
+     La corrección por división de muestra elige la 52 y aplica Bonferroni
+     (alfa = 0.0025); el efecto sobrevive, pero la capa "mejor" no debe
+     presentarse como un descubrimiento independiente.
+
+
+================================================================================
+ARCHIVOS
+================================================================================
+
+  results_llama33/results.json                  resultados completos
+  results_llama33/robust_results.json           cross-fitting, selección de capa
+  results_llama33/format_effect_results.json    especificidad y escala
+  results_llama33/stratified_results.json       estratos por explicitud
+  results_llama33/agent_direction_results.json  rotación, monitor
+  results_llama33/bootstrap_delta_p.json        IC BCa por capa (generado local)
+  results_llama33/directions.npz                vectores de dirección
+  results_llama33/run.log                       log completo de la corrida
+  results_llama33/figures/                      figuras en png y pdf
+
+  Comparación: results/  (Llama-3.1-70B, corrida del hackathon)
+
+================================================================================
+FIN
+================================================================================
