@@ -1,0 +1,74 @@
+{
+  "direction": "w_agent",
+  "layer": 16,
+  "n_prompts": 5,
+  "alphas": [
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    8.0,
+    10.0
+  ],
+  "per_alpha": {
+    "0.5": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 0,
+      "success_rate": 0.0,
+      "already_refusing": 0
+    },
+    "1.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 1,
+      "success_rate": 0.2,
+      "already_refusing": 0
+    },
+    "2.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 1,
+      "success_rate": 0.2,
+      "already_refusing": 0
+    },
+    "3.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 3,
+      "success_rate": 0.6,
+      "already_refusing": 0
+    },
+    "5.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 3,
+      "success_rate": 0.6,
+      "already_refusing": 0
+    },
+    "8.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 1,
+      "success_rate": 0.2,
+      "already_refusing": 0
+    },
+    "10.0": {
+      "total_prompts": 5,
+      "complied_before_intervention": 5,
+      "refused_after_intervention": 0,
+      "success_rate": 0.0,
+      "already_refusing": 0
+    }
+  },
+  "success_rates": [
+    0.0,
+    0.2,
+    0.2,
+    0.6,
+    0.6,
+    0.2,
+    0.0
+  ]
+}

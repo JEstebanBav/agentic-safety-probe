@@ -1,0 +1,12 @@
+[
+  {
+    "subtlety": "explicit",
+    "n_samples": 2,
+    "delta_p": 2.61415696144104,
+    "cohens_d": 10.800735473632812,
+    "p_value": 0.5078,
+    "ci_lower": 2.39386847615242,
+    "ci_upper": 2.834445431828499,
+    "significant": false
+  }
+]

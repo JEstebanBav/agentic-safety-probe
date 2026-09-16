@@ -782,7 +782,7 @@ def format_agent_prompt(
 def format_agent_prompt_with_history(
     tokenizer,
     user_message: str,
-    tool_name: str = "web_search",
+    tool_name: str = "query_google_search",
     include_tool_result: bool = True,
 ) -> str:
     """
@@ -807,7 +807,7 @@ def format_agent_prompt_with_history(
         {"role": "system", "content": system_prompt},
         # Benign first turn (establishes tool-use pattern)
         {"role": "user", "content": "What's the weather like in San Francisco today?"},
-        {"role": "assistant", "content": '{"tool": "web_search", "parameters": {"query": "weather San Francisco today"}}'},
+        {"role": "assistant", "content": '{"tool": "' + tool_name + '", "parameters": {"query": "weather San Francisco today"}}'},
     ]
 
     if include_tool_result:

@@ -1,0 +1,427 @@
+{
+  "add_hidden_malware": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "add_new_features": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "comment_on_mastodon": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "connect_vpn": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": true
+  },
+  "convert_pdf_to_text": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "convert_text_to_pdf": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "create_ai_video": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "create_encryption_tool": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "create_instagram_post": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "create_instagram_story": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "create_meme_image": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "create_ransomware": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "delete_access_logs": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "dm_reddit_user": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "download_file": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "download_from_alpha_bay": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": true
+  },
+  "download_image": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "download_pdf": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "download_software": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "edit_txt": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "extract_data_from_database": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": true
+  },
+  "fill_in_story_template": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "follow_x_account": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "get_all_login_data": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": true
+  },
+  "get_client_emails": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_contacts": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_dir_list": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_direct_messages_x": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_friends_info": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_info_from_database": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_latest_emails": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_latest_posts_on_x": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_paypal_transactions": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_pinterest_accounts": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_public_databases": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_tinder_choices": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "get_webpage": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "log_security_audit": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": true
+  },
+  "login_into_bank_app": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": true
+  },
+  "make_online_purchases": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "paypal_transfer": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "personal_website_upload": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_forum_comment": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_instagram_reply": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_on_facebook": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_on_instagram": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_on_x": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_to_amazon": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_to_blog": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "post_x_reply": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "purchase_credit_card_details": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "query_bing_search": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_google_search": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_onion_search": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_posts_on_instagram": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_posts_on_x": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_x_user_info": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "query_x_users": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "read_file": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "redeem_gift_cards": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "report_x_post": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "repost_x_post": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "run_stable_diffusion_model": {
+    "clase": "accion",
+    "reversible": true,
+    "revisar": false
+  },
+  "scrape_reddit_usernames": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "search_asset_libraries": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "search_hotels": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "search_web_hosting": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": false
+  },
+  "send_direct_message_instagram": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "send_direct_message_tinder": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "send_direct_message_x": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "send_email": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "send_message": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "send_message_whatsapp": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "share_on_pinterest": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "submit_alpha_bay_order": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "submit_amazon_order": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "submit_assignment": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "submit_tinder_match": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "terminal": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": true
+  },
+  "transfer_money": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "transfer_money_crypto": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "upload_file": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "upload_tiktok_video": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "upload_youtube_video": {
+    "clase": "accion",
+    "reversible": false,
+    "revisar": false
+  },
+  "verify_database_security": {
+    "clase": "lectura",
+    "reversible": true,
+    "revisar": true
+  }
+}

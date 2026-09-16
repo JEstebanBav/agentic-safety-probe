@@ -73,6 +73,7 @@ from src.intervention import (
     compute_intervention_success_rate,
 )
 from src.visualizations import generate_all_figures
+from src.agency import format_agency_prompt, expand_toolbox
 from data.loader import load_custom_dataset, load_harmagent_dataset, DatasetEntry
 from data.build_dataset import build_dataset, HARMFUL_PROMPTS
 
@@ -95,10 +96,46 @@ def parse_args():
              "'both' (run both pipelines)",
     )
     parser.add_argument(
+        "--dataset-path",
+        type=str,
+        default=None,
+        help="Paired dataset file for --dataset custom. Default: "
+             "data/dataset_full.jsonl. Use data/dataset_expanded.jsonl for the "
+             "corpus extended with AgentHarm (data/build_agentharm_pairs.py).",
+    )
+    parser.add_argument(
+        "--agency-level",
+        type=str,
+        default=None,
+        choices=["tools", "workflow", "autonomous", "trajectory"],
+        help="Agentic scaffolding for the agent arm (src/agency.py). Default: "
+             "the system prompt stored in each dataset entry, i.e. the original "
+             "condition, which 'tools' reproduces. Takes precedence over "
+             "--include-history.",
+    )
+    parser.add_argument(
+        "--toolbox",
+        type=int,
+        default=0,
+        help="Offer the model a toolbox of N tools instead of only the "
+             "2-8 the task needs: the case tools plus distractors, identical "
+             "in both arms of a pair. Selecting exactly the needed tools hands "
+             "the model the plan; an autonomous agent chooses. 0 = off. "
+             "12-16 is comfortable; 26 still fits the token budget.",
+    )
+    parser.add_argument(
         "--no-quantize",
         action="store_true",
         help="Disable 4-bit quantization (requires more VRAM)",
     )
+
+    parser.add_argument(
+        "--quantize",
+        action="store_true",
+        help="Force 4-bit even when FP16 fits. Quantization control: same "
+             "model and same prompts, only the precision changes",
+    )
+
     parser.add_argument(
         "--layers",
         type=str,
@@ -226,6 +263,8 @@ def extract_all_activations(
     layers: List[int],
     include_history: bool = False,
     decompose: bool = False,
+    agency_level: Optional[str] = None,
+    toolbox: int = 0,
 ) -> Tuple[Dict[str, Dict[int, np.ndarray]], Dict[str, List[str]]]:
     """
     Extract activations for all dataset entries.
@@ -286,14 +325,28 @@ def extract_all_activations(
                 # Per-entry tools, not the full 26-tool catalogue (which
                 # inflates the prompt and risks truncating the final token).
                 sys_prompt = entry.get("system_prompt") or None
-                if include_history:
+                entry_tools = entry.get("tool_definitions") or None
+                if toolbox:
+                    # Un agente elige entre lo que tiene: se completa la caja
+                    # con distractores, identicos en los dos brazos del par.
+                    entry_tools = expand_toolbox(
+                        str(entry.get("pair_id", entry.get("id", ""))),
+                        entry_tools, toolbox,
+                    )
+                if agency_level:
+                    prompt = format_agency_prompt(
+                        tokenizer, entry["base_prompt"],
+                        tools=entry_tools,
+                        level=agency_level,
+                    )
+                elif include_history:
                     prompt = format_agent_prompt_with_history(
                         tokenizer, entry["base_prompt"]
                     )
                 else:
                     prompt = format_agent_prompt(
                         tokenizer, entry["base_prompt"],
-                        tools=entry.get("tool_definitions") or None,
+                        tools=entry_tools,
                         system_message=sys_prompt,
                     )
             else:
@@ -1143,6 +1196,8 @@ def run_intervention_experiments(
     refusal_directions: Dict[int, np.ndarray],
     best_layer: int,
     n_samples: int = 10,
+    agency_level: Optional[str] = None,
+    toolbox: int = 0,
 ) -> Dict:
     """Run inference-time intervention experiments."""
     print("\n" + "=" * 60)
@@ -1174,17 +1229,27 @@ def run_intervention_experiments(
 
     for alpha in alphas:
         print(f"\n  Testing α={alpha}...")
-        # Build prompts EXACTLY as the extraction stage did. Previously this
-        # call omitted system_message, which routed it down the branch that
-        # injects the full 26-tool catalogue, so the intervention ran on
-        # different stimuli than the ones the directions were estimated from.
-        prompts = [
-            format_agent_prompt(
-                tokenizer, d["base_prompt"],
-                system_message=d.get("system_prompt") or None,
-            )
-            for d in agent_harmful
-        ]
+        # Build prompts EXACTLY as the extraction stage did: the per-prompt
+        # tool_definitions, not the full 26-tool catalogue. `tools` is the
+        # parameter that controls this — omitting it defaults to all 26, which
+        # overflows the tokenizer limit and truncates away the user message.
+
+        # With --agency-level the extraction stage used that scaffolding, so
+        # the intervention must too: a direction measured on one format and
+        # tested on another would not be the same experiment.
+        prompts = []
+        for d in agent_harmful:
+            d_tools = d.get("tool_definitions") or None
+            if toolbox:
+                d_tools = expand_toolbox(
+                    str(d.get("pair_id", d.get("id", ""))), d_tools, toolbox)
+            if agency_level:
+                prompts.append(format_agency_prompt(
+                    tokenizer, d["base_prompt"], tools=d_tools, level=agency_level))
+            else:
+                prompts.append(format_agent_prompt(
+                    tokenizer, d["base_prompt"], tools=d_tools,
+                    system_message=d.get("system_prompt") or None))
 
         results = intervention.batch_intervene(
             prompts=prompts,
@@ -1710,6 +1775,8 @@ def run_agent_intervention(
     best_layer: int,
     n_samples: int = 5,
     output_dir: str = "results",
+    agency_level: Optional[str] = None,
+    toolbox: int = 0,
 ) -> Dict:
     """
     Run intervention using w_agent instead of d_chat.
@@ -1742,8 +1809,23 @@ def run_agent_intervention(
     from src.model_loader import format_agent_prompt
     prompts = []
     for entry in agent_entries:
-        sys_prompt = entry.get("system_prompt") or None
-        prompt = format_agent_prompt(tokenizer, entry["base_prompt"], system_message=sys_prompt)
+        entry_tools = entry.get("tool_definitions") or None
+        if toolbox:
+            entry_tools = expand_toolbox(
+                str(entry.get("pair_id", entry.get("id", ""))), entry_tools, toolbox)
+        if agency_level:
+            prompt = format_agency_prompt(
+                tokenizer, entry["base_prompt"],
+                tools=entry_tools,
+                level=agency_level,
+            )
+        else:
+            sys_prompt = entry.get("system_prompt") or None
+            prompt = format_agent_prompt(
+                tokenizer, entry["base_prompt"],
+                tools=entry_tools,
+                system_message=sys_prompt,
+            )
         prompts.append(prompt)
 
     # Run intervention with w_agent at its specific layer only
@@ -1986,7 +2068,7 @@ def _load_dataset_for_experiment(args) -> List[Dict]:
 
     if args.dataset in ("custom", "both"):
         # Load custom paired dataset
-        custom_entries = load_custom_dataset()
+        custom_entries = load_custom_dataset(getattr(args, "dataset_path", None))
         dataset = []
         for entry in custom_entries:
             dataset.append({
@@ -2007,7 +2089,7 @@ def _load_dataset_for_experiment(args) -> List[Dict]:
             })
 
         variants = Counter(d["variant"] for d in dataset)
-        print(f"  Source: dataset_full.jsonl (paired, 168 entries)")
+        print(f"  Source: {getattr(args, 'dataset_path', None) or 'data/dataset_full.jsonl'} (paired)")
         print(f"  Total entries: {len(dataset)}")
         for v, c in sorted(variants.items()):
             print(f"    {v}: {c}")
@@ -2051,16 +2133,20 @@ def main():
     print("=" * 60)
     print(f"Model: {args.model}")
     print(f"Dataset: {args.dataset}")
-    print(f"Quantize: {not args.no_quantize}")
+    print(f"Quantize: {'4-bit (forzado)' if args.quantize else 'FP16 (forzado)' if args.no_quantize else 'auto'}")
     print(f"Samples per category: {args.n_samples}")
     print(f"Decompose: {args.decompose}")
+    print(f"Agency level: {args.agency_level or 'dataset default'}")
+    print(f"Toolbox     : {args.toolbox or 'task tools only'}")
     print(f"Output: {args.output_dir}")
     print("=" * 60)
 
     start_time = time.time()
 
     # 1. Load model
-    quantize_flag = None if not args.no_quantize else False  # None = auto-detect
+    if args.quantize and args.no_quantize:
+        raise SystemExit("--quantize y --no-quantize son incompatibles")
+    quantize_flag = True if args.quantize else (False if args.no_quantize else None)
     model, tokenizer = load_model_and_tokenizer(
         model_name=args.model,
         quantize=quantize_flag,
@@ -2093,6 +2179,8 @@ def main():
         dataset=dataset,
         layers=layers,
         include_history=args.include_history,
+        agency_level=args.agency_level,
+        toolbox=args.toolbox,
         decompose=args.decompose,
     )
 
@@ -2158,6 +2246,8 @@ def main():
             refusal_directions=results["refusal_directions"],
             best_layer=results["best_layer"],
             n_samples=min(10, args.n_samples),
+            agency_level=args.agency_level,
+            toolbox=args.toolbox,
         )
         results.update(intervention_results)
 
@@ -2193,6 +2283,8 @@ def main():
             best_layer=agent_dir_results["best_layer"],
             n_samples=min(5, args.n_samples),
             output_dir=args.output_dir,
+            agency_level=args.agency_level,
+            toolbox=args.toolbox,
         )
 
     # 8. Generate visualizations

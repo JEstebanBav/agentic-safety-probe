@@ -114,12 +114,18 @@ class ActivationIntervention:
 
     def generate(self, prompt: str, max_new_tokens: int = 150) -> str:
         """Generate text. Hooks remain active for every autoregressive step."""
+        max_len = min(
+            getattr(self.model.config, "max_position_embeddings", 8192), 8192
+        )
         inputs = self.tokenizer(
             prompt,
             return_tensors="pt",
             truncation=True,
-            max_length=2048,
+            max_length=max_len,
         ).to(self.model.device)
+        if inputs["input_ids"].shape[1] >= max_len:
+            print(f"    WARNING: prompt reached the {max_len}-token cap; the "
+                  "user message may have been truncated away.")
 
         with torch.inference_mode():
             outputs = self.model.generate(

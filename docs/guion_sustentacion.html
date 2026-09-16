@@ -1,0 +1,1118 @@
+<title>Guion de Sustentación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+
+<style>
+:root{
+  --ground:#f1f2f1;
+  --surface:#ffffff;
+  --surface-2:#e7e9e8;
+  --ink:#15181b;
+  --ink-2:#525a61;
+  --ink-3:#858e95;
+  --rule:#d8dbda;
+  --rule-strong:#b6bbba;
+  --accent:#9b2c22;
+  --on-accent:#ffffff;
+  --accent-soft:#fbeeec;
+  --solid:#1f6640;
+  --solid-soft:#eaf4ee;
+  --push:#8a5906;
+  --push-soft:#fbf2e2;
+  --cond:'IBM Plex Sans Condensed','IBM Plex Sans',system-ui,sans-serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#131513;
+    --surface:#1a1d1c;
+    --surface-2:#222624;
+    --ink:#eceeed;
+    --ink-2:#a3abaa;
+    --ink-3:#767e7d;
+    --rule:#2b302e;
+    --rule-strong:#3d4441;
+    --accent:#f0857a;
+    --on-accent:#141614;
+    --accent-soft:#2a1a18;
+    --solid:#5cb886;
+    --solid-soft:#16241c;
+    --push:#d9a24a;
+    --push-soft:#26200f;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131513;
+  --surface:#1a1d1c;
+  --surface-2:#222624;
+  --ink:#eceeed;
+  --ink-2:#a3abaa;
+  --ink-3:#767e7d;
+  --rule:#2b302e;
+  --rule-strong:#3d4441;
+  --accent:#f0857a;
+  --on-accent:#141614;
+  --accent-soft:#2a1a18;
+  --solid:#5cb886;
+  --solid-soft:#16241c;
+  --push:#d9a24a;
+  --push-soft:#26200f;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;line-height:1.6;margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(28px,4vw,64px) clamp(18px,4vw,52px) 100px}
+
+/* cabecera */
+header.head{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:34px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+h1{font-family:var(--cond);font-weight:700;font-size:clamp(32px,5.2vw,54px);line-height:1.04;letter-spacing:-.012em;margin:0 0 12px;text-wrap:balance}
+.head p{margin:0;color:var(--ink-2);font-size:16.5px;max-width:70ch}
+
+h2{
+  font-family:var(--cond);font-weight:700;font-size:clamp(21px,2.5vw,29px);
+  line-height:1.15;margin:0;letter-spacing:-.005em;text-wrap:balance;
+}
+h3{font-family:var(--sans);font-weight:600;font-size:15.5px;margin:0;line-height:1.35}
+p{margin:0;max-width:74ch}
+
+section.blk{margin-top:clamp(38px,4.6vw,62px);display:flex;flex-direction:column;gap:16px;scroll-margin-top:20px}
+.blk-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:9px}
+.blk-n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;flex:none}
+.intro{color:var(--ink-2);font-size:15.5px}
+
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.var{font-family:'IBM Plex Serif',Georgia,serif;font-style:italic}
+strong{font-weight:600}
+
+/* espina dorsal */
+ol.spine{list-style:none;margin:0;padding:0;counter-reset:sp;display:flex;flex-direction:column;gap:0}
+ol.spine li{
+  counter-increment:sp;display:flex;gap:18px;padding:15px 0;
+  border-bottom:1px solid var(--rule);font-size:16.5px;line-height:1.5;
+}
+ol.spine li:last-child{border-bottom:none}
+ol.spine li::before{
+  content:counter(sp);flex:none;font-family:var(--mono);font-size:12px;color:var(--accent);
+  width:20px;padding-top:4px;
+}
+ol.spine b{font-weight:600}
+
+/* cifras */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.fig{background:var(--surface);padding:15px 17px;display:flex;flex-direction:column;gap:5px}
+.fig-v{font-family:var(--mono);font-size:23px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.fig-l{font-size:13px;color:var(--ink-2);line-height:1.4}
+.fig-w{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+
+/* planes */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:820px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:17px;display:flex;flex-direction:column;gap:10px}
+.plan-t{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)}
+.plan-h{font-family:var(--cond);font-size:24px;font-weight:700;line-height:1}
+.plan p{font-size:13.5px;color:var(--ink-2)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-family:var(--mono);font-size:11px;padding:2px 6px;border:1px solid var(--rule-strong);border-radius:2px;color:var(--ink-2)}
+.chip.key{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* guion por diapositiva */
+.script{display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.cue{background:var(--surface);display:grid;grid-template-columns:74px 1fr;gap:0}
+@media (max-width:700px){.cue{grid-template-columns:1fr}}
+.cue-rail{
+  padding:15px 12px;border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:3px;align-items:flex-start;
+}
+@media (max-width:700px){.cue-rail{border-right:none;border-bottom:1px solid var(--rule);flex-direction:row;align-items:baseline;gap:10px}}
+.cue-n{font-family:var(--mono);font-size:17px;font-weight:600;line-height:1}
+.cue-t{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.cue-body{padding:15px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cue-meta{display:flex;flex-direction:column;gap:5px}
+.cue-meta div{font-size:13.5px;color:var(--ink-2);line-height:1.45;display:flex;gap:9px}
+.cue-tag{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  flex:none;padding:2px 5px;border-radius:2px;height:fit-content;margin-top:2px;
+}
+.cue-tag.p{background:var(--push-soft);color:var(--push)}
+.cue-tag.n{background:var(--accent-soft);color:var(--accent)}
+.cue-tag.s{background:var(--solid-soft);color:var(--solid)}
+.cue.anchor{background:var(--surface-2)}
+.cue.anchor .cue-n{color:var(--accent)}
+
+/* conceptos explicados */
+.concepts{display:flex;flex-direction:column;gap:20px}
+.cx{background:var(--surface);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.cx-h{
+  display:flex;align-items:baseline;gap:12px;padding:14px 20px;
+  border-bottom:1px solid var(--rule);background:var(--surface-2);
+}
+.cx-n{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;flex:none}
+.cx-t{font-family:var(--cond);font-weight:700;font-size:20px;line-height:1.2}
+.cx-where{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);flex:none}
+@media (max-width:640px){.cx-where{display:none}}
+.cx-b{padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+.cx-b p{font-size:15.5px;line-height:1.6;color:var(--ink-2)}
+.cx-b p b{color:var(--ink);font-weight:600}
+.cx-b p.lead{color:var(--ink);font-size:16px}
+.cx-step{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:-6px;
+}
+.analog{
+  background:var(--accent-soft);border-left:2px solid var(--accent);
+  padding:13px 17px;border-radius:0 3px 3px 0;
+}
+.analog .lbl{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);display:block;margin-bottom:5px;
+}
+.analog p{font-size:15px;line-height:1.55;color:var(--ink);margin:0}
+.calc{
+  font-family:var(--mono);font-size:14px;background:var(--surface-2);
+  border:1px solid var(--rule);border-radius:3px;padding:12px 15px;
+  overflow-x:auto;white-space:nowrap;color:var(--ink);
+}
+.calc .c-note{color:var(--ink-3);font-size:12.5px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+@media (max-width:700px){.three{grid-template-columns:1fr}}
+.three>div{background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:5px}
+.three .t-n{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.three .t-b{font-size:14px;line-height:1.45;color:var(--ink-2)}
+.three .t-b b{color:var(--ink);font-weight:600}
+table.mxmini{
+  border-collapse:collapse;width:100%;font-family:var(--mono);
+  font-variant-numeric:tabular-nums;font-size:14px;
+}
+table.mxmini th,table.mxmini td{border:1px solid var(--rule);padding:8px 11px;text-align:right}
+table.mxmini thead th{
+  background:var(--surface-2);font-family:var(--sans);font-weight:600;
+  font-size:12px;color:var(--ink-2);text-align:center;
+}
+table.mxmini thead th:first-child{background:transparent;border-color:transparent}
+table.mxmini tbody th{
+  font-family:var(--sans);font-weight:600;font-size:13px;text-align:left;
+  background:var(--surface-2);white-space:nowrap;color:var(--ink);
+}
+table.mxmini td{background:var(--surface);color:var(--ink)}
+table.mxmini td.m{background:var(--accent-soft);font-weight:500}
+table.mxmini td.c{background:var(--accent);color:var(--on-accent);font-weight:600}
+
+/* guion hablado */
+.speech{display:flex;flex-direction:column;gap:11px}
+.speech p{
+  font-size:16px;line-height:1.68;color:var(--ink);max-width:66ch;
+  margin:0;
+}
+.speech p b{font-weight:600}
+.speech p em{font-style:italic}
+.dir{
+  font-family:var(--mono);font-size:12.5px;color:var(--accent);
+  font-style:normal;letter-spacing:.01em;
+}
+.dir::before{content:""}
+.cue-body{padding:17px 20px}
+.cue-meta{margin-top:5px;padding-top:11px;border-top:1px solid var(--rule)}
+
+/* preguntas */
+.qs{display:flex;flex-direction:column;gap:12px}
+details.q{
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  border-left:2px solid var(--rule-strong);
+}
+details.q[data-w="alta"]{border-left-color:var(--accent)}
+details.q[data-w="dura"]{border-left-color:var(--push)}
+details.q summary{
+  padding:13px 17px;cursor:pointer;font-size:15.5px;font-weight:600;line-height:1.4;
+  display:flex;gap:11px;align-items:baseline;list-style:none;
+}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::before{
+  content:"▸";flex:none;color:var(--accent);font-size:12px;transition:transform .15s ease;
+}
+details.q[open] summary::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){details.q summary::before{transition:none}}
+details.q summary:hover{color:var(--accent)}
+.q-w{
+  margin-left:auto;flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;
+  text-transform:uppercase;padding:2px 6px;border-radius:2px;font-weight:500;
+  background:var(--surface-2);color:var(--ink-3);
+}
+details.q[data-w="alta"] .q-w{background:var(--accent-soft);color:var(--accent)}
+details.q[data-w="dura"] .q-w{background:var(--push-soft);color:var(--push)}
+.q-body{padding:0 17px 16px 41px;display:flex;flex-direction:column;gap:10px}
+.q-body p{font-size:15px;color:var(--ink-2);line-height:1.55}
+.q-body p.first{color:var(--ink)}
+.q-body .anchor-n{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  border-top:1px solid var(--rule);padding-top:9px;
+}
+
+/* avisos */
+.note{
+  background:var(--surface);border:1px solid var(--rule);border-left:2px solid var(--accent);
+  border-radius:0 3px 3px 0;padding:14px 18px;font-size:15px;line-height:1.55;
+}
+.note.push{border-left-color:var(--push);background:var(--push-soft)}
+.note.solid{border-left-color:var(--solid);background:var(--solid-soft)}
+.note b{font-weight:600}
+
+ul.plain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+ul.plain li{display:flex;gap:11px;font-size:15px;color:var(--ink-2);line-height:1.5}
+ul.plain li::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:9px}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.dont{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+@media (max-width:760px){.dont{grid-template-columns:1fr}}
+.dont>div{background:var(--surface);padding:14px 17px;display:flex;flex-direction:column;gap:6px}
+.dont-h{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.dont .bad .dont-h{color:var(--accent)}
+.dont .good .dont-h{color:var(--solid)}
+.dont p{font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  details.q{break-inside:avoid}
+  details.q .q-body{display:flex !important}
+  section.blk{break-inside:avoid-page}
+}
+</style>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="kicker">Documento de trabajo · no se muestra en la reunión</div>
+  <h1>Guion de sustentación</h1>
+  <p>El texto hablado de la presentación, escrito para <b>contárselo a alguien que no conoce el tema</b>: cada término se introduce antes de usarse y ninguna frase supone conocimiento previo. Trae además los conceptos difíciles explicados desde cero, por si te preguntan por debajo de lo que el guion dice, y 26 preguntas con respuesta preparada. Acompaña a la presentación de 30 diapositivas.</p>
+  <p style="margin-top:11px;font-size:15px;color:var(--ink-3)">La sección <a href="#recorrido">05</a> es el guion propiamente dicho. Todo lo demás es material de apoyo para estudiarlo.</p>
+</header>
+
+<!-- 1 · ESPINA DORSAL -->
+<section class="blk" id="espina">
+  <div class="blk-head"><span class="blk-n">01</span><h2>La espina dorsal</h2></div>
+  <p class="intro">Si el proyector falla, esto es lo que tienes que poder decir. Seis frases en orden: cada una prepara la siguiente y ninguna se puede saltar sin que la cadena se rompa. Practícalas hasta decirlas sin mirar.</p>
+  <ol class="spine">
+    <li><b>El supuesto que el despliegue da por válido es que la seguridad medida en chat se conserva cuando el modelo actúa como agente.</b> AgentHarm mostró que se incumple en el comportamiento, pero no explicó por qué.</li>
+    <li><b>El rechazo tiene una forma geométrica concreta:</b> una dirección en el espacio de activaciones. Eso permite preguntar qué le pasa a esa dirección cuando cambia el formato, y no solo qué hace el modelo.</li>
+    <li><b>Con texto idéntico, la misma instrucción dañina proyecta 5,74 unidades menos sobre esa dirección cuando el modelo dispone de herramientas.</b> Intervalo [4,62 · 6,73], 36 de 42 pares.</li>
+    <li><b>El efecto es específico del contenido dañino, no del formato:</b> el brazo benigno se mueve en sentido contrario, y la interacción vale 8,97 con <span class="var">d</span> = 2,67. Ese control es lo que convierte el número en un hallazgo.</li>
+    <li><b>La información no desaparece: cambia de eje.</b> La dirección estimada dentro del formato agéntico es casi ortogonal a la conversacional donde el efecto es más intenso, y sigue detectando (F₁ = 0,909 fuera de fold).</li>
+    <li><b>Y no es un modelo: es el formato.</b> El mismo tamaño de efecto estandarizado aparece en Llama, Qwen y Mistral, de 8 a 70 mil millones de parámetros, en dos precisiones.</li>
+  </ol>
+  <div class="note">
+    <b>El cierre.</b> Un monitor de seguridad construido sobre representaciones conversacionales mediría en una dirección casi ortogonal a aquella donde la información reside. No falla de forma visible: sigue produciendo valores de apariencia normal. Es la diferencia entre un instrumento que pierde precisión y uno que apunta al lugar equivocado.
+  </div>
+</section>
+
+<!-- 2 · CIFRAS -->
+<section class="blk" id="cifras">
+  <div class="blk-head"><span class="blk-n">02</span><h2>Las siete cifras que debes tener de memoria</h2></div>
+  <p class="intro">No las leas de la diapositiva. Que salgan solas es lo que hace que la conversación se vuelva una discusión entre colegas y no una lectura en voz alta.</p>
+  <div class="figs">
+    <div class="fig"><div class="fig-v">5,74</div><div class="fig-l"><span class="var">Δp<sub>h</sub></span> en la capa 56 · IC [4,62 · 6,73]</div><div class="fig-w">36 de 42 pares decrecen</div></div>
+    <div class="fig"><div class="fig-v">8,97</div><div class="fig-l">interacción <span class="var">Δ²p</span> · <span class="var">d</span> = 2,67</div><div class="fig-w">φ = −56,3 % · brazos opuestos</div></div>
+    <div class="fig"><div class="fig-v">37,5 %</div><div class="fig-l">pérdida estandarizada · la cruda es 80,9 %</div><div class="fig-w">κ = 0,306</div></div>
+    <div class="fig"><div class="fig-v">0,059</div><div class="fig-l">gap de detección en la capa de referencia</div><div class="fig-w">≈ 104 de 1 764 comparaciones</div></div>
+    <div class="fig"><div class="fig-v">0,031</div><div class="fig-l">cos(<span class="var">w<sub>ag</sub></span>, <span class="var">r̂</span>) en la capa 28</div><div class="fig-w">F₁ = 0,909 · TFP = 0,143</div></div>
+    <div class="fig"><div class="fig-v">2,29 – 3,01</div><div class="fig-l"><span class="var">d</span> de la interacción en las cinco corridas</div><div class="fig-w">tres familias de arquitectura</div></div>
+    <div class="fig"><div class="fig-v">42</div><div class="fig-l">pares contrastivos · 168 entradas</div><div class="fig-w">d = 8 192 dimensiones</div></div>
+  </div>
+  <div class="note push">
+    <b>La cifra que más te van a mirar es la última.</b> Ten preparado, antes de que te lo pregunten, por qué 42 y qué afirmaciones sostiene y cuáles no. Ver pregunta B1.
+  </div>
+</section>
+
+<!-- 3 · CONCEPTOS -->
+<section class="blk" id="conceptos">
+  <div class="blk-head"><span class="blk-n">03</span><h2>Los siete conceptos difíciles, explicados desde cero</h2></div>
+  <p class="intro">Esta es la parte que hay que entender de verdad, no memorizar. Si dominas estos siete, cualquier pregunta del tutor se responde combinándolos. Cada uno va con una analogía y, donde hace falta, con la cuenta hecha con tus números reales.</p>
+
+  <div class="concepts">
+
+    <!-- C1 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">01</span><span class="cx-t">La dirección de rechazo y la proyección</span><span class="cx-where">diapositiva 05</span></div>
+      <div class="cx-b">
+        <p class="lead">Cuando el modelo lee una instrucción, en cada capa la convierte en una lista de 8 192 números. Es un punto en un espacio de 8 192 dimensiones. Ningún número por separado significa nada legible.</p>
+        <div class="cx-step">El truco</div>
+        <p>Coges los puntos de las 42 instrucciones <b>dañinas</b> y sacas su promedio: eso es un punto, el «centro de lo dañino» (<span class="var">μ<sub>h</sub></span>). Haces lo mismo con las 42 <b>benignas</b>: el «centro de lo inocuo» (<span class="var">μ<sub>b</sub></span>). Y restas uno del otro.</p>
+        <p>Lo que obtienes es una <b>flecha que apunta desde lo inocuo hacia lo peligroso</b>. Esa flecha es la dirección de rechazo. Después la divides por su longitud, para quedarte solo con su orientación y que mida 1 — así las proyecciones se expresan en una unidad estable.</p>
+        <div class="analog">
+          <span class="lbl">Analogía</span>
+          <p>Imagina que cada instrucción es una ciudad en un mapa gigante. No sabes qué significan la latitud y la longitud. Pero calculas el centro de las ciudades del norte y el centro de las del sur, y trazas la flecha que va de uno al otro: acabas de descubrir el eje «norte–sur» sin que nadie te lo dijera. La dirección de rechazo es ese eje, y el concepto que lo ordena es la peligrosidad.</p>
+        </div>
+        <div class="cx-step">La proyección</div>
+        <p>Una vez tienes la flecha, la <b>proyección</b> de una instrucción es cuánto avanza a lo largo de ella: literalmente, la sombra que su punto arroja sobre la flecha. Es un solo número. Alto significa «el modelo está representando esto como peligroso»; bajo o negativo, lo contrario. <b>Toda la tesis se reduce a comparar ese número entre dos formatos.</b></p>
+        <div class="analog">
+          <span class="lbl">Por qué importa que sea un estimador</span>
+          <p>La flecha no es un dato que el modelo te entregue: la calculas tú, con 42 ejemplos, en un espacio de 8 192 dimensiones. Con tan pocos puntos para tantas dimensiones, parte de esa flecha es ruido de <em>tu</em> muestra concreta y no señal del modelo. <b>Todo el protocolo de la diapositiva 09 existe por esta única razón.</b></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C2 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">02</span><span class="cx-t">Qué es Δp<sub>h</sub> exactamente, y por qué no basta</span><span class="cx-where">diapositivas 07 y 13</span></div>
+      <div class="cx-b">
+        <p class="lead"><b>Empecemos por lo literal.</b> Cada instrucción, en cada formato, produce <em>un número</em>: su proyección. La instrucción nº 1 marca <span class="num">8,993</span> en chat y <span class="num">0,952</span> en formato agéntico. La resta, <span class="num">+8,041</span>, es cuánto cayó <em>esa</em> instrucción.</p>
+        <div class="calc">par 1 &nbsp;&nbsp;8,993 → 0,952 &nbsp;&nbsp;δ = +8,041<br>par 2 &nbsp;&nbsp;0,583 → −1,286 &nbsp;δ = +1,869<br>par 3 &nbsp;&nbsp;9,125 → 1,436 &nbsp;&nbsp;δ = +7,689<br>par 4 &nbsp;&nbsp;6,319 → −0,396 &nbsp;δ = +6,715<br><span class="c-note">…hasta el par 42</span><br><br>promedio de los 42 δ = <b>5,739</b> &nbsp;<span class="c-note">← esto es Δp<sub>h</sub>, y nada más que esto</span></div>
+        <p><b>Δp<sub>h</sub> es el promedio de 42 caídas individuales.</b> La <em>h</em> es de <em>harmful</em>: es el desplazamiento del brazo dañino. Y se calcula par a par, no restando dos medias sueltas — por eso las pruebas pareadas están autorizadas, y por eso puedes decir «36 de 42 pares bajan».</p>
+        <div class="analog">
+          <span class="lbl">La confusión más común</span>
+          <p>En el trabajo hay <b>dos tipos de diferencia</b> y ambas se llaman «diferencia». <b>S</b> compara <em>clases</em> — dañino frente a benigno — <b>dentro</b> de un formato: mide cuánto separa el modelo lo peligroso de lo inocuo. <b>Δp</b> compara <em>formatos</em> — chat frente a agéntico — <b>dentro</b> de un brazo: mide cuánto se mueve ese brazo al cambiar de formato. <b>Δp<sub>h</sub> es del segundo tipo: no mide separación entre clases.</b></p>
+        </div>
+        <div class="cx-step">La tabla que lo ordena todo</div>
+        <p>El experimento es un 2 × 2: {dañino, benigno} × {chat, agéntico}. Son <b>cuatro casillas</b>, cada una la proyección media de 42 instrucciones. Todas las cantidades del estudio son restas de esas cuatro casillas — nada más.</p>
+        <div class="tw"><table class="mxmini">
+          <thead><tr><th></th><th>chat</th><th>agéntico</th><th>entre formatos</th></tr></thead>
+          <tbody>
+            <tr><th>dañinas</th><td>+6,847</td><td>+1,107</td><td class="m">Δp<sub>h</sub> = +5,739</td></tr>
+            <tr><th>benignas</th><td>−4,251</td><td>−1,017</td><td class="m">Δp<sub>b</sub> = −3,234</td></tr>
+            <tr class="sep"><th>separación</th><td class="m">11,097</td><td class="m">2,124</td><td class="c">Δ²p = +8,973</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>Las filas son el efecto del formato. Las columnas son la separación entre clases.</b> Y la esquina se obtiene por los dos caminos, dando lo mismo: <span class="num">5,739 − (−3,234) = 8,973</span> y también <span class="num">11,097 − 2,124 = 8,973</span>. Es decir, <b>«cuánto más cayó lo dañino que lo benigno» es exactamente lo mismo que «cuánto se cerró la separación entre las dos clases»</b>. Si entiendes esa equivalencia, entiendes la diapositiva 07 entera.</p>
+        <div class="cx-step">Y ahora, por qué Δp<sub>h</sub> no basta</div>
+        <p>Mirando solo la fila de arriba sabes que las dañinas bajaron 5,74. Pero <b>tres cosas completamente distintas producen ese mismo número</b>, y solo una es la que te interesa.</p>
+        <div class="three">
+          <div><span class="t-n">Explicación 1 · la tuya</span><span class="t-b"><b>El rechazo se debilita.</b> El modelo de verdad responde con menos intensidad ante la petición peligrosa cuando tiene herramientas.</span></div>
+          <div><span class="t-n">Explicación 2 · rival</span><span class="t-b"><b>Todo se movió.</b> El <em>prompt</em> agéntico es más largo, trae el esquema de herramientas y otro mensaje de sistema. La nube entera de puntos se desplazó y el mecanismo está intacto: solo cambió el origen.</span></div>
+          <div><span class="t-n">Explicación 3 · rival</span><span class="t-b"><b>Todo se encogió.</b> Las activaciones son de menor magnitud, así que todas las distancias medidas en unidades crudas se reducen, aunque la separación relativa entre clases no haya cambiado.</span></div>
+        </div>
+        <div class="cx-step">Cómo se separan</div>
+        <p>La explicación 2 se descarta mirando <b>la fila de abajo</b> de la tabla. Las instrucciones benignas atraviesan <em>exactamente</em> el mismo cambio de formato: mismo mensaje de sistema, mismas herramientas, misma longitud extra. Si lo que ocurriera fuera un desplazamiento común, también habrían bajado. <b>No bajaron: subieron</b>, de −4,251 a −1,017. De modo que lo que le pasa al brazo dañino no le está pasando a toda representación por igual.</p>
+        <p>La resta de esas dos diferencias — <span class="num">Δ²p = Δp<sub>h</sub> − Δp<sub>b</sub></span> — se llama <b>diferencia en diferencias</b>. Si tu tutor viene de econometría, esa palabra le ahorra toda la explicación: es el mismo diseño con el que se evalúa el efecto de una política comparando un grupo tratado y uno de control antes y después.</p>
+        <div class="cx-step">Y φ, la fracción común</div>
+        <p><span class="var">φ</span> = Δp<sub>b</sub> ÷ Δp<sub>h</sub> responde: <b>¿qué porción del efecto es común a los dos brazos?</b> Léelo así:</p>
+        <div class="three">
+          <div><span class="t-n">φ ≈ 1</span><span class="t-b">Los dos brazos se movieron igual. <b>Todo era formato.</b> Tu hipótesis quedaría muerta.</span></div>
+          <div><span class="t-n">φ pequeño</span><span class="t-b">El brazo benigno apenas se movió. <b>Debilitamiento específico.</b> Es el caso de Qwen3-32B (+12,1 %).</span></div>
+          <div><span class="t-n">φ &lt; 0</span><span class="t-b">Se mueven en <b>sentidos opuestos</b>. El caso más marcado, y es el de Llama-3.3 (−56,3 %).</span></div>
+        </div>
+        <div class="analog">
+          <span class="lbl">Por qué Δ²p puede ser mayor que Δp<sub>h</sub></span>
+          <p>Esto confunde a todo el mundo. No es una anomalía, es aritmética de signos: si lo dañino <em>baja</em> 5,74 y lo benigno <em>sube</em> 3,23, la distancia entre ambos se cerró en 8,97. Las dos nubes convergen. Por eso en la diapositiva 13 la separación entre clases pasa de 11,097 a 2,124.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C3 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">03</span><span class="cx-t">El mismo efecto en tres unidades</span><span class="cx-where">diapositivas 08, 14, 15 y 20</span></div>
+      <div class="cx-b">
+        <p class="lead">Esta es la que más preguntas genera, porque el mismo fenómeno aparece como «cae 80,9 %», «cae 37,5 %» y «cae 6,4 %» en tres diapositivas distintas. No es una inconsistencia: son tres preguntas distintas.</p>
+        <div class="analog">
+          <span class="lbl">Analogía</span>
+          <p>Mides la diferencia de altura entre dos personas y da 20 centímetros. Luego cambias de unidad y la expresas en «cabezas»: ahora da 0,1 cabezas. El número cambió muchísimo; la diferencia real, nada. <b>Si además la unidad de medida se encoge a la vez que mides, el número cae por dos motivos mezclados y no puedes saber cuál es cuál.</b> Eso es exactamente lo que pasa aquí.</p>
+        </div>
+        <div class="cx-step">Las tres lecturas, con tus números de la capa 56</div>
+        <div class="calc">separación cruda &nbsp;&nbsp;11,097 → 2,124 &nbsp;&nbsp;= −80,9 % &nbsp;<span class="c-note">← distancia entre los centros de las dos nubes</span><br>desviación típica &nbsp;3,786 → 1,160 &nbsp;&nbsp;<span class="c-note">← la nube agéntica es 3 veces más estrecha</span><br>κ = 1,160 ÷ 3,786 = <b>0,306</b> &nbsp;<span class="c-note">← el factor de encogimiento</span><br><br>separación ÷ dispersión (d de Cohen) &nbsp;2,931 → 1,832 &nbsp;= <b>−37,5 %</b><br>AUROC (solo el orden) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0,969 → 0,905 &nbsp;= <b>−6,4 %</b></div>
+        <p><b>Qué responde cada una.</b> La cruda responde «¿cuánto bajó el termómetro?», pero el termómetro cambió de escala a la vez. La estandarizada divide por la dispersión, así que el encogimiento se cancela: responde «¿cuánto bajó de verdad?» — y es <b>la cifra que corresponde al efecto</b>. El AUROC ignora las distancias y solo mira el orden: responde «¿sigue bastando para distinguir?».</p>
+        <div class="analog">
+          <span class="lbl">La frase que resuelve la aparente contradicción</span>
+          <p>«La divergencia entre las tres no es una inconsistencia: <b>es la información que permite distinguir un cambio de unidades de un cambio de separabilidad.</b>» Si solo reportaras la cruda, estarías exagerando; si solo el AUROC, minimizando.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C4 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">04</span><span class="cx-t">Por qué el AUROC dentro de muestra vale 1,000</span><span class="cx-where">diapositivas 09 y 11</span></div>
+      <div class="cx-b">
+        <p class="lead">Tienes 84 puntos (42 dañinos + 42 benignos) en un espacio de 8 192 dimensiones. Cuando hay muchísimas más dimensiones que puntos, <b>siempre existe un plano que separa perfectamente cualquier etiquetado</b> — incluso si las etiquetas fueran lanzadas al aire.</p>
+        <div class="analog">
+          <span class="lbl">Analogía</span>
+          <p>Con 2 puntos en una hoja de papel, siempre puedes trazar una recta que los separe, los llames como los llames. Con 3 puntos en el espacio, siempre puedes encontrar un plano. Que lo consigas <b>no dice nada sobre los puntos</b>: dice algo sobre cuántas dimensiones tienes disponibles. Con 84 puntos en 8 192 dimensiones estás muchísimo más holgado que en esos ejemplos.</p>
+        </div>
+        <p>La prueba está en tu propia tabla: el AUROC dentro de muestra vale <b>exactamente 1,000 en las veinte capas</b>, incluida la capa 76, donde el valor honesto cae a 0,673. Una columna que vale lo mismo en una capa informativa y en una que no lo es <b>no puede usarse como evidencia de nada</b>. La incluyes precisamente para exhibirlo.</p>
+        <div class="cx-step">La solución: validación cruzada sobre pares</div>
+        <p>Partes los 42 pares en 5 bloques. Calculas la flecha usando 4 bloques y la evalúas sobre el bloque que quedó fuera, que no participó en su cálculo. Rotas hasta que cada bloque haya sido el evaluado. Así <b>ninguna instrucción se puntúa con una flecha que la haya visto</b>. A la diferencia entre el valor de dentro y el de fuera se le llama <b>optimismo</b>.</p>
+        <div class="analog">
+          <span class="lbl">El detalle que un matemático nota si falta</span>
+          <p>Las particiones se hacen sobre <b>pares</b>, no sobre instrucciones sueltas. Si la instrucción dañina cayera en entrenamiento y su contraparte benigna en evaluación, se filtraría hacia la flecha justamente el contraste que quieres medir — y comparten estructura y vocabulario por construcción. Manteniendo el par completo dentro de la misma partición, esa fuga queda excluida.</p>
+        </div>
+        <div class="cx-step">El suelo de azar empírico</div>
+        <p>Repites <b>todo el procedimiento</b> tras barajar al azar las etiquetas de daño. Lo que sale es el rendimiento que se obtiene sin ninguna señal real, para <em>este</em> tamaño de muestra y <em>esta</em> dimensión. Resultó <b>0,460</b>, no 0,500. Solo midiéndolo puedes saber cuál es el suelo que tu valor observado tiene que superar.</p>
+      </div>
+    </div>
+
+    <!-- C5 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">05</span><span class="cx-t">Las pruebas estadísticas, una por una</span><span class="cx-where">diapositiva 10</span></div>
+      <div class="cx-b">
+        <p class="lead">Son cuatro y cada una cubre una objeción distinta. La clave es que <b>no son redundantes</b>: si te tumban una, las otras siguen en pie.</p>
+        <div class="cx-step">Permutación de signos · qué hace</div>
+        <p>La hipótesis nula es «el formato no importa». Si de verdad no importara, dentro de cada par daría igual cuál de las dos condiciones llamas «chat» y cuál «agente» — es decir, el signo de esa diferencia podría ser + o − al azar. Así que barajas los signos de los 42 pares 10 000 veces, calculas el promedio cada vez, y ves qué tan raro resulta tu valor observado dentro de esa nube de resultados posibles.</p>
+        <div class="analog">
+          <span class="lbl">Por qué de signos y no global</span>
+          <p>Una permutación global mezclaría observaciones de <em>pares distintos</em>. Eso rompe el emparejamiento, que es justo lo que controla el contenido de la instrucción. <b>El diseño pareado solo autoriza intercambiar etiquetas dentro de cada par</b>, y eso equivale a cambiar el signo de su diferencia.</p>
+        </div>
+        <div class="cx-step">Prueba de signos exacta · tu carta más fuerte</div>
+        <p>Solo cuenta <b>cuántos pares bajaron</b>: 36 de 42. Nada más. No usa magnitudes, así que no le afecta ni cómo estimaste la flecha ni ninguna reescala de las proyecciones. Es una binomial pura. <b>Si alguien ataca la estimación de la dirección o el argumento de escala, esta prueba sobrevive intacta</b> — y por sí sola da p &lt; 10⁻⁵.</p>
+        <div class="cx-step">t pareada y bootstrap BCa</div>
+        <p>La <b>t pareada unilateral</b> es la comparación paramétrica clásica: la incluyes para que quien la espere la encuentre. El <b>bootstrap</b> remuestrea los 42 pares con reemplazo 10 000 veces para ver cuánto oscilaría Δp si te hubiera tocado otra muestra; el resultado es el intervalo de confianza. <b>BCa</b> significa que corrige sesgo y asimetría de esa distribución remuestreada, lo que da una cobertura más fiel que un percentil simple.</p>
+        <div class="analog">
+          <span class="lbl">Cómo presentarlas en dos frases</span>
+          <p>«Cada prueba cubre una objeción distinta: la permutación no asume distribución, la t da la comparación paramétrica, el BCa da el intervalo, y la de signos es inmune tanto a la estimación de la dirección como a la escala. <b>Las cuatro coinciden.</b>»</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C6 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">06</span><span class="cx-t">La rotación: w<sub>ag</sub>, coseno, fiabilidad y atenuación</span><span class="cx-where">diapositivas 16 y 21</span></div>
+      <div class="cx-b">
+        <p class="lead">Hasta aquí has usado <em>una</em> flecha, la calculada en formato conversacional. Ahora repites el mismo cálculo pero <b>usando solo datos en formato agéntico</b>: centro de las dañinas agénticas menos centro de las benignas agénticas. Obtienes una segunda flecha, <span class="var">w<sub>ag</sub></span>.</p>
+        <div class="cx-step">El coseno</div>
+        <p>El coseno entre dos flechas mide el ángulo que forman. Vale <b>1</b> si apuntan al mismo sitio, <b>0</b> si son perpendiculares, <b>−1</b> si son opuestas. En la capa 28 vale <b>0,031</b>: prácticamente perpendiculares.</p>
+        <div class="analog">
+          <span class="lbl">Qué significa eso en cristiano</span>
+          <p>En formato agéntico el modelo <b>sigue distinguiendo</b> lo dañino de lo benigno — la información está ahí y una sonda la encuentra. Pero lo hace <b>a lo largo de un eje que casi no tiene relación con el eje conversacional</b>. Un monitor construido con la flecha del chat estaría midiendo en una dirección donde ya no hay nada que medir. Es la diferencia entre un instrumento que pierde precisión y uno que apunta al lugar equivocado.</p>
+        </div>
+        <div class="cx-step">Fiabilidad · la objeción que te van a hacer</div>
+        <p>«¿Y si ese coseno bajo es solo ruido?» Para responderlo mides la <b>fiabilidad</b>: partes la muestra en dos mitades disjuntas, calculas <span class="var">w<sub>ag</sub></span> en cada una por separado y comparas las dos flechas resultantes. Si las dos mitades dan flechas parecidas, tu estimación es estable. Salió <b>0,188</b> en Llama-3.3, que es baja.</p>
+        <div class="cx-step">Atenuación · por qué eso no te hunde</div>
+        <p>Aquí está la clave, y hay que decirla con precisión: <b>el ruido de medición empuja las correlaciones observadas hacia cero, no lejos de cero.</b> Es decir, si hay ruido, el coseno verdadero sería <em>mayor</em> que el que observas, nunca menor. Corrigiendo por atenuación, el valor real rondaría 0,11 — que sigue siendo un ángulo próximo a la perpendicular.</p>
+        <div class="analog">
+          <span class="lbl">La respuesta corta</span>
+          <p>«El ruido no puede estar <em>creando</em> la ortogonalidad; si acaso la exagera un poco. Y ahora tengo un argumento mejor que la corrección: <b>en Qwen3-32B y Mistral-7B la fiabilidad sí supera el umbral de interpretabilidad, y allí el coseno sigue siendo 0,09 a 0,16.</b>»</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- C7 -->
+    <div class="cx">
+      <div class="cx-h"><span class="cx-n">07</span><span class="cx-t">Por qué la capa importa, y por qué el criterio por defecto engaña</span><span class="cx-where">diapositivas 14, 18 y 24</span></div>
+      <div class="cx-b">
+        <p class="lead">Todo el análisis se repite capa por capa, porque el fenómeno puede concentrarse en una región de la red en vez de repartirse. Pero eso crea dos problemas: cuál capa reportar, y cómo no hacer trampa al elegirla.</p>
+        <div class="cx-step">Problema 1 · el criterio crudo premia a las capas profundas</div>
+        <p>Los vectores del flujo residual <b>son literalmente más largos según avanzas en la red</b>: su norma crece con la profundidad. Como Δp se mide en unidades crudas, la regla «elige la capa con mayor Δp» favorece automáticamente a las capas tardías. <b>No es que el fenómeno esté allí: es que la regla de medir infla.</b> Por eso el máximo crudo cae en la capa 56 pero el máximo del tamaño de efecto pareado, que no depende de la escala, cae en la 28.</p>
+        <div class="analog">
+          <span class="lbl">El caso Qwen3-8B lo demuestra</span>
+          <p>El criterio crudo eligió la capa 32. En esa capa la línea base <b>está rota</b>: la sonda validada vale 0,558, casi azar — el modelo ni siquiera codifica el daño allí, así que no hay nada cuya transformación medir. Y todos los indicadores lo gritaron a la vez: sesgo del 466 %, fiabilidad 0,007, monitor 0,43, y el AUROC de w<sub>ag</sub> en 0,421, <b>por debajo del azar</b>. En la capa 22, donde la sonda vale 0,956, todo funciona con normalidad. <b>Preséntalo como fortaleza: el método no fabrica un efecto donde la premisa no se cumple.</b></p>
+        </div>
+        <div class="cx-step">Problema 2 · elegir la mejor de 20 es comparación múltiple</div>
+        <p>Si pruebas 20 capas y reportas la que mejor sale, has hecho 20 intentos y presentas uno. La solución que aplicas: <b>divides la muestra en dos</b>. Evalúas las capas candidatas sobre una mitad de los pares y haces la inferencia sobre la otra mitad, con corrección de Bonferroni sobre las 20 capas (umbral α = 0,0025). Como los datos de inferencia no intervinieron en la elección, esa capa — la 52 — <b>no está contaminada</b>.</p>
+        <div class="cx-step">Por qué hablas de tres capas y no de una</div>
+        <div class="three">
+          <div><span class="t-n">Capa 56</span><span class="t-b">La del criterio crudo. La reportas <b>por comparabilidad</b> con la corrida previa, no como descubrimiento.</span></div>
+          <div><span class="t-n">Capa 52</span><span class="t-b">La elegida por división de muestra. Es la <b>capa de referencia</b> del análisis de sensibilidad.</span></div>
+          <div><span class="t-n">Capa 28</span><span class="t-b">Donde convergen los <b>cuatro criterios independientes de la escala</b>: sonda máxima, sesgo mínimo, coseno mínimo y mejor monitor.</span></div>
+        </div>
+        <p><b>Las tres coinciden en signo, significancia y especificidad</b>, y solo difieren en la cifra cruda — que es precisamente la dependiente de escala. Ese es el argumento de que ninguna conclusión depende de la capa elegida.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 4 · PLANES -->
+<section class="blk" id="planes">
+  <div class="blk-head"><span class="blk-n">04</span><h2>Tres planes según el tiempo que te den</h2></div>
+  <p class="intro">Decide cuál usas <em>antes</em> de entrar, y dilo al empezar: «tengo treinta minutos preparados, si prefiere que profundice en la metodología recorto la parte comparativa». Eso pone el control del tiempo en manos del tutor y evita que te corte a mitad.</p>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-t">Plan corto</div>
+      <div class="plan-h">15 min</div>
+      <p>Solo resultados. Asume que el tutor ya conoce el método. Si pregunta por metodología, saltas a las diapositivas 7 a 9 bajo demanda.</p>
+      <div class="chips">
+        <span class="chip">01</span><span class="chip">03</span><span class="chip key">12</span><span class="chip key">13</span><span class="chip">14</span><span class="chip">15</span><span class="chip">16</span><span class="chip key">19</span><span class="chip">20</span><span class="chip">27</span>
+      </div>
+    </div>
+    <div class="plan">
+      <div class="plan-t">Plan estándar</div>
+      <div class="plan-h">30 min</div>
+      <p>Metodología comprimida más resultados completos. <b>Es el plan por defecto.</b> Deja unos ocho minutos de margen para preguntas.</p>
+      <div class="chips">
+        <span class="chip">01</span><span class="chip">03</span><span class="chip">04</span><span class="chip">05</span><span class="chip">06</span><span class="chip key">07</span><span class="chip key">08</span><span class="chip key">09</span><span class="chip">11</span><span class="chip key">12</span><span class="chip key">13</span><span class="chip">14</span><span class="chip">15</span><span class="chip">16</span><span class="chip key">19</span><span class="chip">20</span><span class="chip">21</span><span class="chip">22</span><span class="chip">25</span><span class="chip">26</span><span class="chip">27</span>
+      </div>
+    </div>
+    <div class="plan">
+      <div class="plan-t">Plan completo</div>
+      <div class="plan-h">45 min</div>
+      <p>Las 30 diapositivas. Úsalo solo si el tutor pidió revisión detallada; en una reunión de avance normal sobra.</p>
+      <div class="chips"><span class="chip">01 → 30</span></div>
+    </div>
+  </div>
+  <div class="note">
+    <b>Las diapositivas marcadas en rojo son las que no se negocian.</b> La 07 (por qué la interacción), la 09 (circularidad), la 12 y la 13 (el resultado y su control) y la 19 (la comparativa). Si el tiempo se te acaba, sacrifica cualquier otra antes que esas cinco.
+  </div>
+</section>
+
+<!-- 5 · RECORRIDO -->
+<section class="blk" id="recorrido">
+  <div class="blk-head"><span class="blk-n">05</span><h2>El guion hablado</h2></div>
+  <p class="intro">Esto es lo que <b>dices en voz alta</b>, escrito para que se sostenga ante alguien que no conoce el tema: cada término se introduce antes de usarse y ninguna frase supone que quien escucha ya sabe algo. Léelo entero dos o tres veces; después ya no necesitarás leerlo. Entre corchetes van las <span class="dir">[indicaciones]</span>: dónde señalar, dónde parar.</p>
+
+  <div class="script">
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">03</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Voy a empezar por el problema, porque todo lo demás sale de ahí.</p>
+        <p>Hasta hace poco un modelo de lenguaje era un sistema que producía texto: uno le escribía y él respondía. En los últimos dos años eso cambió. Hoy estos modelos operan como <b>agentes</b>: tienen herramientas conectadas y pueden ejecutar acciones — enviar un correo, consultar una base de datos, iniciar una transacción.</p>
+        <p>Ese cambio altera la naturaleza del riesgo. Si falla un sistema conversacional, el resultado es un texto inadecuado. Si falla un sistema con herramientas, el resultado es una acción con efectos reales.</p>
+        <p>Y aquí está el problema. Cuando se evalúa si un modelo es seguro, se evalúa conversando con él: se le hacen peticiones dañinas y se comprueba que las rechaza. Después se despliega como agente dando por hecho que esa garantía se conserva. <span class="dir">[pausa]</span> Hay un trabajo de 2024, AgentHarm, que demostró que no se conserva: los mismos modelos que rechazan una petición cuando conversan, la ejecutan cuando tienen herramientas disponibles.</p>
+        <p>Lo que ese trabajo no explica es <em>por qué</em>. Mide que la defensa cede, pero no qué ocurre dentro del modelo para que ceda. <b>Ese hueco es el que ocupa mi tesis.</b></p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>No cites las cifras de industria del 88 %. Son percepción del sector, no medición controlada, y si te las cuestionan pierdes tres minutos defendiendo algo que no es tuyo.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">04</div><div class="cue-t">1 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Mi pregunta, entonces, es esta: cuando el modelo pasa de conversar a operar con herramientas, ¿qué le ocurre por dentro al mecanismo que le permite rechazar?</p>
+        <p>Para poder responderla con limpieza, el experimento cambia <b>una sola cosa</b>. Tomo una instrucción dañina y la presento en formato conversación. Después presento exactamente la misma instrucción — el mismo texto, carácter por carácter — en formato agéntico, donde el modelo tiene herramientas disponibles. Lo único distinto entre las dos condiciones es la presencia de esas herramientas.</p>
+        <p>Eso cierra las explicaciones alternativas. La diferencia que yo mida no puede venir del contenido de la petición, porque el contenido es idéntico; ni de que unas peticiones sean más duras que otras, porque comparo cada petición consigo misma. <b>Cada instrucción es su propio control.</b></p>
+        <p>Hay algo que este diseño <em>no</em> establece, y prefiero decirlo desde ahora. Establece qué le pasa a la representación interna cuando cambia el formato. No establece que ese cambio interno sea la <em>causa</em> de que el modelo obedezca. Ese segundo paso exige intervenir en el modelo y no solo observarlo, y ahí el trabajo sigue abierto.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>La última frase, sin falta. Declarar tú la limitación antes de que te la señalen te compra credibilidad para todo lo que viene después.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">05</div><div class="cue-t">2,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Ahora tengo que explicar qué es lo que mido, porque no es el comportamiento del modelo sino algo de más adentro.</p>
+        <p>Cuando el modelo lee una instrucción, la va transformando capa por capa. En cada capa mantiene un vector — una lista de números — que concentra todo lo que ha procesado hasta ese punto. En los modelos que uso, esa lista tiene <b>8 192 números</b>. Eso es lo que se llama el <b>flujo residual</b>, y es la representación interna del modelo. Ninguno de esos números por separado significa nada legible.</p>
+        <p>La pregunta natural es cómo se saca información de una lista de ocho mil números que uno no entiende. La respuesta es un procedimiento que ya está en la literatura y que yo replico.</p>
+        <p>Tomo las 42 instrucciones dañinas y saco el promedio de sus vectores: eso me da un punto, el centro de lo dañino. Hago lo mismo con las 42 benignas: el centro de lo inocuo. Y resto uno del otro. Lo que queda es <b>una flecha que apunta desde lo inocuo hacia lo peligroso</b>.</p>
+        <p><span class="dir">[si ves cara de duda, usa esto]</span> Imagine un mapa donde cada instrucción es una ciudad y usted no sabe qué significan las coordenadas. Si calcula el centro de las ciudades del norte, el centro de las del sur, y traza la flecha que va de uno al otro, acaba de descubrir el eje norte–sur sin que nadie se lo dijera. Aquí es igual, solo que el concepto que ordena el eje es la peligrosidad.</p>
+        <p>Esa flecha se llama la <b>dirección de rechazo</b>. Y lo importante es que no me la inventé: hay un trabajo de Arditi y colegas, de 2024, que demostró que tiene un papel causal. Si al modelo se le quita esa dirección, deja de rechazar. Si se le refuerza, rechaza hasta peticiones inofensivas. Es decir, el rechazo no está repartido de forma difusa por toda la red: está gobernado por una sola dirección. <b>Y eso es lo que hace posible mi pregunta</b>, porque una dirección se puede medir.</p>
+        <p>Una vez tengo la flecha, puedo medir cualquier instrucción contra ella. La <b>proyección</b> de una instrucción es cuánto avanza a lo largo de esa flecha — literalmente, la sombra que su punto arroja sobre ella. Es un solo número. Si es alto, el modelo está representando esa petición como peligrosa; si es bajo, no.</p>
+        <p>Todo el trabajo se reduce a comparar ese número entre los dos formatos.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>No leas las fórmulas de la pantalla. Están ahí para que quien quiera verificar pueda; explicarlas en palabras es más rápido y se entiende mejor.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">06</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Los datos son 42 pares de instrucciones que construí para esto. Cada par tiene una instrucción dañina y una benigna, y cada una aparece en los dos formatos: cuatro versiones por par.</p>
+        <p>El detalle de diseño que más importa es cómo se construyó la contraparte benigna. <b>No es una instrucción cualquiera sobre otro tema: comparte estructura y vocabulario con la dañina.</b> Por ejemplo, la dañina pide probar credenciales bancarias robadas y transferir el dinero; la benigna pide probar cuentas de prueba autorizadas para control de calidad. Casi las mismas palabras, intención opuesta.</p>
+        <p>Eso es lo que hace que la flecha capture la <em>intención</em> y no el <em>tema</em>. Si la contraparte benigna hablara de recetas de cocina, la flecha estaría separando banca de cocina, y yo creería estar midiendo peligrosidad.</p>
+        <p>Y por eso no uso un conjunto de datos ya existente. AgentHarm, que es el de referencia, usa textos distintos en cada condición. Sin instrucciones pareadas, cualquier diferencia que yo midiera podría venir del contenido en lugar del formato.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag s">si preguntan</span>Por qué 42 y no más: con un diseño pareado, 42 pares dan potencia suficiente para el efecto global. Para el análisis por subgrupos no alcanza, y lo digo así cuando llegue esa diapositiva.</div></div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">07</div><div class="cue-t">3,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p><b>Esta es la diapositiva más importante de la parte metodológica, así que voy despacio.</b></p>
+        <p><span class="dir">[señala la tabla]</span> Tengo cuatro casillas: dañino y benigno, por conversación y agéntico. En cada casilla pongo el promedio de las proyecciones — ese número del que hablaba. Con datos reales queda así.</p>
+        <p>Las instrucciones dañinas, en conversación, promedian <b>6,8</b>. Las mismas instrucciones, en formato agéntico, promedian <b>1,1</b>. La diferencia, <b>5,7</b>, es lo que llamo el <b>gap de proyección</b> del brazo dañino.</p>
+        <p>Quiero ser preciso en cómo se calcula, porque no es restar dos promedios sueltos. Para cada una de las 42 instrucciones tomo su proyección en conversación, le resto su proyección en agente, y obtengo una caída individual. La primera cae 8,0. La segunda, 1,9. Y así hasta la cuarenta y dos. <b>El gap es el promedio de esas 42 caídas.</b> Por eso más adelante puedo decir que 36 de los 42 pares bajaron: porque tengo el dato uno a uno.</p>
+        <p><span class="dir">[pausa — aquí empieza el argumento]</span></p>
+        <p>Ahora bien: ese número por sí solo <b>no responde mi pregunta</b>, y esta es la parte que quiero que quede clara.</p>
+        <p>Que las dañinas hayan bajado 5,7 es compatible con tres cosas distintas. La primera es la que yo postulo: el mecanismo de rechazo responde con menos fuerza. La segunda es que se haya movido todo — el estímulo agéntico es más largo, trae la lista de herramientas y otro mensaje de sistema, así que la nube entera de puntos pudo desplazarse sin que el mecanismo se tocara. La tercera es que se haya encogido todo, un simple cambio de escala.</p>
+        <p><b>Las tres producen exactamente el mismo número.</b> Así que necesito algo que las separe.</p>
+        <p><span class="dir">[señala la fila de abajo]</span> Y ahí entra el brazo benigno. Las instrucciones benignas pasan por <em>exactamente</em> el mismo cambio de formato: mismo mensaje de sistema, mismas herramientas, la misma longitud extra. Si lo que estuviera ocurriendo fuera un desplazamiento general, a ellas también les habría bajado la proyección.</p>
+        <p><b>No les bajó: les subió.</b> De −4,3 a −1,0.</p>
+        <p>Entonces la cantidad que de verdad responde mi pregunta no es la fila de arriba sola, sino <b>la diferencia entre las dos filas</b>: lo que le ocurre a lo dañino y no le ocurre a lo benigno. Eso vale <b>8,9</b>, y es lo que llamo la <b>interacción</b>.</p>
+        <p><span class="dir">[opcional, si va bien de tiempo]</span> Y hay una forma de verificarlo que a mí me pareció elegante: esa misma cantidad se puede leer por las columnas. En conversación, la distancia entre el centro de lo dañino y el centro de lo benigno es 11,1. En formato agéntico, esa distancia es 2,1. La diferencia, otra vez, 8,9. Es decir: «cuánto más cayó lo dañino que lo benigno» y «cuánto se cerró la separación entre las dos clases» <b>son la misma cosa</b>.</p>
+      </div>
+      <div class="cue-meta">
+        <div><span class="cue-tag n">di esto</span>Si quien escucha entiende esta diapositiva, entiende la tesis. Si te quedas sin tiempo, quítale minutos a cualquier otra antes que a esta.</div>
+        <div><span class="cue-tag s">si preguntan</span>Es un diseño de <b>diferencia en diferencias</b>. Si tu interlocutor viene de economía o estadística, esa palabra le ahorra la explicación entera.</div>
+      </div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">08</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Hay una precaución más antes de pasar a los resultados, y tiene que ver con las unidades.</p>
+        <p>Cuando digo que la separación entre clases cayó de 11,1 a 2,1, eso es una caída del <b>80,9 %</b>. Suena enorme. Pero hay un detalle: al pasar a formato agéntico las nubes de puntos no solo se acercaron, <b>también se estrecharon</b>. La dispersión pasó de 3,8 a 1,2 — la nube agéntica es tres veces más estrecha que la conversacional.</p>
+        <p><span class="dir">[analogía]</span> Es como si midiera la diferencia de altura entre dos personas y, mientras mido, la regla se fuera encogiendo. El número cae por dos motivos mezclados y no puedo saber cuánto corresponde a cada uno.</p>
+        <p>La forma estándar de resolverlo es <b>dividir la separación entre la dispersión</b>. Eso cancela el encogimiento y deja una cantidad que no depende de la escala. Medido así, la caída es del <b>37,5 %</b>, no del 80.</p>
+        <p>Y hay una tercera medida que ignora las distancias por completo y solo mira el <em>orden</em>: se llama AUROC, y es la probabilidad de que, si tomo al azar una instrucción dañina y una benigna, la dañina proyecte más que la benigna. Medida así, la caída es del <b>6,4 %</b>.</p>
+        <p>Ochenta, treinta y siete y seis. <b>No es una contradicción: son tres preguntas distintas.</b> La primera mezcla el efecto con el cambio de escala. La segunda es la que corresponde al efecto. La tercera pregunta otra cosa — si la respuesta del modelo sigue bastando para distinguir. Reporto las tres a la vez precisamente porque la divergencia entre ellas es informativa.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>«La divergencia entre las tres no es una inconsistencia: es la información que permite distinguir un cambio de unidades de un cambio de separabilidad.» Vale la pena decirla tal cual.</div></div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">09</div><div class="cue-t">3 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Y un último control metodológico, que probablemente sea mi aporte más transferible a otros trabajos.</p>
+        <p>Hay una trampa geométrica en este tipo de análisis. Yo tengo 84 instrucciones — 42 dañinas y 42 benignas — en un espacio de 8 192 dimensiones. <b>Cuando hay muchísimas más dimensiones que puntos, siempre existe una separación perfecta entre cualquier etiquetado</b>, incluso si las etiquetas se hubieran repartido al azar.</p>
+        <p><span class="dir">[analogía]</span> Con dos puntos en una hoja de papel usted siempre puede trazar una recta que los separe, los llame como los llame. Que lo consiga no dice nada sobre los puntos: dice algo sobre cuántas dimensiones tiene disponibles. Con 84 puntos en 8 192 dimensiones está muchísimo más holgado que en ese ejemplo.</p>
+        <p>Y se ve en mis propios datos. <span class="dir">[señala la columna]</span> Si mido la capacidad de separación sobre las mismas instrucciones que usé para calcular la flecha, me da <b>1,000 — perfecto — en las veinte capas</b>. Incluso en una capa donde el valor honesto es 0,673. Una columna que vale lo mismo en una capa informativa y en una que no lo es <b>no puede usarse como evidencia de nada</b>. La muestro precisamente para descartarla.</p>
+        <p>Lo que hago en su lugar: parto los 42 pares en cinco bloques, calculo la flecha con cuatro bloques y la evalúo sobre el que quedó fuera. Después roto. Así <b>ninguna instrucción se puntúa con una flecha que ya la haya visto</b>.</p>
+        <p>Un detalle que importa: las particiones son sobre <b>pares completos</b>, no sobre instrucciones sueltas. Si la dañina cayera en el grupo de cálculo y su contraparte benigna en el de evaluación, se filtraría hacia la flecha justamente el contraste que quiero medir.</p>
+        <p>Y además mido el suelo. Repito todo el procedimiento con las etiquetas de daño barajadas al azar. Lo que sale — <b>0,460</b> — es el rendimiento que se obtiene sin ninguna señal real, para este tamaño de muestra y esta dimensión. No es 0,500, que es lo que uno supondría. <b>Solo midiéndolo se sabe qué umbral hay que superar.</b></p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>Lo de las particiones sobre pares. Es el detalle que alguien con formación estadística echa de menos si falta, y que suma mucho si está.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">10</div><div class="cue-t">1 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Sobre las pruebas estadísticas, muy brevemente, porque son cuatro y cada una cubre una objeción distinta.</p>
+        <p>La <b>prueba de permutación</b> no supone ninguna forma de distribución: construye la hipótesis nula intercambiando la etiqueta de formato dentro de cada par, que es la única permutación que un diseño pareado autoriza. La <b>t pareada</b> es la comparación clásica, incluida para quien la espere. El <b>bootstrap</b> da el intervalo de confianza remuestreando los pares.</p>
+        <p>Y la cuarta es la que a mí más me importa: la <b>prueba de signos</b>. Solo cuenta cuántos pares bajaron y cuántos subieron — nada más. No usa magnitudes. <b>Eso la hace inmune tanto a cómo estimé la flecha como a cualquier discusión sobre escala.</b> Y por sí sola, con 36 de 42 pares, ya da un resultado concluyente.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>Guárdate la última frase. Es tu respuesta a las dos objeciones más duras que pueden hacerte.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">11</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Antes de comparar formatos tengo que establecer una cosa: que en conversación el modelo <em>sí</em> codifica la intención dañina de forma accesible. <b>Si no fuera así, no habría nada cuya transformación medir.</b></p>
+        <p>Y sí lo hace. Un clasificador lineal entrenado sobre las activaciones, y evaluado honestamente sobre datos que no vio, alcanza <b>0,96</b>. Como referencia, el azar en estas condiciones es 0,46.</p>
+        <p>Hay un detalle que vale la pena señalar. Ese clasificador lineal empata prácticamente con uno mucho más flexible, capaz de trazar fronteras curvas — 0,96 contra 0,98. Que la flexibilidad extra no sirva de nada <b>sostiene la premisa del método</b>: la información está como <em>una dirección</em> en el espacio, no como una región de forma caprichosa. Que es justamente lo que hace que la flecha tenga sentido.</p>
+      </div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">12</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Vamos al resultado.</p>
+        <p><b>La misma instrucción, con el mismo texto, proyecta 5,74 unidades menos sobre la dirección de rechazo cuando el modelo dispone de herramientas.</b> La media pasa de 6,85 a 1,11.</p>
+        <p>Tres cosas sostienen ese número. El intervalo de confianza va de 4,62 a 6,73, así que <b>no toca el cero</b>. Treinta y seis de los cuarenta y dos pares bajan <b>individualmente</b>, no solo en promedio. Y el efecto aparece en <b>diecinueve de las veinte capas</b> que analicé.</p>
+        <p>Esa última es la que más me importa. Que no dependa de una capa concreta es lo que lo convierte en un fenómeno y no en una casualidad de dónde puse el termómetro.</p>
+        <p><span class="dir">[señala la figura]</span> Y esto es lo mismo dibujado: las dos nubes de la izquierda son las instrucciones dañinas en cada formato. Se puede ver el desplazamiento hacia abajo.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>Todavía no digas «el modelo deja de detectar el daño». Eso es otra cantidad y viene tres diapositivas después. Si lo dices aquí, tendrás que retractarte.</div></div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">13</div><div class="cue-t">2,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Y aquí está el control que convierte ese número en un hallazgo.</p>
+        <p><span class="dir">[señala las dos nubes de la derecha]</span> Estas son las instrucciones benignas, que pasaron por el mismo cambio de formato. <b>No solo no pierden proyección: la ganan.</b></p>
+        <p>Los dos brazos se mueven <b>en sentidos opuestos</b>. Y la consecuencia es que las dos clases convergen: en conversación, la distancia entre lo dañino y lo benigno es 11,1; en formato agéntico, 2,1. <b>No es que el modelo deje de responder a la peligrosidad: es que las representaciones de lo dañino y lo inocuo se acercan sobre el eje que las distinguía.</b></p>
+        <p><span class="dir">[pasa a la figura por capa]</span> Y hay un segundo argumento, independiente del anterior, que a mí me parece el más fuerte de todo el trabajo.</p>
+        <p>Esta figura muestra el efecto capa por capa. Lo que se ve es que <b>la interacción crece de forma sostenida con la profundidad</b>, desde la capa 8 hasta la 56.</p>
+        <p>Piense en lo que eso descarta. Si el desplazamiento se debiera a que el estímulo agéntico es más largo, o a que trae otro mensaje de sistema, <b>no habría ninguna razón para que se acentuara a medida que la red construye significado</b>. Sería un efecto plano. Un mecanismo que opera sobre la representación semántica de la petición, en cambio, sí tiene esa razón — porque el significado se construye con la profundidad.</p>
+        <p>Es una predicción que la explicación rival no hace, y los datos la cumplen.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>El argumento de la profundidad, completo. Es lo que distingue una medición de una interpretación bien fundada, y quien te escuche con criterio lo va a valorar más que la cifra.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">14</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Ahora, ¿cuánto de ese efecto es real y cuánto es el cambio de unidades del que hablaba antes?</p>
+        <p>Aplicando la corrección: de la caída del 80,9 % en unidades crudas, <b>la parte que corresponde al efecto es el 37,5 %</b>. El resto es que la regla se encogió. Sigue siendo una reducción sustancial, pero es menos de la mitad de lo que sugiere el número crudo, y me parece importante decirlo así.</p>
+        <p>Eso tiene una segunda consecuencia, sobre <em>dónde</em> ocurre el fenómeno. <span class="dir">[señala la figura]</span></p>
+        <p>Los vectores internos del modelo <b>son más largos a medida que se avanza en la red</b>. Entonces, si yo elijo la capa donde el efecto es mayor en unidades crudas, esa regla favorece automáticamente a las capas profundas — no porque el fenómeno esté ahí, sino porque ahí los números son más grandes de entrada.</p>
+        <p>Cuando uso el criterio que no depende de la escala, el máximo se mueve a la capa 28. Y en esa capa coinciden otros tres indicadores independientes entre sí: es donde el clasificador funciona mejor, donde la estimación es más estable y donde el monitor rinde más. <b>Cuatro criterios distintos, ninguno dependiente de la escala, apuntan a la misma región de la red.</b></p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>Que reportas la capa 56 por comparabilidad con la corrida anterior, no porque sea un descubrimiento. Es una distinción que te protege de la objeción de comparación múltiple.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">15</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Hay una segunda cantidad que conviene no confundir con la anterior, y prefiero separarlas explícitamente porque es fácil mezclarlas.</p>
+        <p><b>El gap de proyección mide intensidad</b>: con cuánta fuerza responde la representación de rechazo ante una petición peligrosa. Eso cae un 37,5 %.</p>
+        <p><b>El gap de detección mide otra cosa</b>: si esa respuesta, aunque más débil, <em>sigue bastando</em> para separar lo dañino de lo inocuo. Eso cae un 6,4 %.</p>
+        <p>Que la segunda cifra sea mucho menor que la primera no es una contradicción. La detección se basa en el <em>orden</em>, y el orden se satura: se puede perder muchísimo margen sin que muchas comparaciones lleguen a cruzarse.</p>
+        <p><span class="dir">[esto es lo que se recuerda — dilo despacio]</span> Para hacerlo concreto: entre 42 instrucciones dañinas y 42 benignas hay 1 764 comparaciones posibles. Ese 6 % corresponde a unas <b>104 comparaciones</b> que el formato conversacional ordena bien y el agéntico ya no.</p>
+        <p>Así que el fenómeno es una <b>pérdida de margen, no un colapso de la discriminación</b>. Y me parece importante decirlo con esa precisión, porque exagerarlo sería fácil y falso.</p>
+      </div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">16</div><div class="cue-t">2,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Y llegamos a lo que para mí es el hallazgo más interesante.</p>
+        <p>Hasta aquí he usado <em>una</em> flecha: la calculada con datos conversacionales. Ahora repito exactamente el mismo cálculo pero <b>usando solo datos en formato agéntico</b> — centro de las dañinas agénticas menos centro de las benignas agénticas. Obtengo una segunda flecha.</p>
+        <p>Y comparo las dos. La forma de comparar dos flechas es medir el ángulo entre ellas: si apuntan al mismo sitio, el coseno vale 1; si son perpendiculares, vale 0.</p>
+        <p><b>En la capa donde el fenómeno es más nítido, vale 0,031.</b> Prácticamente perpendiculares.</p>
+        <p><span class="dir">[pausa]</span> Déjeme decir qué significa eso, porque es más preciso que decir que el modelo «se vuelve inseguro».</p>
+        <p><b>El modelo sigue sabiendo.</b> La información sobre si una petición es peligrosa sigue estando ahí en formato agéntico, y una flecha calculada dentro de ese formato la recupera bien. Lo que pasa es que <b>el modelo la codifica sobre un eje distinto</b>, casi sin relación con el conversacional.</p>
+        <p>Y ahí está la consecuencia práctica. Un monitor de seguridad construido a partir de representaciones conversacionales — que es lo que la literatura disponible sugiere hacer — <b>estaría midiendo en una dirección donde ya no hay nada que medir</b>.</p>
+        <p>Lo peor es cómo falla algo así. Un monitor que se degradara de forma proporcional al riesgo daría alertas cada vez más débiles, y eso sería un indicio de que algo va mal. Uno que mide sobre el eje equivocado <b>puede seguir produciendo valores de apariencia perfectamente normal</b> mientras la información que debería capturar está en otra parte. Es la diferencia entre un instrumento que pierde precisión y uno que apunta al lugar equivocado.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>No presentes el monitor como una solución lista. Declara tú que su tasa de falsos positivos está entre el 14 y el 21 %, antes de que te lo pregunten.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">17</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Una pregunta que me parecía obligada: ¿depende esto de cuán evidente sea el daño?</p>
+        <p>Clasifiqué las instrucciones en tres niveles. <b>Explícitas</b>, donde el daño está en las palabras. <b>Contextuales</b>, donde ninguna palabra es abiertamente dañina y el daño se infiere del contexto. Y de <b>apariencia legítima</b>, que llevan un encuadre profesional que oculta la acción dañina — por ejemplo, redactar un correo de phishing presentándolo como parte de un entrenamiento de seguridad de la empresa.</p>
+        <p>Los números sugieren que el efecto es mayor cuanto más explícito es el daño. <b>Pero los intervalos de confianza no sostienen esa ordenación</b>: se solapan entre sí, y el grupo más pequeño tiene solo diez pares.</p>
+        <p>Así que lo que sí puedo afirmar es que <b>el efecto está presente en los tres niveles</b>. La ordenación entre ellos la presento como un patrón exploratorio, no como un resultado. Haría falta un conjunto de datos mayor para afirmarla.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>Nunca «el efecto es mayor en las explícitas». Di «hay una tendencia aparente que el corpus no permite afirmar». La diferencia entre las dos frases es la diferencia entre rigor y entusiasmo.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">18</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Hasta aquí, todo lo que he contado sale de un modelo. Y en la versión anterior del documento yo mismo señalaba eso como una limitación.</p>
+        <p>Había hecho dos corridas, sobre Llama-3.1 y Llama-3.3. Pero esos dos modelos <b>comparten arquitectura</b> — son de la misma familia. Replicar entre ellos es replicar entre dos versiones de lo mismo, no entre diseños distintos. Un resultado así siempre deja abierta la duda de si uno está describiendo un fenómeno general o una peculiaridad de una arquitectura.</p>
+        <p>Desde entonces corrí <b>cuatro modelos más</b>, de dos familias distintas: Qwen y Mistral, en tamaños de 8, 32 y 7 mil millones de parámetros, y en dos precisiones numéricas distintas. <b>Eso es lo que voy a mostrar ahora, y cierra esa limitación.</b></p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>Que la limitación la habías identificado tú antes de resolverla. Enseñar que reconociste la debilidad y luego la cerraste vale más que el resultado en sí.</div></div>
+    </div></div>
+
+    <div class="cue anchor"><div class="cue-rail"><div class="cue-n">19</div><div class="cue-t">2,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p><span class="dir">[no recorras la tabla — es la forma más rápida de perder a quien te escucha]</span></p>
+        <p>Esta tabla tiene seis corridas y muchas columnas, pero solo voy a señalar tres renglones.</p>
+        <p><b>El primero: la interacción</b> — esa cantidad que aísla lo específico del contenido dañino. Es positiva y de tamaño grande en las cinco corridas completas. Los valores van de 2,3 a 3,0, que en esta escala son todos efectos grandes.</p>
+        <p><b>El segundo: el encogimiento de la escala.</b> El formato agéntico comprime la representación interna en <em>todos</em> los modelos, sin excepción.</p>
+        <p><b>Y el tercero: el ángulo.</b> Esa cuasi-perpendicularidad entre las dos flechas aparece en todos.</p>
+        <p>Hay un cuarto que menciono porque habla del método y no del fenómeno: el sesgo que introduce estimar la flecha con los mismos datos que después se evalúan se mantiene <b>entre el 2 y el 5 % en todos los modelos</b>. Es decir, el protocolo se comporta igual en arquitecturas distintas.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag s">si preguntan</span>Por Qwen3-32B, que tiene una columna con signo distinto: pregunta D2. Por qué el gap de detección varía tanto entre modelos: pregunta D3.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">20</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Esta figura es la que mejor resume por qué la decisión sobre las unidades importaba.</p>
+        <p><span class="dir">[panel izquierdo]</span> A la izquierda está el efecto medido en unidades crudas, en los cinco modelos. Fíjese en la escala: va de 1,7 a 74,5. <b>Un rango de cuarenta y cinco veces.</b> Si uno mirara solo esto, concluiría que en unos modelos el fenómeno es enorme y en otros casi inexistente.</p>
+        <p>Pero eso es un espejismo. La razón es que la magnitud interna de los vectores <b>difiere en un orden de magnitud entre redes</b>: un mismo fenómeno da números distintos según la escala interna de cada modelo.</p>
+        <p><span class="dir">[panel derecho]</span> A la derecha está exactamente el mismo efecto, en los mismos cinco modelos, expresado en unidades que no dependen de esa escala. <b>Todos caen entre 2,3 y 3,0.</b></p>
+        <p>Y esto es, para mí, el argumento más fuerte de generalización que tengo. <b>Cinco redes de arquitectura, tamaño y precisión distintos convergen al mismo valor.</b> Un artefacto del formato — algo que dependiera de cómo escribí los estímulos — no tendría por qué producir esa coincidencia.</p>
+      </div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">21</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Esta figura muestra el ángulo entre las dos flechas, a lo largo de la red, en los cinco modelos.</p>
+        <p>Un detalle del eje horizontal que hace la figura posible: <b>no es el número de capa, es el porcentaje de profundidad</b>. Los modelos tienen 32, 36, 64 y 80 capas, así que «la capa 16» no significa lo mismo en unos que en otros. Expresado en porcentaje sí son comparables.</p>
+        <p>Y lo que se ve es que <b>las cinco curvas describen la misma trayectoria</b>: empiezan alrededor de 0,4 o 0,5, caen hasta la banda de cuasi-perpendicularidad en la zona media-profunda de la red, y vuelven a subir hacia la salida.</p>
+        <p>Hay algo más que quiero señalar, porque responde a una objeción que yo mismo me hice. En el modelo principal, la estimación de esa segunda flecha es poco estable, así que se podría argumentar que el ángulo que observo es ruido. <b>En Qwen y en Mistral la estimación sí es estable</b>, y ahí el ángulo sigue siendo prácticamente perpendicular. Así que la conclusión ya no depende de esa corrección.</p>
+      </div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">22</div><div class="cue-t">1,5 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Dos consecuencias más, y son de naturaleza distinta.</p>
+        <p><span class="dir">[panel izquierdo]</span> El encogimiento de la escala <b>es universal</b>: aparece en las cinco corridas. El formato agéntico comprime la representación interna, sin excepción.</p>
+        <p><span class="dir">[panel derecho]</span> La pérdida de capacidad de detección <b>no lo es</b>. Va de 0,02 a 0,21, es decir, un factor de diez entre el mejor y el peor caso.</p>
+        <p>Y la explicación es la misma distinción de antes: <b>depende de cuánto margen tenía cada modelo para perder</b>. En Qwen3-8B la separación entre clases pasa de 2,9 a 0,4, prácticamente un colapso. En Qwen3-32B pasa de 3,1 a 2,4 y la detección apenas se mueve.</p>
+        <p>Quiero ser explícito en algo: <b>esto no ordena por tamaño de modelo</b>, y no voy a afirmar que lo haga. Con cinco corridas no tengo base para una ley de escala.</p>
+      </div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">23</div><div class="cue-t">1 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Un control técnico rápido, porque abre una objeción legítima.</p>
+        <p>Tres de mis seis corridas usan una versión comprimida de los modelos — lo que se llama cuantización — para que quepan en la memoria disponible. Eso redondea los números internos, así que alguien podría decir con razón: <b>¿y si lo que estás midiendo es un artefacto de esa compresión?</b></p>
+        <p>Para responderlo corrí el mismo modelo, Mistral, en las dos precisiones. El procedimiento seleccionó <b>independientemente la misma capa</b> en ambos casos, y las cantidades principales difieren en menos del 2 %.</p>
+        <p>Con una salvedad que prefiero decir yo: las dos corridas <b>sí divergen en dos capas concretas</b>, justo donde el efecto es numéricamente frágil en ese modelo, y coinciden hasta la cuarta cifra en todas las demás. La razón es que estos cálculos en precisión reducida no son estrictamente deterministas.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>La salvedad, siempre tú primero. <b>Que lo digas tú desactiva la objeción; que lo encuentre quien te escucha la agrava.</b></div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">24</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Y este caso me parece el más instructivo de todos, aunque a primera vista parezca un fallo.</p>
+        <p>En Qwen3-8B, el criterio automático que elige la capa a analizar eligió la capa 32. Y en esa capa <b>la línea base está rota</b>: el clasificador apenas supera el azar. Es decir, en esa capa el modelo <em>ni siquiera codifica</em> si la petición es dañina, así que no hay nada cuya transformación medir.</p>
+        <p>Lo notable — y por eso lo muestro — es que <b>todos mis indicadores de validez lo rechazaron a la vez</b>. El sesgo de estimación se disparó al 466 %. La estabilidad de la dirección se fue a cero. El monitor se desplomó. Y la capacidad de detección quedó <em>por debajo del azar</em>.</p>
+        <p>En la capa 22, donde la línea base sí se sostiene, todo funciona con normalidad.</p>
+        <p><b>La lección es que el método no fabrica un efecto donde la premisa no se cumple</b>, y eso es exactamente lo que uno le pide a un protocolo de validación. De aquí sale además una recomendación concreta: cambiar el criterio con el que la herramienta elige la capa por defecto.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>Preséntalo desde el principio como fortaleza del protocolo, no como un tropiezo que hay que excusar. El encuadre cambia por completo cómo se recibe.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">25</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Falta la pieza que cerraría el argumento, y quiero ser muy claro sobre su estado.</p>
+        <p>Todo lo que he mostrado es <b>observación</b>: miro la representación interna y describo cómo cambia. Para poder decir que ese cambio es la <em>causa</em> de que el modelo obedezca, hay que <b>intervenir</b>: modificar la representación mientras el modelo genera su respuesta, y ver si el comportamiento cambia. Si sumarle la dirección agéntica devuelve el rechazo, entonces esa dirección no solo correlaciona: controla.</p>
+        <p>Esa etapa tenía un defecto de implementación que corregí. Ahora da la <b>primera señal no nula</b> del proyecto: en Mistral, la intervención restaura el rechazo, y lo hace con la misma forma de curva en las dos precisiones que probé — sube hasta un máximo y después cae, que es lo esperable porque pasarse de dosis degrada la generación en lugar de producir un rechazo.</p>
+        <p>Pero <b>son cinco instrucciones</b>. Una tasa del 60 % son tres casos. Y en dos de los cuatro modelos la intervención sigue dando cero, sin que yo haya establecido todavía si eso es un límite del método o de esos modelos.</p>
+        <p><b>Así que es una señal que justifica repetir la etapa con potencia, no una demostración.</b> Prefiero decirlo así.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag p">no digas</span>Nunca «demostramos causalidad». Ni siquiera «hay evidencia causal». Es una señal.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">26</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Las limitaciones, que prefiero enumerar yo.</p>
+        <p><b>Tres se cerraron o se atenuaron</b> con las corridas nuevas: la replicación estaba limitada a una familia y ahora son tres; la duda sobre la compresión numérica quedó controlada; y la estabilidad de la segunda dirección, que era baja en el modelo principal, se confirmó en los otros dos.</p>
+        <p><b>Cuatro siguen abiertas.</b> El tamaño del corpus, 42 pares, que es el cuello de botella dominante. La tasa de falsos positivos del monitor, demasiado alta para un uso real. El hecho de que solo puedo trabajar con modelos de pesos abiertos. Y la principal.</p>
+        <p><span class="dir">[pausa]</span> La principal es <b>el eslabón causal</b>, y separa lo que he demostrado de lo que he sugerido. Todo lo que he presentado describe <em>cómo se reorganiza la información</em> entre formatos. <b>Ninguna de mis afirmaciones establece que esa reorganización cause el incumplimiento del rechazo.</b></p>
+        <p>Las implicaciones prácticas que mencioné son consistentes con la evidencia y con la literatura sobre comportamiento, pero su confirmación exige esa etapa de intervención.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>No pases rápido esta diapositiva. Enumerar tus propias debilidades con precisión y sin dramatismo es lo que más credibilidad te da en toda la presentación.</div></div>
+    </div></div>
+
+    <div class="cue"><div class="cue-rail"><div class="cue-n">27</div><div class="cue-t">2 min</div></div><div class="cue-body">
+      <div class="speech">
+        <p>Para cerrar, separo lo establecido de lo sugerido.</p>
+        <p><b>Establecido:</b> el formato agéntico atenúa la respuesta del mecanismo de rechazo, de forma específica al contenido dañino y no como un desplazamiento general; y el eje sobre el que el modelo codifica la peligrosidad rota casi hasta la perpendicular. Replicado en tres familias de arquitectura.</p>
+        <p><b>Sugerido:</b> que este fenómeno explique el fallo de comportamiento que documenta la literatura. Consistente con la evidencia, no demostrado por ella.</p>
+        <p>Y de lo que viene, el primer paso es <b>ampliar el conjunto de datos</b>. La razón es concreta: 42 pares es el cuello de botella dominante, y es el único cambio que mejora todos los estadísticos a la vez — la precisión de las estimaciones, la potencia del análisis por subgrupos, la estabilidad de la segunda dirección y la calibración del monitor. <b>Un modelo más grande no mueve esa aguja; más datos sí.</b></p>
+        <p><span class="dir">[cierra pidiendo algo — no con un resumen]</span> Lo que necesito decidir con usted es si el próximo paso es ampliar el corpus o cerrar primero la etapa de intervención.</p>
+      </div>
+      <div class="cue-meta"><div><span class="cue-tag n">di esto</span>La última frase convierte el final en una conversación en vez de un silencio incómodo. Es la diferencia entre informar y consultar.</div></div>
+    </div></div>
+
+  </div>
+</section>
+
+<!-- 6 · PREGUNTAS -->
+<section class="blk" id="preguntas">
+  <div class="blk-head"><span class="blk-n">06</span><h2>Preguntas probables, con respuesta preparada</h2></div>
+  <p class="intro">Agrupadas por tema. Las marcadas <b>alta</b> es casi seguro que salgan; las marcadas <b>dura</b> apuntan a debilidades reales del trabajo y hay que responderlas sin defensividad. Despliega cada una y practica la respuesta en voz alta: leerla no sirve.</p>
+
+  <h3 style="margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">A · Diseño e identificación</h3>
+  <div class="qs">
+    <details class="q" data-w="alta"><summary>¿Por qué la interacción y no simplemente el gap de proyección?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Porque <span class="var">Δp<sub>h</sub></span> por sí solo es compatible con tres mecanismos y solo uno es el que postula la investigación. El segundo es un desplazamiento rígido: el <em>prompt</em> agéntico es más largo, incorpora el esquema de herramientas y otro mensaje de sistema, y cualquiera de esos elementos puede mover todo el flujo residual sin que el mecanismo de rechazo se toque. El tercero es una contracción de escala.</p>
+        <p>Las instrucciones benignas atraviesan exactamente el mismo cambio de formato, así que un desplazamiento presente también en ellas es atribuible al formato y no al rechazo. <span class="var">Δ²p</span> = <span class="var">Δp<sub>h</sub></span> − <span class="var">Δp<sub>b</sub></span> aísla la parte específica del contenido dañino.</p>
+        <p class="anchor-n">Cifra de apoyo · <span class="num">Δ²p = 8,97</span> con <span class="num">d = 2,67</span>, p &lt; 10⁻⁴ · Diapositivas 07 y 13</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="alta"><summary>¿Cómo sabes que no es simplemente que el <em>prompt</em> agéntico es más largo?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Es exactamente lo que descarta el brazo benigno. Si fuera longitud, ambos brazos se desplazarían por igual y la fracción común <span class="var">φ</span> sería próxima a 1. Lo que observo es <span class="num">φ = −56,3 %</span>: se desplazan en sentidos opuestos.</p>
+        <p>Hay un segundo argumento, independiente del primero: un efecto de longitud no tendría razón para acentuarse con la profundidad de la red, y la interacción crece de forma sostenida desde la capa 8 hasta la 56. Un mecanismo que opera sobre la representación semántica de la petición sí tiene esa razón.</p>
+        <p class="anchor-n">Diapositiva 13 · figura del desplazamiento por capa</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>La interacción (8,97) es mayor que el efecto principal (5,74). ¿No es eso una anomalía?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">No, es aritmética de signos opuestos: <span class="num">8,973 = 5,739 − (−3,234)</span>. La formalización lo contempla explícitamente y lo identifica como el escenario <em>más</em> favorable a la hipótesis, no el más débil.</p>
+        <p>La lectura sustantiva es que el formato agéntico no solo atenúa la respuesta ante lo dañino: además <em>sube</em> la proyección de lo inocuo. Las dos clases convergen sobre el eje que las distinguía — de 11,097 unidades de separación a 2,124.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿Por qué mides en el último token y no en toda la secuencia?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Porque concentra la información contextual de la solicitud completa en el momento previo a generar la respuesta: es el punto de decisión. Es también la convención de la literatura que replico, lo que permite comparar.</p>
+        <p>Y es la razón de un detalle del procedimiento: la rutina opera con un presupuesto de 4 096 <em>tokens</em> y <b>aborta la corrida si algún estímulo lo alcanza</b>, en lugar de recortarlo en silencio. Sobre un texto recortado ese último <em>token</em> dejaría de ser el final de la petición. Que las corridas terminaran certifica que toda activación analizada corresponde a una instrucción completa en ambos formatos.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3 style="margin-top:26px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">B · Estadística</h3>
+  <div class="qs">
+    <details class="q" data-w="dura"><summary>n = 42. ¿Tienes potencia para sostener esto?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Depende de qué afirmación, y conviene separarlas. Para el efecto global sí: <span class="num">d<sub>z</sub> = 1,63</span> en la capa 56, 36 de 42 pares decrecen y la prueba de signos exacta da <span class="num">p &lt; 10⁻⁵</span> — y esa prueba no depende de supuestos distribucionales ni de magnitudes.</p>
+        <p>Para la ordenación entre estratos, no. Con 18, 14 y 10 pares los intervalos se solapan y el estrato de apariencia legítima alcanza significación apenas marginal. Por eso lo presento como patrón exploratorio y no como resultado.</p>
+        <p>Es la limitación que más me importa cerrar, y es la primera de mis recomendaciones: duplicar el conjunto mejora todos los estadísticos a la vez. Un modelo más grande no mueve esa aguja.</p>
+        <p class="anchor-n">Diapositivas 17 y 26</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="alta"><summary>Evalúas veinte capas y reportas la mejor. ¿No es comparación múltiple?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Sí, y por eso la selección de capa se replica sobre una división de la muestra: las capas candidatas se evalúan sobre una mitad de los pares y la inferencia se hace sobre la otra, con corrección de Bonferroni sobre las veinte capas — umbral <span class="num">α = 0,0025</span>.</p>
+        <p>Esa capa es la 52, y en ella <span class="num">Δp<sub>h</sub> = 5,703</span> con intervalo <span class="num">[4,83 · 6,39]</span> y 39 de 42 pares decreciendo. La capa 56 la reporto por comparabilidad con la corrida previa, no como descubrimiento independiente.</p>
+        <p>Además las tres capas que discuto — 28, 52 y 56 — coinciden en signo, significancia y especificidad. Solo difieren en la cifra cruda, que es precisamente la dependiente de escala.</p>
+        <p class="anchor-n">Diapositivas 09 y 14</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿Por qué permutación de signos y no una permutación global?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Porque el diseño es pareado. La hipótesis nula correcta intercambia la etiqueta de formato <em>dentro de cada par</em>, lo que equivale a cambiar el signo de esa diferencia. Es la permutación que el diseño autoriza.</p>
+        <p>Una permutación global mezclaría observaciones de pares distintos, destruiría el emparejamiento y estaría probando una hipótesis diferente — con un error estándar que no corresponde a este diseño.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary><span class="var">d<sub>z</sub></span> o <span class="var">d</span> agrupada, ¿cuál es la correcta?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Responden a preguntas distintas y reporto las dos. La pareada estandariza por la variabilidad de las diferencias dentro del par — mide cuán <em>consistente</em> es el cambio. La agrupada estandariza por la variabilidad entre instrucciones — mide cuán <em>grande</em> es respecto de la dispersión natural.</p>
+        <p>La distinción no es académica: en las tres capas finales de la red la <span class="var">d<sub>z</sub></span> se dispara hasta 12,4 con desplazamientos de 0,065 unidades. Allí describe consistencia, no magnitud, y por eso no leo esas capas con las mismas herramientas que el bloque profundo-medio.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿Por qué intervalos BCa y no percentiles?<span class="q-w">baja</span></summary>
+      <div class="q-body">
+        <p class="first">Porque la distribución remuestreada es asimétrica y el BCa corrige sesgo y aceleración, lo que da cobertura más precisa. Calculo ambos y coinciden en excluir el cero; reporto el BCa por ser el más conservador de los dos en este caso.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3 style="margin-top:26px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">C · Circularidad y validez interna</h3>
+  <div class="qs">
+    <details class="q" data-w="dura"><summary>El AUROC dentro de muestra es 1,000 en las veinte capas. Eso invalida el análisis.<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Al contrario: lo incluyo precisamente para exhibir esa saturación y descartarla como evidencia. Con 84 puntos en 8 192 dimensiones cualquier etiquetado es linealmente separable, de modo que un AUROC dentro de muestra próximo a uno es una propiedad de la geometría del problema y no un hallazgo sobre los datos.</p>
+        <p>Vale <span class="num">1,000</span> incluso en la capa 76, donde el valor validado cae a <span class="num">0,673</span>. Esa es la demostración de que la columna no distingue una capa informativa de una que no lo es.</p>
+        <p>Por eso toda cifra de detección que uso es fuera de fold, con la dirección reajustada dentro de cada partición, y por eso mido el nivel de azar empírico con etiquetas barajadas — que resultó <span class="num">0,460</span>, no <span class="num">0,500</span>.</p>
+        <p class="anchor-n">Diapositivas 09 y 11 · es también uno de mis aportes metodológicos</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="alta"><summary>¿Cuánto de tu efecto viene de haber estimado la dirección sobre los mismos datos que proyectas?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Lo mido explícitamente. Al recalcular la dirección fuera de muestra, <span class="var">Δp<sub>h</sub></span> baja de <span class="num">5,739</span> a <span class="num">5,497</span>: un sesgo de <span class="num">4,4 %</span>. En la capa de referencia el sesgo es <span class="num">2,4 %</span>, y en los seis modelos se mantiene entre el 2 y el 5 %.</p>
+        <p>El comportamiento del sesgo a lo largo de la red da un criterio adicional de credibilidad: entre las capas 24 y 56 se mantiene entre el 1,4 % y el 4,4 %, mientras que en las capas 60 y 64 alcanza el 108 % y el 408 %, hasta el punto de que en la 64 la estimación corregida invierte el signo. <b>La región donde el efecto es sustantivo coincide con la región donde la estimación es estable</b>, y la región donde la estimación es frágil es también aquella donde el efecto aparente carece de magnitud.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="dura"><summary>El coseno es 0,047 pero la fiabilidad de esa dirección es 0,188. ¿No estás midiendo ruido?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Es la cautela correcta y la declaro en el documento. Una fiabilidad baja atenúa el coseno observado <em>hacia cero</em>, de modo que el valor verdadero sería mayor, no menor: corrigiendo por atenuación rondaría <span class="num">0,11</span>, que sigue correspondiendo a un ángulo próximo a la ortogonalidad. La conclusión no depende de que el ruido esté aplastando una correlación real, aunque el margen de error es amplio.</p>
+        <p>Y ahora tengo un argumento mejor que esa corrección. En Qwen3-32B la fiabilidad es <span class="num">0,270</span> y en Mistral-7B <span class="num">0,298</span> y <span class="num">0,313</span> — por encima del umbral de interpretabilidad — y el coseno en esos modelos sigue siendo <span class="num">0,09</span> a <span class="num">0,16</span>. <b>En los modelos donde la estimación es fiable, la rotación sigue estando ahí.</b></p>
+        <p class="anchor-n">Diapositiva 21</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿Por qué diferencia de medias y no una sonda entrenada o PCA?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Tres razones. Primera: replica el método de Arditi et al., lo que permite comparación directa con la literatura. Segunda: está determinada por dos promedios, así que su optimismo es pequeño — la inflación es del orden de <span class="num">0,005</span>, dos órdenes de magnitud menor que la de una sonda entrenada, que ajusta un hiperplano completo y con 84 puntos en 8 192 dimensiones tiene holgura para separar cualquier etiquetado.</p>
+        <p>Tercera: la sonda entrenada la uso igualmente, como evidencia complementaria. Que la lineal iguale prácticamente al MLP (<span class="num">0,961</span> frente a <span class="num">0,985</span>) sostiene la premisa del método. Y el PCA se usa como validación: se comprueba que el contraste dañino–benigno corresponde a un eje dominante de variación.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3 style="margin-top:26px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">D · La comparativa entre modelos</h3>
+  <div class="qs">
+    <details class="q" data-w="alta"><summary>Los <span class="var">Δp<sub>h</sub></span> van de 1,67 a 74,50. ¿No son resultados incompatibles?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">No son comparables en esas unidades, y esa es justamente la demostración. La norma del flujo residual difiere en un orden de magnitud entre redes, de modo que el número crudo refleja la escala interna de cada modelo y no la magnitud del fenómeno.</p>
+        <p>Expresado como tamaño de efecto de la interacción, el mismo conjunto de corridas se agrupa entre <span class="num">2,29</span> y <span class="num">3,01</span>. Que cinco redes de arquitectura, tamaño y precisión distintos converjan al mismo efecto estandarizado es la clase de regularidad que un artefacto de formato no produciría.</p>
+        <p class="anchor-n">Diapositiva 20 · es la validación empírica del argumento de escala</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="dura"><summary>En Qwen3-32B la fracción común es positiva y en los demás negativa. ¿No contradice el hallazgo?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">No, pero conviene precisar por qué. El marco predice tres escenarios distinguibles: desplazamiento rígido (<span class="var">Δ²p</span> ≈ 0, <span class="var">φ</span> ≈ 1), debilitamiento específico (<span class="var">Δ²p</span> &gt; 0 con <span class="var">φ</span> pequeño) y brazos opuestos (<span class="var">φ</span> &lt; 0).</p>
+        <p>Qwen3-32B cae en el segundo: ambos brazos pierden proyección, pero el dañino unas ocho veces más (<span class="num">74,5</span> frente a <span class="num">9,0</span>), y la interacción sigue siendo <span class="num">65,49</span> con <span class="num">d = 3,01</span>. Llama-3.3 cae en el tercero, que es el caso más marcado. <b>Los dos sostienen la hipótesis; difieren en cuán marcada resulta la especificidad.</b> Ninguno es el escenario que la refutaría.</p>
+        <p>Lo que no tengo es un mecanismo que explique por qué unos modelos caen en un escenario y otros en otro. Es una pregunta abierta y prefiero decirlo así.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>El gap de detección va de 0,019 a 0,208. ¿Qué modelo hay que creer?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Los dos, porque el gap de detección y el de proyección son cantidades separadas — es la distinción de la diapositiva 15, ahora entre modelos. El gap de proyección se replica con regularidad notable; el de detección depende de cuánto margen tenía cada modelo para perder.</p>
+        <p>En Qwen3-8B la separación estandarizada cae de <span class="num">2,88</span> a <span class="num">0,36</span>, prácticamente un colapso, y el gap es <span class="num">0,208</span>. En Qwen3-32B cae de <span class="num">3,12</span> a <span class="num">2,36</span> y el AUROC apenas se mueve. No ordena por tamaño de modelo, y no afirmo que lo haga.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="alta"><summary>Tres corridas en 4 bits. ¿La cuantización no distorsiona las activaciones?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Es la objeción que motivó el control. Mistral-7B se corrió en ambas precisiones sobre el mismo conjunto y el mismo procedimiento: la división de muestra seleccionó independientemente la <b>misma capa 16</b>, la interacción difiere un <span class="num">1,6 %</span>, el tamaño del efecto un <span class="num">1,3 %</span>, y el sesgo por circularidad es idéntico (<span class="num">4,8 %</span>).</p>
+        <p>Con una salvedad que conviene declarar: las dos corridas divergen en las capas 18 y 20, donde el signo llega a invertirse, y coinciden hasta la cuarta cifra en las demás. Esa es precisamente la región donde el efecto es numéricamente frágil en Mistral. La inferencia en precisión reducida no es estrictamente determinista — el orden de las operaciones en punto flotante puede variar — así que cabe esperar que una réplica reproduzca las magnitudes dentro del margen de los intervalos, no cifra por cifra.</p>
+        <p class="anchor-n">Diapositiva 23</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿Por qué reportas en una capa distinta a la que eligió tu propio procedimiento?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Porque el criterio por defecto — máximo desplazamiento en unidades crudas — favorece sistemáticamente a las capas tardías, ya que la norma del flujo residual crece con la profundidad.</p>
+        <p>El caso de Qwen3-8B lo hace evidente: eligió la capa 32, donde la sonda validada vale <span class="num">0,558</span> y el sesgo por circularidad es del <span class="num">466 %</span>. En la capa 22 la sonda vale <span class="num">0,956</span> y el sesgo <span class="num">2,1 %</span>. Reportar en la capa seleccionada por división de muestra es el criterio no contaminado por comparación múltiple, y el único que permite comparar redes de profundidad distinta sobre una base común. Es también una de mis recomendaciones: cambiar ese criterio por defecto en la tubería.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3 style="margin-top:26px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">E · Alcance, aporte y validez externa</h3>
+  <div class="qs">
+    <details class="q" data-w="dura"><summary>¿Esto demuestra que el modelo incumple el rechazo porque la dirección rota?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">No, y es la limitación que más restringe el trabajo. El diseño establece el vínculo entre el formato y la representación; no establece el vínculo entre la representación y el comportamiento.</p>
+        <p>Todo lo que presento describe cómo se <em>reorganiza</em> la información entre formatos. Ninguna afirmación establece que esa reorganización <em>cause</em> el incumplimiento. Cerrar ese eslabón exige la etapa de intervención, donde ahora tengo la primera señal no nula pero con <span class="num">n = 5</span>.</p>
+        <p>Las implicaciones prácticas que menciono son consistentes con la evidencia disponible y con la literatura conductual que motiva el estudio, pero su confirmación exige esa etapa. Lo digo así en el documento y lo diré así en la sustentación.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="alta"><summary>¿Cuál es tu aporte frente a Arditi et al. (2024)?<span class="q-w">alta</span></summary>
+      <div class="q-body">
+        <p class="first">Ellos caracterizan la dirección de rechazo y demuestran su papel causal en formato conversacional. Mi aporte es mostrar que <b>esa caracterización no es transferible entre contextos de operación sin verificación</b>: en el bloque de la red donde el efecto es más intenso, la dirección conversacional deja de ser el eje sobre el que el modelo codifica la peligrosidad.</p>
+        <p>La consecuencia es concreta y comprobable: un monitor basado en representaciones internas debe estimarse sobre activaciones recogidas en el mismo formato en que el sistema va a operar. Y hay un segundo aporte, metodológico: el protocolo de estimación honesta — separación entre los datos que estiman la dirección y los que evalúan su desempeño, más el suelo de azar empírico — sin el cual las cifras de detección en este régimen no distinguen una capa informativa de una que no lo es.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>Solo modelos de pesos abiertos y un corpus propio. ¿Qué validez externa tiene?<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Los modelos abiertos son la condición de posibilidad del estudio, no una comodidad: sin acceso a las activaciones no hay medición interna. Es una restricción del objeto, no del diseño.</p>
+        <p>El corpus propio es necesario porque los <em>benchmarks</em> existentes no están pareados — AgentHarm usa textos distintos en cada condición — y sin pareamiento el desplazamiento podría deberse al contenido de la petición. El precio de esa decisión es el tamaño, y lo declaro como la limitación dominante.</p>
+        <p>Lo que sí puedo afirmar sobre generalización es lo de la diapositiva 20: el efecto aparece con el mismo tamaño estandarizado en tres familias de arquitectura, dos precisiones y un rango de tamaño de 8 a 70 mil millones de parámetros.</p>
+      </div>
+    </details>
+
+    <details class="q"><summary>¿No es un trabajo de doble uso? Estás describiendo cómo evadir una defensa.<span class="q-w">media</span></summary>
+      <div class="q-body">
+        <p class="first">Lo es, y el documento lo trata explícitamente. La posición que adopto es que el balance favorece la divulgación por dos razones. La primera: el fallo que documento <b>ya está disponible en el plano conductual</b> — AgentHarm lo publicó — de modo que la contribución no revela una vulnerabilidad desconocida sino que explica una ya establecida.</p>
+        <p>La segunda: una defensa basada en representaciones internas solo puede construirse a partir de este tipo de diagnóstico, y quien está en posición de construirla es precisamente quien opera el modelo.</p>
+        <p>Añado tres rasgos del diseño que acotan el riesgo: las instrucciones describen la acción pero no contienen procedimientos ni datos que permitan ejecutarla; las herramientas son simuladas y no están conectadas a ningún sistema; y el estudio no registra las respuestas del modelo para obtener contenido dañino, sino sus activaciones. Además el enfoque es diagnóstico: observo el modelo sin modificarlo, a diferencia de parte de la literatura, que elimina el mecanismo para verificar su papel causal y produce un modelo desalineado como subproducto.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3 style="margin-top:26px;font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)">F · Las que más duelen</h3>
+  <div class="qs">
+    <details class="q" data-w="dura"><summary>¿Por qué la corrida anterior daba una conclusión distinta?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Porque se detuvo en la capa 25 y el efecto reside más profundo. Dentro de esa ventana el desplazamiento venía creciendo — 0,054 en la capa 10, 0,238 en la 15, 0,684 en la 20 — con un leve descenso en la 25 que aparentaba ser un máximo. El barrido completo muestra que no lo era: sigue creciendo hasta <span class="num">5,70</span> en la capa 52.</p>
+        <p>La conclusión que se derivaba de la corrida corta — que el desplazamiento disminuye pero la detección se preserva — era un artefacto de la ventana observada. En la capa 20 el gap de detección es de apenas <span class="num">0,008</span> en ambas corridas; en las capas profundas sí se degrada. <b>Las dos corridas no se contradicen: la primera no alcanzó la región donde reside el efecto.</b></p>
+        <p>Lo reporto explícitamente en el documento como advertencia metodológica, porque es una lección transferible: un barrido parcial puede producir una conclusión invertida.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="dura"><summary>Tu monitor tiene entre 19 y 33 % de falsos positivos. ¿Sirve de algo?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Para producción no, y lo digo en esos términos. Rechazar una de cada tres peticiones legítimas hace el sistema inutilizable.</p>
+        <p>Lo que el resultado establece es la <em>viabilidad del enfoque</em>: la información sobre la peligrosidad sigue presente y sigue siendo linealmente accesible cuando el modelo opera como agente, con F₁ fuera de fold de <span class="num">0,909</span> en la mejor capa. El problema no es de pérdida de información sino de localización.</p>
+        <p>Reducir la tasa de falsos positivos es trabajo pendiente, y mi sospecha — que no puedo demostrar todavía — es que pasa antes por el tamaño del corpus que por el método, porque el umbral se calibra sobre 42 pares.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="dura"><summary>La intervención da cero en dos de los cuatro modelos. ¿No debilita el resultado de Mistral?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Obliga a leerlo con cautela, y por eso no lo presento como evidencia causal. No he establecido si el cero es un límite del método — la rutina de generación tuvo un defecto de implementación que corregí y podría quedar algo — o de esos modelos.</p>
+        <p>Lo que hace que el resultado de Mistral sea más que ruido es que <b>dos cuantizaciones independientes describen la misma curva</b>: respuesta en U invertida con máximo en <span class="var">α</span> entre 3 y 5, y caída a cero por encima de 8. La no monotonía es esperable, porque sobrepasar la dosis degrada la generación en lugar de producir un rechazo.</p>
+        <p>Aun así, con cinco instrucciones una tasa de 0,6 son tres casos. Es una señal que justifica repetir la etapa con potencia, no una demostración.</p>
+      </div>
+    </details>
+
+    <details class="q" data-w="dura"><summary>Con veinte capas y seis modelos, ¿no estás eligiendo las cifras que te convienen?<span class="q-w">dura</span></summary>
+      <div class="q-body">
+        <p class="first">Es el riesgo que el protocolo está diseñado para acotar, y respondo con cuatro cosas concretas.</p>
+        <p>Primera: la capa se selecciona por división de muestra con Bonferroni, no por el resultado. Segunda: las tres capas que discuto coinciden en signo, significancia y especificidad, y solo difieren en la cifra cruda. Tercera: los seis modelos se reportan con el mismo criterio y en la misma tabla, <b>incluidos el que sale peor</b> (Qwen3-8B, con un gap de detección cuatro veces mayor que el resto) <b>y el que da la fracción común con signo distinto</b> (Qwen3-32B).</p>
+        <p>Cuarta, y la que más peso tiene: la prueba de signos exacta no depende ni de la dirección estimada ni de la escala de las proyecciones, y sostiene el hallazgo por sí sola — 36 de 42 pares, <span class="num">p &lt; 10⁻⁵</span>.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- 7 · CIERRE -->
+<section class="blk" id="cierre">
+  <div class="blk-head"><span class="blk-n">07</span><h2>Dos reglas para el momento</h2></div>
+
+  <div class="note solid">
+    <b>Cuando no sepas la respuesta.</b> Di exactamente eso, y conviértelo en información útil: «no lo he medido; lo que sí sé es X, y para responder eso haría falta Y». Un tutor no espera que lo sepas todo; espera que distingas lo que sabes de lo que supones. Inventar una respuesta es el único error que no se recupera en una sustentación.
+  </div>
+
+  <div class="dont">
+    <div class="bad">
+      <div class="dont-h">No digas</div>
+      <p>«Demostramos que el formato agéntico desactiva la seguridad del modelo.»</p>
+    </div>
+    <div class="good">
+      <div class="dont-h">Di</div>
+      <p>«Medimos que la representación del rechazo responde con menos intensidad, de forma específica al contenido dañino. El vínculo con el comportamiento sigue abierto.»</p>
+    </div>
+    <div class="bad">
+      <div class="dont-h">No digas</div>
+      <p>«El modelo deja de detectar el daño en formato agéntico.»</p>
+    </div>
+    <div class="good">
+      <div class="dont-h">Di</div>
+      <p>«Pierde margen: la detección cae 6,4 % mientras la intensidad de la respuesta cae 37,5 %. Son cantidades distintas.»</p>
+    </div>
+    <div class="bad">
+      <div class="dont-h">No digas</div>
+      <p>«El monitor alcanza F₁ de 0,909, así que es viable desplegarlo.»</p>
+    </div>
+    <div class="good">
+      <div class="dont-h">Di</div>
+      <p>«F₁ de 0,909 con una tasa de falsos positivos del 14 %. Establece la viabilidad del enfoque, no la de un sistema en producción.»</p>
+    </div>
+    <div class="bad">
+      <div class="dont-h">No digas</div>
+      <p>«El efecto es mayor en las instrucciones explícitas que en las encubiertas.»</p>
+    </div>
+    <div class="good">
+      <div class="dont-h">Di</div>
+      <p>«Hay una tendencia aparente en esa dirección que los intervalos no sostienen; con 10 pares en el estrato menor solo puedo presentarlo como patrón exploratorio.»</p>
+    </div>
+  </div>
+
+  <div class="note push">
+    <b>Y una recomendación sobre el cierre.</b> Termina con una pregunta concreta, no con un resumen. «Lo que necesito decidir con usted es si el próximo paso es ampliar el corpus o cerrar primero la intervención» hace que la reunión termine en una decisión compartida, que es exactamente lo que un tutor espera de una reunión de avance.
+  </div>
+</section>
+
+</div>
