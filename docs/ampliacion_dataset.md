@@ -6,6 +6,39 @@ Implementación: [`data/build_agentharm_pairs.py`](../data/build_agentharm_pairs
 
 ---
 
+## 0. Estado actual: el corpus v2
+
+**El corpus vigente es [`data/dataset_v2.jsonl`](../data/dataset_v2.jsonl): 96 pares, 384 entradas.** Corrige las dos debilidades que este documento dejaba abiertas. El resto del documento describe cómo se llegó hasta aquí y sigue siendo válido como registro de las decisiones.
+
+```bash
+python data/prepare_dataset_v2.py --input <ruta>/dataset_v2.jsonl \
+       --etiquetado <ruta>/etiquetado_anotado.csv
+./scripts/run_modelo.sh <modelo> <salida> --no-quantize --dataset-path data/dataset_v2.jsonl
+```
+
+### Qué corrige
+
+| | Antes | Corpus v2 |
+|---|---|---|
+| Pares | 93 | **96** |
+| Estratos por explicitud | 18 / 14 / 10 + 51 sin etiquetar | **42 / 24 / 30**, todos etiquetados |
+| Emparejamiento léxico medio | 0,492 propio · 0,299 metas | **0,463** en todo el corpus |
+| Categorías | 8 | 7 (se retira *contenido sexual*) |
+
+Dos cambios lo explican. Se añadieron **20 pares propios nuevos, todos de apariencia legítima**, que era el estrato más débil con solo 10; y se **etiquetaron los 34 pares importados** de AgentHarm, que antes entraban como `sin_etiquetar`. El estrato que apenas alcanzaba significación pasa de 10 a 30 pares.
+
+Los 42 pares originales se conservan **verbatim**: presentes, sin una palabra cambiada, ninguno perdido.
+
+### Dos cosas que hay que declarar en el documento de tesis
+
+**Los gemelos benignos de AgentHarm ya no son todos los publicados.** De los 34 pares importados, 16 conservan el benigno del *benchmark* y **18 fueron reescritos** para que sean pares mínimos. Eso sube su emparejamiento de 0,273 a 0,439 y es una mejora metodológica real, pero cambia la procedencia: la formulación correcta es *«instrucciones dañinas de AgentHarm, con contrapartes benignas reescritas según el criterio de par mínimo»*, no *«pares de AgentHarm»*. Una instrucción dañina también se retocó, `ah_val_38`, para quitar una contradicción del original (*copyrighted **free** assets*).
+
+**El etiquetado de explicitud lo hizo un solo anotador.** Las 34 etiquetas coinciden con el corpus sin discrepancias, pero las columnas `anotador_2` y `consenso` están vacías, así que **no puede calcularse la κ de Cohen**. El análisis por estratos debe reportarse como de un anotador único hasta que exista el segundo. El registro está en [`data/etiquetado_explicitud_v2.csv`](../data/etiquetado_explicitud_v2.csv), con la justificación de cada etiqueta.
+
+Un detalle menor: `ah_val_95` queda en 0,179 de similitud léxica, un milésimo por debajo del umbral histórico de 0,180. Se conserva por ser una diferencia sin significado práctico; retirarlo es una línea si se prefiere el criterio estricto.
+
+---
+
 ## 1. Por qué ampliar, y qué no resuelve ampliar
 
 Con 42 pares, el tamaño de muestra es el cuello de botella dominante del trabajo: limita a la vez la amplitud de todos los intervalos, la potencia del análisis por estratos, la fiabilidad de la dirección agéntica y la calibración del umbral del monitor. Un modelo más grande no mueve ninguna de esas cuatro cosas; más pares las mueve todas.
@@ -198,13 +231,13 @@ python data/build_agentharm_pairs.py
 python data/build_agentharm_pairs.py --estilo pareado
 
 # Análisis principal, máxima potencia
-./run_modelo.sh Qwen/Qwen3-8B ./results_qwen8b_ampliado --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_ampliado --no-quantize \
     --dataset-path data/dataset_expanded.jsonl
 
 # Metas frente a procedimientos: dos corridas, misma composición
-./run_modelo.sh Qwen/Qwen3-8B ./results_qwen8b_proc --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_proc --no-quantize \
     --dataset-path data/dataset_expanded_procedimientos.jsonl --agency-level autonomous
-./run_modelo.sh Qwen/Qwen3-8B ./results_qwen8b_metas --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_metas --no-quantize \
     --dataset-path data/dataset_expanded_metas.jsonl --agency-level autonomous
 
 # Sin --dataset-path, el pipeline usa dataset_full.jsonl como siempre

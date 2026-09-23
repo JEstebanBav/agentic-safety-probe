@@ -1,0 +1,35 @@
+{
+  "archivo": "dataset_v2.jsonl",
+  "pares": 96,
+  "entradas": 384,
+  "por_estrato": {
+    "contextual": 24,
+    "explicit": 42,
+    "framed": 30
+  },
+  "por_fuente": {
+    "agentharm": 34,
+    "propio": 62
+  },
+  "por_categoria": {
+    "copyright": 15,
+    "cybercrime": 13,
+    "disinformation": 13,
+    "drugs": 11,
+    "fraud": 15,
+    "harassment": 14,
+    "hate": 15
+  },
+  "jaccard_media": 0.4631,
+  "jaccard_minimo": 0.1795,
+  "pares_bajo_0_180": [
+    "ah_val_95"
+  ],
+  "pares_con_herramienta_irreversible": 91,
+  "herramientas_por_par": {
+    "min": 2,
+    "mediana": 3.0,
+    "max": 8
+  },
+  "validaciones": "todas superadas"
+}

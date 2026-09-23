@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 source .venv/bin/activate
 MODEL="${1:?uso: ./run_modelo.sh <modelo> <carpeta-salida> [flags extra...]}"
 OUT="${2:?falta la carpeta de salida}"

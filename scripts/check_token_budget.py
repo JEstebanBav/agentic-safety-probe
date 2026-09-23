@@ -29,7 +29,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.agency import AGENCY_LEVELS, expand_toolbox, format_agency_prompt  # noqa: E402
