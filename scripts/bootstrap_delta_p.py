@@ -48,7 +48,7 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.robust_estimation import (  # noqa: E402
     paired_bootstrap_ci,
@@ -299,7 +299,7 @@ def print_detail(r: Dict, ci_level: float) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--results", type=str, default="results/results.json",
+    ap.add_argument("--results", type=str, default="results/llama31_hackathon/results.json",
                     help="results.json produced by run_experiment.py")
     ap.add_argument("--n-boot", type=int, default=10000,
                     help="bootstrap resamples (default 10000)")

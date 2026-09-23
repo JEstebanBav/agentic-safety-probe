@@ -1,10 +1,13 @@
 import json, os
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
 
 RUNS = {
-    "Mistral-7B  FP16 ": "results_mistral7b",
-    "Mistral-7B  4-bit": "results_mistral7b_4bit",
-    "Qwen3-32B   4-bit": "results_qwen32b",
-    "Llama-3.3-70B    ": "results_llama33",
+    "Mistral-7B  FP16 ": "results/mistral7b_fp16",
+    "Mistral-7B  4-bit": "results/mistral7b_4bit",
+    "Qwen3-32B   4-bit": "results/qwen32b",
+    "Llama-3.3-70B    ": "results/llama33",
 }
 
 def at(pl, frac):
@@ -20,7 +23,7 @@ print(f"{'modelo':<18}{'capas':>6}{'cos@25%':>9}{'cos@50%':>9}{'cos@75%':>9}"
 print("-" * 88)
 
 for name, d in RUNS.items():
-    f = os.path.join(d, "agent_direction_results.json")
+    f = os.path.join(ROOT, d, "agent_direction_results.json")
     if not os.path.exists(f):
         print(f"{name:<18}  (sin datos: {d})")
         continue
@@ -46,7 +49,7 @@ print("reliab < 0.25 => el angulo NO es interpretable (MIN_RELIABILITY_FOR_CORRE
 print()
 
 for name, d in RUNS.items():
-    f = os.path.join(d, "agent_direction_results.json")
+    f = os.path.join(ROOT, d, "agent_direction_results.json")
     if not os.path.exists(f):
         continue
     r  = json.load(open(f))

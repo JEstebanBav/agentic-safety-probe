@@ -139,10 +139,10 @@ El contenido de la trayectoria es deliberadamente neutro: no contiene nada relac
 Una corrida por nivel; sin `--agency-level`, el comportamiento es exactamente el de siempre.
 
 ```bash
-./run_modelo.sh Qwen/Qwen3-8B ./results_qwen8b_c2 --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_c2 --no-quantize \
     --dataset-path data/dataset_expanded.jsonl --agency-level workflow
 
-./run_modelo.sh Qwen/Qwen3-8B ./results_qwen8b_c3 --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_c3 --no-quantize \
     --dataset-path data/dataset_expanded.jsonl --agency-level autonomous
 ```
 

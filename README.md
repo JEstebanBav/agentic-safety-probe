@@ -206,17 +206,32 @@ An autonomous agent receives goals, not procedures. Concise prompts share less
 vocabulary with their benign twin, so fewer clear the threshold (39/52 vs 51/52);
 requiring a behaviour to clear it in **both** wordings leaves 38.
 
-**The three corpora**
+**The corpora**
 
 | File | Wording | Pairs | Entries | Use |
 |---|---|---|---|---|
+| **`dataset_v2.jsonl`** | goals | **96** | 384 | **current corpus** |
 | `dataset_full.jsonl` | — | 42 | 168 | original, untouched |
-| `dataset_expanded.jsonl` | procedures | **93** | 372 | main analysis, maximum power |
+| `dataset_expanded.jsonl` | procedures | 93 | 372 | superseded by v2 |
 | `dataset_expanded_procedimientos.jsonl` | procedures | 80 | 320 | goals ↔ procedures contrast |
-| `dataset_expanded_metas.jsonl` | **goals** | 80 | 320 | goals ↔ procedures contrast |
+| `dataset_expanded_metas.jsonl` | goals | 80 | 320 | goals ↔ procedures contrast |
 
 The two 80-pair corpora hold the same behaviours, so comparing them isolates the
 wording instead of confounding it with corpus composition.
+
+**`dataset_v2.jsonl` is the corpus to run.** It fixes the weakest point of the
+design: the explicitness strata go from 18 / 14 / 10 (plus 51 unlabelled pairs)
+to **42 / 24 / 30, all labelled**, by adding 20 new hand-crafted *framed* pairs
+and labelling the imported ones. The 42 original pairs are preserved verbatim.
+Two caveats belong in any write-up: 18 of the 34 AgentHarm benign twins were
+**rewritten** to satisfy the minimal-pair criterion (so they are no longer the
+published benchmark's), and the explicitness labels come from **a single
+annotator**, so no Cohen's κ can be reported yet.
+
+```bash
+python data/prepare_dataset_v2.py --input <path>/dataset_v2.jsonl --etiquetado <path>/labels.csv
+python run_experiment.py --model <model> --dataset-path data/dataset_v2.jsonl
+```
 
 **Tools**
 
@@ -302,7 +317,7 @@ cd /workspace
 unzip agentic-safety-probe-runpod.zip
 pip install -r requirements.txt
 huggingface-cli login
-# Open run_experiment_runpod.ipynb
+# Open notebooks/run_experiment_runpod.ipynb
 ```
 
 Recommended GPU: RTX A5000 ($0.27/hr, 24GB). Full experiment costs ~$0.20.
@@ -407,7 +422,7 @@ agentic-safety-probe/
 │   └── decision_log.md          # Design decisions and rationale
 ├── tool_definitions.json        # 26 original tool schemas (85 with the imported ones)
 ├── run_experiment.py            # Main CLI pipeline
-├── run_experiment_runpod.ipynb   # Cloud notebook
+├── notebooks/run_experiment_runpod.ipynb   # Cloud notebook
 ├── bootstrap_delta_p.py         # DeltaP CIs from saved results (no GPU)
 ├── validate_corrections.py      # Ground-truth checks of the estimators (no GPU)
 └── requirements.txt
