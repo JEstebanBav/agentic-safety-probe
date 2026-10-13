@@ -117,11 +117,44 @@ def compute_refusal_direction_pca(
         pc1 = -pc1
         cosine_sim = -cosine_sim
     
+    # PC1 need not be the component that carries the contrast: when another
+    # source of variation is larger (prompt length, topic), the harmful/benign
+    # axis shows up as PC2 or PC3. Reporting only cos(PC1, d) would then read
+    # as a failed validation when the direction is in fact a principal axis.
+    cos_components = [
+        abs(float(np.dot(c / np.linalg.norm(c), diff_means_dir)))
+        for c in pca.components_
+    ]
+    best_component = int(np.argmax(cos_components))
+
+    # Share of the TOTAL variance that lies along the difference-in-means
+    # direction, and how much of the variance along it is between classes.
+    # Unlike the cosine, neither depends on which component the axis lands in.
+    proj = contrast_matrix @ diff_means_dir
+    total_var = float((contrast_matrix ** 2).sum() / (len(contrast_matrix) - 1))
+    var_along = float(np.var(proj, ddof=1))
+    n_h = len(harmful_activations)
+    grand = float(proj.mean())
+    between = (
+        n_h * (float(proj[:n_h].mean()) - grand) ** 2
+        + (len(proj) - n_h) * (float(proj[n_h:].mean()) - grand) ** 2
+    )
+    total_ss = float(((proj - grand) ** 2).sum())
+
     validation = {
         "cosine_similarity_with_diff_means": float(cosine_sim),
         "explained_variance_ratio_pc1": float(pca.explained_variance_ratio_[0]),
         "explained_variance_ratios": pca.explained_variance_ratio_.tolist(),
         "directions_aligned": bool(cosine_sim > 0.8),
+        "cosines_with_components": cos_components,
+        "best_aligned_component": best_component + 1,
+        "cosine_best_component": cos_components[best_component],
+        "variance_fraction_along_direction": (
+            var_along / total_var if total_var > 0 else float("nan")
+        ),
+        "between_class_share_along_direction": (
+            between / total_ss if total_ss > 0 else float("nan")
+        ),
     }
     
     return pc1, validation

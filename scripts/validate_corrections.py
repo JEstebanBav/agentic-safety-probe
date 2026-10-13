@@ -47,6 +47,32 @@ G. HELD-OUT AUROC
                  out-of-fold value ~0.5. This is experiment C's point made for
                  the difference-in-means direction rather than for a probe.
 
+H. PAIR FOLDS    A harmful prompt and its benign twin share a template, so
+                 their activations share a large component. Folding the 84
+                 rows freely puts one twin in training and the other in the
+                 test fold, with opposite labels: the probe learns the shared
+                 component as evidence for the WRONG label of the held-out
+                 twin. With nothing to detect, the AUROC must be ~0.5; row
+                 folds report far less, and with a real signal they understate
+                 it. Folding by pair restores both.
+
+I. PAIRED INTERACTION
+                 The harmful and benign arms are matched prompt for prompt. If
+                 the two shifts of a pair share a component, the within-pair
+                 test has a narrower interval than the two-sample one; if they
+                 do not, the two agree. Either way the paired analysis is the
+                 one that matches the design.
+
+J. ROTATION      The angle between the chat direction and the agent direction,
+                 with a known truth. The raw cosine between two directions
+                 fitted on the same prompts is pulled toward zero by noise and
+                 toward one by the content the two formats share, so it misses
+                 in both directions. Fitting on disjoint halves and dividing
+                 by what the method achieves against itself recovers the
+                 truth. A probe normal and a centroid difference fitted on the
+                 SAME data are also compared: they are different objects, and
+                 a cosine between them is not an angle between formats.
+
 Run:
     python validate_corrections.py
     python validate_corrections.py --trials 50 --seed 7
@@ -74,6 +100,12 @@ from src.robust_estimation import (  # noqa: E402
     _diff_in_means_direction,
 )
 from src.format_effect import specificity_from_projections  # noqa: E402
+from src.probes import cross_validate_probe  # noqa: E402
+from src.robust_estimation import (  # noqa: E402
+    _fit_agent_direction,
+    format_rotation,
+    pair_groups,
+)
 
 # Geometry of the real study
 N_PAIRS = 42
@@ -588,6 +620,168 @@ def experiment_heldout_auroc(trials: int, seed: int, separation: float,
     return out
 
 
+def experiment_pair_folds(trials: int, seed: int, separation: float,
+                          shared_scale: float, label: str) -> dict:
+    """
+    Does it matter whether a fold holds out ROWS or whole PAIRS?
+
+    Each pair draws one vector that both of its prompts carry - the template,
+    the topic, the tools they mention - on top of which the harmful twin moves
+    one way along the true axis and the benign twin the other. That shared
+    vector is the whole difference between a matched design and two
+    independent samples.
+
+    With row folds a twin is in the training set 4 times out of 5 while its
+    partner is scored, carrying the opposite label. The probe has 67 points in
+    thousands of dimensions and fits them exactly, so the shared vector
+    becomes a feature for the training twin's label - and the held-out twin,
+    which has the same vector and the other label, is scored on the wrong
+    side.
+    """
+    rng = np.random.default_rng(seed)
+    y = np.r_[np.ones(N_PAIRS), np.zeros(N_PAIRS)]
+    groups = pair_groups(N_PAIRS, N_PAIRS)
+    rows, pairs = [], []
+
+    for _ in range(trials):
+        u = _unit(rng, HIDDEN_DIM)
+        shared = shared_scale * rng.standard_normal((N_PAIRS, HIDDEN_DIM))
+        H = shared + rng.standard_normal((N_PAIRS, HIDDEN_DIM)) + 0.5 * separation * u
+        B = shared + rng.standard_normal((N_PAIRS, HIDDEN_DIM)) - 0.5 * separation * u
+        X = np.concatenate([H, B])
+        s = int(rng.integers(1 << 30))
+        rows.append(cross_validate_probe(X, y, n_folds=N_FOLDS, seed=s).auroc)
+        pairs.append(cross_validate_probe(
+            X, y, n_folds=N_FOLDS, seed=s, groups=groups).auroc)
+
+    out = {
+        "label": label, "separation": separation,
+        "rows": float(np.mean(rows)), "pairs": float(np.mean(pairs)),
+    }
+    print(f"\n  {label} (separation = {separation:.2f}, shared component "
+          f"scale = {shared_scale:.1f})")
+    print(f"    probe AUROC, folds over ROWS  : {out['rows']:.3f}")
+    print(f"    probe AUROC, folds over PAIRS : {out['pairs']:.3f}")
+    return out
+
+
+def experiment_paired_interaction(trials: int, seed: int, shared_sd: float,
+                                  label: str) -> dict:
+    """
+    Width of the interaction interval, paired versus two-sample.
+
+    Works directly on shifts (chat minus agent projections), which is all the
+    interaction test sees. A pair-level component of standard deviation
+    `shared_sd` enters both the harmful and the benign shift of a pair; the
+    true interaction is 1.0 in every trial.
+    """
+    rng = np.random.default_rng(seed)
+    w_paired, w_two, corr = [], [], []
+    zeros = np.zeros(N_PAIRS)
+
+    for _ in range(trials):
+        common = shared_sd * rng.standard_normal(N_PAIRS)
+        shift_h = 1.0 + common + rng.standard_normal(N_PAIRS)
+        shift_b = 0.0 + common + rng.standard_normal(N_PAIRS)
+        s = int(rng.integers(1 << 30))
+        # chat = shift, agent = 0 reproduces the shifts exactly.
+        paired = specificity_from_projections(
+            shift_h, zeros, shift_b, zeros, n_permutations=2000, n_boot=2000,
+            seed=s, paired_arms=True)
+        two = specificity_from_projections(
+            shift_h, zeros, shift_b, zeros, n_permutations=2000, n_boot=2000,
+            seed=s, paired_arms=False)
+        w_paired.append(paired.interaction_ci_upper - paired.interaction_ci_lower)
+        w_two.append(two.interaction_ci_upper - two.interaction_ci_lower)
+        corr.append(paired.shift_correlation)
+
+    out = {
+        "label": label,
+        "width_paired": float(np.mean(w_paired)),
+        "width_two_sample": float(np.mean(w_two)),
+        "corr": float(np.mean(corr)),
+    }
+    out["ratio"] = out["width_paired"] / out["width_two_sample"]
+    print(f"\n  {label}")
+    print(f"    corr(shift harmful, shift benign) : {out['corr']:+.2f}")
+    print(f"    95% CI width, within pairs        : {out['width_paired']:.3f}")
+    print(f"    95% CI width, two-sample          : {out['width_two_sample']:.3f}")
+    print(f"    ratio paired / two-sample         : {out['ratio']:.2f}")
+    return out
+
+
+def _two_formats(rng, true_cos: float, separation: float,
+                 anisotropic: bool = False):
+    """
+    Four arms with a KNOWN cosine between the chat and the agent axis.
+
+    Every prompt carries its own content vector into both formats (the request
+    is the same text), on top of a component shared by the two twins of a pair
+    and of noise specific to each format. That shared content is what makes a
+    same-prompt cosine between formats optimistic.
+    """
+    u_c = _unit(rng, HIDDEN_DIM)
+    o = rng.standard_normal(HIDDEN_DIM)
+    o -= (o @ u_c) * u_c
+    o /= np.linalg.norm(o)
+    u_a = true_cos * u_c + np.sqrt(1.0 - true_cos ** 2) * o
+
+    scale = (np.exp(rng.normal(0.0, 1.0, HIDDEN_DIM)) if anisotropic
+             else np.ones(HIDDEN_DIM))
+    shape = (N_PAIRS, HIDDEN_DIM)
+    topic = 2.0 * rng.standard_normal(shape)
+    e_h, e_b = rng.standard_normal(shape), rng.standard_normal(shape)
+
+    def arm(content, axis, sign):
+        return ((topic + content + rng.standard_normal(shape)) * scale
+                + sign * 0.5 * separation * axis)
+
+    return (arm(e_h, u_c, +1), arm(e_b, u_c, -1),
+            arm(e_h, u_a, +1), arm(e_b, u_a, -1))
+
+
+def experiment_rotation(trials: int, seed: int, true_cos: float) -> dict:
+    """Raw versus normalised cosine between formats, against a known truth."""
+    rng = np.random.default_rng(seed)
+    full, norm, rel = [], [], []
+    for _ in range(trials):
+        arms = _two_formats(rng, true_cos, separation=60.0)
+        r = format_rotation(*arms, method="diff_means", n_repeats=12,
+                            seed=int(rng.integers(1 << 30)))
+        full.append(r["cosine_full_sample"])
+        norm.append(r["cosine_normalised"])
+        rel.append(r["ceiling"])
+    out = {
+        "true_cos": true_cos,
+        "full": float(np.mean(full)),
+        "normalised": float(np.nanmean(norm)),
+        "ceiling": float(np.mean(rel)),
+    }
+    print(f"\n  true cosine between formats = {true_cos:.2f}")
+    print(f"    raw cosine, both fitted on all prompts : {out['full']:.3f}")
+    print(f"    reliability ceiling of the method      : {out['ceiling']:.3f}")
+    print(f"    normalised, disjoint halves            : {out['normalised']:.3f}")
+    return out
+
+
+def experiment_method_mismatch(trials: int, seed: int) -> dict:
+    """One true axis, one data set, two estimators: how far apart do they land?"""
+    rng = np.random.default_rng(seed)
+    y = np.r_[np.ones(N_PAIRS), np.zeros(N_PAIRS)]
+    cosines = []
+    for _ in range(trials):
+        ch, cb, _ah, _ab = _two_formats(rng, 1.0, separation=60.0,
+                                        anisotropic=True)
+        X = np.concatenate([ch, cb])
+        cosines.append(float(
+            _fit_agent_direction(X, y, method="logistic")
+            @ _fit_agent_direction(X, y, method="diff_means")))
+    out = {"cosine": float(np.mean(cosines))}
+    print("\n  one axis, one data set, noise of unequal variance per dimension")
+    print(f"    cos(probe normal, centroid difference) : {out['cosine']:.3f}")
+    return out
+
+
 # ============================================================
 # MAIN
 # ============================================================
@@ -660,6 +854,37 @@ def main() -> int:
         args.trials, args.seed + 6500, separation=SEPARATION,
         label="REAL separation",
     )
+
+    _banner("H. PAIR FOLDS - may a fold separate a prompt from its twin?")
+    print("\n  Twins share a component (same template, same topic). Row folds")
+    print("  train on one twin and test on the other, labels opposed.")
+    folds_null = experiment_pair_folds(
+        args.trials, args.seed + 7000, separation=0.0, shared_scale=1.0,
+        label="NO true separation",
+    )
+    folds_signal = experiment_pair_folds(
+        args.trials, args.seed + 7500, separation=3.0 * SEPARATION,
+        shared_scale=1.0, label="REAL separation",
+    )
+
+    _banner("I. PAIRED INTERACTION - which units are exchangeable?")
+    print("\n  True interaction = 1.0 in both cases. Only the amount the two")
+    print("  shifts of a pair have in common changes.")
+    inter_shared = experiment_paired_interaction(
+        args.trials, args.seed + 8000, shared_sd=1.5,
+        label="shifts of a pair SHARE a component",
+    )
+    inter_indep = experiment_paired_interaction(
+        args.trials, args.seed + 8500, shared_sd=0.0,
+        label="shifts of a pair are UNRELATED",
+    )
+
+    _banner("J. ROTATION - is a cosine between formats an angle?")
+    print("\n  The same request is read in both formats, so its content is in")
+    print("  both activations. Three truths: no rotation, 60 degrees, 90.")
+    rot = [experiment_rotation(args.trials, args.seed + 9000 + i * 100, c)
+           for i, c in enumerate([1.0, 0.5, 0.0])]
+    mismatch = experiment_method_mismatch(args.trials, args.seed + 9500)
 
     # ---------------- verdicts ----------------
     _banner("VERDICTS")
@@ -838,6 +1063,55 @@ def main() -> int:
         f"{auroc_signal['optimism']:+.3f}) against {auroc_null['oof']:.3f} "
         f"(optimism {auroc_null['optimism']:+.3f}) with nothing to detect; "
         f"in-sample reports {auroc_signal['in_sample']:.3f} either way",
+    ))
+
+    # With nothing to detect, the honest AUROC is 0.5. Row folds must miss it
+    # on the LOW side - that is the signature of training on the twin.
+    checks.append((
+        "H1. Row folds are not a valid null for matched pairs; pair folds are",
+        folds_null["rows"] < 0.35 and 0.40 <= folds_null["pairs"] <= 0.60,
+        f"no true separation: rows {folds_null['rows']:.3f}, pairs "
+        f"{folds_null['pairs']:.3f} (truth 0.500)",
+    ))
+    checks.append((
+        "H2. With a real signal, row folds understate what pair folds recover",
+        folds_signal["pairs"] > folds_signal["rows"] + 0.10,
+        f"real separation: rows {folds_signal['rows']:.3f}, pairs "
+        f"{folds_signal['pairs']:.3f}",
+    ))
+    checks.append((
+        "I1. Pairing narrows the interaction interval when shifts are shared",
+        inter_shared["ratio"] < 0.85,
+        f"corr {inter_shared['corr']:+.2f}: paired width "
+        f"{inter_shared['width_paired']:.3f} vs two-sample "
+        f"{inter_shared['width_two_sample']:.3f}",
+    ))
+    checks.append((
+        "I2. With unrelated shifts the two analyses agree",
+        0.85 <= inter_indep["ratio"] <= 1.15,
+        f"corr {inter_indep['corr']:+.2f}: paired width "
+        f"{inter_indep['width_paired']:.3f} vs two-sample "
+        f"{inter_indep['width_two_sample']:.3f}",
+    ))
+
+    checks.append((
+        "J1. The normalised cosine recovers the true angle between formats",
+        all(abs(r["normalised"] - r["true_cos"]) < 0.10 for r in rot),
+        "; ".join(f"truth {r['true_cos']:.1f} -> {r['normalised']:.3f}"
+                  for r in rot),
+    ))
+    # Noise drags the raw cosine below 1 when nothing rotated; shared prompt
+    # content lifts it above 0 when the axes are orthogonal.
+    checks.append((
+        "J2. The raw cosine misses in both directions",
+        rot[0]["full"] < 0.97 and rot[2]["full"] > 0.03,
+        f"no rotation reads {rot[0]['full']:.3f} (truth 1.000); a right angle "
+        f"reads {rot[2]['full']:.3f} (truth 0.000)",
+    ))
+    checks.append((
+        "J3. A probe normal and a centroid difference are different objects",
+        mismatch["cosine"] < 0.80,
+        f"same data, one true axis: cosine {mismatch['cosine']:.3f}",
     ))
 
     for name, passed, detail in checks:

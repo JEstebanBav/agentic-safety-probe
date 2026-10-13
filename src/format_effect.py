@@ -61,6 +61,7 @@ from .robust_estimation import (
     paired_sign_test,
     paired_ttest_directional,
     pooled_cohens_d,
+    run_paired_suite,
 )
 
 
@@ -90,6 +91,19 @@ class SpecificityResult:
     # same prompts, 'held-out' when each prompt was scored by a direction
     # fitted without it. The two are not interchangeable.
     evaluation: str = "in-sample"
+    # True when harmful prompt i and benign prompt i are the two halves of one
+    # pair and the interaction was tested WITHIN pairs (see
+    # specificity_from_projections). interaction_p, the interval and the
+    # effect size above then come from that paired analysis.
+    arms_paired: bool = False
+    effect_size_kind: str = "d (pooled, two-sample)"
+    n_pairs_interaction_positive: Optional[int] = None
+    shift_correlation: Optional[float] = None
+    # The two-sample analysis, kept beside the paired one whenever both were
+    # run, so the consequence of the pairing is reported rather than assumed.
+    interaction_p_two_sample: Optional[float] = None
+    interaction_ci_lower_two_sample: Optional[float] = None
+    interaction_ci_upper_two_sample: Optional[float] = None
 
     @property
     def is_specific(self) -> bool:
@@ -159,9 +173,11 @@ def format_effect_specificity(
     Test whether the agentic shift is specific to harmful requests.
 
     Both arms are paired within themselves (a prompt appears in both formats),
-    so each arm's shift is a within-pair difference. The two arms are distinct
-    prompts, however, so the interaction between them is a between-group
-    contrast on those differences.
+    so each arm's shift is a within-pair difference. The two arms are ALSO
+    matched to each other: benign prompt i is the harmful prompt i rewritten
+    with a legitimate intent, sharing its structure, vocabulary and tools. The
+    interaction is therefore a within-pair contrast of the two shifts, and is
+    tested as one (see `specificity_from_projections`).
 
     Interpretation:
         interaction ~ 0        the format translates everything equally; the
@@ -202,9 +218,29 @@ def specificity_from_projections(
     n_boot: int = 10000,
     seed: int = 42,
     evaluation: str = "in-sample",
+    paired_arms: Optional[bool] = None,
 ) -> SpecificityResult:
     """
     Difference-in-differences on projections that are already computed.
+
+    WHICH UNITS ARE EXCHANGEABLE
+
+    The corpus is built pair by pair: each harmful instruction has a benign
+    counterpart on the same template. Row i of the harmful arm and row i of
+    the benign arm are therefore not two independent draws but two halves of
+    one unit, and the quantity under test is the within-pair double difference
+
+        D_i = (chat_h,i - agent_h,i) - (chat_b,i - agent_b,i).
+
+    Its null distribution comes from flipping the sign of D_i pair by pair,
+    and its interval from resampling pairs. Treating the arms as independent
+    groups - shuffling the 84 shifts across arms and bootstrapping each arm
+    separately, as this function first did - is the analysis for a design in
+    which the benign prompts were unrelated to the harmful ones. It is not
+    wrong in expectation, but it is not the design: it ignores whatever the
+    two shifts of a pair share, and so mis-states the uncertainty by an amount
+    that depends on their correlation. Both analyses are reported, and
+    `shift_correlation` says how far apart they can be.
 
     Separated from `format_effect_specificity` so the same contrast can be run
     on HELD-OUT projections, where each prompt was scored by a direction
@@ -215,6 +251,10 @@ def specificity_from_projections(
         the four arguments are projection vectors (n,), not activations.
         evaluation: label recorded on the result and printed in the report, so
             an in-sample and a held-out figure can never be confused.
+        paired_arms: True tests the interaction within pairs and requires the
+            arms to be row-aligned. False forces the two-sample analysis. None
+            (default) pairs whenever the arms have the same number of rows,
+            which in this pipeline means they are row-aligned by pair id.
     """
     chat_harmful = np.asarray(chat_harmful, dtype=float)
     agent_harmful = np.asarray(agent_harmful, dtype=float)
@@ -250,16 +290,24 @@ def specificity_from_projections(
 
     d_inter = pooled_cohens_d(shift_h, shift_b)
 
-    # Bootstrap the interaction, resampling each arm independently because the
-    # arms are independent groups.
+    # Two-sample bootstrap: each arm resampled on its own.
     bh = rng.integers(0, n_h, size=(n_boot, n_h))
     bb = rng.integers(0, len(shift_b), size=(n_boot, len(shift_b)))
     boot = shift_h[bh].mean(axis=1) - shift_b[bb].mean(axis=1)
+    ci_two = (float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5)))
 
     dp_h, dp_b = float(shift_h.mean()), float(shift_b.mean())
     common = float(dp_b / dp_h) if abs(dp_h) > 1e-12 else float("nan")
 
-    return SpecificityResult(
+    if paired_arms is None:
+        paired_arms = len(shift_h) == len(shift_b)
+    if paired_arms and len(shift_h) != len(shift_b):
+        raise ValueError(
+            "paired_arms=True needs row-aligned arms; got "
+            f"{len(shift_h)} harmful and {len(shift_b)} benign rows."
+        )
+
+    common_fields = dict(
         layer_idx=layer_idx,
         n_harmful=len(shift_h),
         n_benign=len(shift_b),
@@ -267,12 +315,44 @@ def specificity_from_projections(
         delta_p_benign=dp_b,
         interaction=observed,
         benign_shift_p=float(p_benign),
-        interaction_p=p_inter,
-        interaction_cohens_d=d_inter,
-        interaction_ci_lower=float(np.percentile(boot, 2.5)),
-        interaction_ci_upper=float(np.percentile(boot, 97.5)),
         common_shift_fraction=common,
         evaluation=evaluation,
+    )
+
+    if not paired_arms:
+        return SpecificityResult(
+            interaction_p=p_inter,
+            interaction_cohens_d=d_inter,
+            interaction_ci_lower=ci_two[0],
+            interaction_ci_upper=ci_two[1],
+            **common_fields,
+        )
+
+    # Within-pair test of D_i against zero: sign-flip permutation, paired
+    # bootstrap, d_z. Two-sided, like the two-sample test it replaces.
+    paired = run_paired_suite(
+        shift_h, shift_b, n_permutations, n_boot, "two-sided", seed
+    )
+    if np.std(shift_h) > 0 and np.std(shift_b) > 0:
+        corr = float(np.corrcoef(shift_h, shift_b)[0, 1])
+    else:
+        corr = float("nan")
+
+    return SpecificityResult(
+        # A permutation p cannot be smaller than 1/n_permutations; report the
+        # floor rather than a literal zero.
+        interaction_p=float(max(paired.p_value_permutation, paired.p_value_floor)),
+        interaction_cohens_d=paired.cohens_d_paired,
+        interaction_ci_lower=paired.ci_lower,
+        interaction_ci_upper=paired.ci_upper,
+        arms_paired=True,
+        effect_size_kind="d_z (paired)",
+        n_pairs_interaction_positive=int((shift_h - shift_b > 0).sum()),
+        shift_correlation=corr,
+        interaction_p_two_sample=p_inter,
+        interaction_ci_lower_two_sample=ci_two[0],
+        interaction_ci_upper_two_sample=ci_two[1],
+        **common_fields,
     )
 
 
@@ -491,14 +571,29 @@ def format_specificity_report(res: SpecificityResult) -> str:
         f"  benign arm moves? p                  : {res.benign_shift_p:.4f}",
         "-" * 72,
         f"  INTERACTION (harmful - benign)       : {res.interaction:+.4f}",
+        f"  test                                 : "
+        + ("within pairs (sign-flip on D_i)" if res.arms_paired
+           else "two-sample (arms not matched)"),
         f"  permutation p                        : {res.interaction_p:.4f}",
-        f"  Cohen d (pooled)                     : {res.interaction_cohens_d:+.3f}",
+        f"  effect size, {res.effect_size_kind:<24}: "
+        f"{res.interaction_cohens_d:+.3f}",
         f"  95% CI                               : "
         f"[{res.interaction_ci_lower:+.4f}, {res.interaction_ci_upper:+.4f}]",
         f"  share of the effect common to benign : "
         f"{res.common_shift_fraction:+.1%}",
-        "-" * 72,
     ]
+    if res.arms_paired:
+        lines += [
+            f"  pairs with D_i > 0                   : "
+            f"{res.n_pairs_interaction_positive}/{res.n_harmful}",
+            f"  corr(shift harmful, shift benign)    : "
+            f"{res.shift_correlation:+.3f}",
+            f"  two-sample reference (unpaired)      : "
+            f"p={res.interaction_p_two_sample:.4f}  CI "
+            f"[{res.interaction_ci_lower_two_sample:+.4f}, "
+            f"{res.interaction_ci_upper_two_sample:+.4f}]",
+        ]
+    lines.append("-" * 72)
     if res.is_specific:
         lines += [
             "  VERDICT: the shift is SPECIFIC to harmful requests. A rigid",

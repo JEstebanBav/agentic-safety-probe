@@ -830,6 +830,46 @@ def format_agent_prompt_with_history(
     )
 
 
+def encode_prompt(tokenizer, prompt: str, max_length: Optional[int] = None):
+    """
+    Tokenise a prompt string that has ALREADY been through the chat template.
+
+    `apply_chat_template(tokenize=False)` returns text that already contains
+    the special tokens, the beginning-of-sequence token included. Passing that
+    text to `tokenizer(...)` with its default `add_special_tokens=True` makes
+    Llama and Mistral tokenizers prepend a SECOND one. The model then reads a
+    sequence that opens with two BOS tokens, which it never saw in training.
+    The duplication is the same in every condition, so it does not manufacture
+    a chat/agent difference, but the activations measured are those of a
+    slightly malformed prompt rather than of the one the methodology
+    describes.
+
+    The extractor and the generation stage both tokenised this way, each on
+    its own. They now share this function, so the prompt whose activation is
+    measured and the prompt the model is asked to answer are token-for-token
+    the same sequence.
+
+    Set PROBE_LEGACY_BOS=1 to restore the old double-BOS behaviour, which is
+    the only way to reproduce the figures of runs made before this change.
+
+    Returns the tokenizer output (input_ids, attention_mask) as tensors.
+    """
+    import os
+
+    bos = getattr(tokenizer, "bos_token", None)
+    legacy = os.environ.get("PROBE_LEGACY_BOS", "") == "1"
+    add_special = legacy or not (bos and prompt.startswith(bos))
+
+    kwargs = {
+        "return_tensors": "pt",
+        "padding": False,
+        "add_special_tokens": add_special,
+    }
+    if max_length is not None:
+        kwargs.update(truncation=True, max_length=max_length)
+    return tokenizer(prompt, **kwargs)
+
+
 def get_model_info(model) -> Dict:
     """Get model architecture information."""
     return {

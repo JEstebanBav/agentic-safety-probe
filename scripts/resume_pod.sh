@@ -142,17 +142,22 @@ If the model is not cached yet:
     tmux new -s dl
     hf download meta-llama/Llama-3.3-70B-Instruct
 
-Dry run (16 forward passes, validates the whole path):
+Dry run (4 pairs, EVERY stage including generation - a few minutes):
     python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
-      --no-quantize --limit-pairs 4 --skip-intervention \
-      --n-repeats 1 --n-label-permutations 0 --output-dir /workspace/dryrun
+      --no-quantize --limit-pairs 4 --layers 28,52,56 --factorial \
+      --n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000 \
+      --intervention-layers 52 --intervention-doses 1,2 \
+      --output-dir /workspace/dryrun
 
-Real run:
-    mkdir -p /workspace/results_llama33
+Real run (see docs/guia_runpod_llama33.md for what to check in the output):
+    mkdir -p /workspace/results_llama33_v2
     python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
-      --no-quantize --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 \
-      --n-label-permutations 10 --n-bootstrap 10000 --decompose \
-      --output-dir /workspace/results_llama33 \
-      2>&1 | tee /workspace/results_llama33/run.log
+      --no-quantize \
+      --layers 0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76 \
+      --factorial --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 \
+      --n-label-permutations 10 --n-bootstrap 10000 \
+      --intervention-layers 52,28 --intervention-doses 0.5,1,2,4 \
+      --output-dir /workspace/results_llama33_v2 \
+      2>&1 | tee /workspace/results_llama33_v2/run.log
 
 NEXT
