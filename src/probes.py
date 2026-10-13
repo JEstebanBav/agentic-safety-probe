@@ -78,9 +78,10 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score, accuracy_score, f1_score
 from sklearn.preprocessing import StandardScaler
+
+from src.robust_estimation import grouped_fold_indices
 
 
 @dataclass
@@ -141,6 +142,10 @@ class ProbeResult:
 
     n_samples: Optional[int] = None
     n_positive: Optional[int] = None
+    # True when folds held out whole prompt pairs (harmful + benign twin)
+    # rather than individual rows. Recorded so a figure produced under one
+    # scheme is never compared with one produced under the other unknowingly.
+    folds_by_pair: bool = False
 
 
 @dataclass
@@ -256,6 +261,7 @@ def _cv_fold_scores(
     hidden_size: int,
     seed: int,
     with_direction: bool = True,
+    groups: Optional[np.ndarray] = None,
 ) -> Dict[str, object]:
     """
     One complete K-fold pass with EVERY fitted object confined to the fold.
@@ -269,20 +275,23 @@ def _cv_fold_scores(
     Nothing derived from the test rows enters steps 1-3, which is the property
     that makes the resulting AUROC interpretable.
 
+    `groups` carries the prompt-pair id of each row. When given, a fold holds
+    out whole pairs: a harmful prompt and its benign twin share structure and
+    vocabulary by construction, so testing on one while training on the other
+    is not an out-of-sample evaluation of the harmful/benign contrast.
+
     Returns the per-fold statistics. Fold AUROCs are not pooled into a single
     number: each fold has its own scaler and probe, so scores from different
     folds are not on a common scale and concatenating them would compare
     incomparable quantities. The mean and sd across folds are the summary.
     """
-    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
-
     auroc_folds: List[float] = []
     acc_folds: List[float] = []
     f1_folds: List[float] = []
     dir_auroc_folds: List[float] = []
     cos_folds: List[float] = []
 
-    for train_idx, test_idx in skf.split(X, y):
+    for train_idx, test_idx in grouped_fold_indices(y, n_folds, seed, groups):
         X_tr, X_te = X[train_idx], X[test_idx]
         y_tr, y_te = y[train_idx], y[test_idx]
 
@@ -406,6 +415,7 @@ def cross_validate_probe(
     n_label_permutations: int = 0,
     ci_level: float = 0.95,
     seed: int = 42,
+    groups: Optional[np.ndarray] = None,
 ) -> ProbeResult:
     """
     (Repeated) K-fold cross-validation with the FULL pipeline inside each fold.
@@ -429,6 +439,9 @@ def cross_validate_probe(
             n and d — the number the reported AUROC must be read against.
         ci_level: Level for the Nadeau-Bengio corrected interval.
         seed: Random seed.
+        groups: Prompt-pair id per row. When given, folds hold out whole
+            pairs, and the label-permutation control shuffles labels WITHIN
+            each pair - the exchangeability a matched design licenses.
 
     Returns:
         ProbeResult whose `auroc` is the cross-validated mean, with the sd,
@@ -444,6 +457,13 @@ def cross_validate_probe(
         raise ValueError("Both classes must be present to probe.")
 
     k = _max_usable_folds(y, n_folds)
+    if groups is not None:
+        groups = np.asarray(groups)
+        if len(groups) != len(y):
+            raise ValueError(
+                f"groups has {len(groups)} entries but y has {len(y)} labels."
+            )
+        k = max(2, min(k, len(np.unique(groups))))
 
     # ---- In-sample reference: the inflated number, kept for comparison ----
     scaler_full = StandardScaler()
@@ -475,7 +495,7 @@ def cross_validate_probe(
         # spuriously tiny spread.
         cv = _cv_fold_scores(
             X, y, k, probe_type, hidden_size,
-            seed=seed + 1000 * r, with_direction=True,
+            seed=seed + 1000 * r, with_direction=True, groups=groups,
         )
         for key in pooled:
             pooled[key].extend(cv[key])
@@ -507,10 +527,18 @@ def cross_validate_probe(
         rng = np.random.default_rng(seed)
         perm_scores: List[float] = []
         for r in range(n_label_permutations):
-            y_shuffled = rng.permutation(y)
+            if groups is None:
+                y_shuffled = rng.permutation(y)
+            else:
+                # Shuffle within each pair: which of the two twins is called
+                # harmful becomes a coin flip, while every fold stays balanced.
+                y_shuffled = y.copy()
+                for g in np.unique(groups):
+                    idx = np.flatnonzero(groups == g)
+                    y_shuffled[idx] = rng.permutation(y[idx])
             res = _cv_fold_scores(
                 X, y_shuffled, k, probe_type, hidden_size,
-                seed=seed + r + 1, with_direction=False,
+                seed=seed + r + 1, with_direction=False, groups=groups,
             )
             if res["auroc_folds"]:
                 perm_scores.append(float(np.mean(res["auroc_folds"])))
@@ -545,7 +573,100 @@ def cross_validate_probe(
         cosine_with_refusal_oof_std=cos_sd,
         n_samples=int(len(y)),
         n_positive=int((y == 1).sum()),
+        folds_by_pair=groups is not None,
     )
+
+
+def paired_fold_difference(
+    scores_a: List[float],
+    scores_b: List[float],
+    n_train: int,
+    n_test: int,
+    ci_level: float = 0.95,
+) -> Dict[str, float]:
+    """
+    Compare two probes fold by fold, on the SAME partitions.
+
+    Two cross-validated AUROCs that look alike are not thereby equivalent, and
+    two that differ are not thereby different: each carries a wide interval at
+    this sample size, and the two intervals are computed on the same prompts,
+    so they are strongly correlated. The quantity that answers the question is
+    the per-fold DIFFERENCE, in which everything the two probes share - the
+    difficulty of that particular held-out fold above all - cancels.
+
+    The variance of the mean difference uses the Nadeau-Bengio correction for
+    the same reason the single-probe interval does: training folds overlap, so
+    the fold differences are not independent draws.
+
+    Read the result as an interval, not as a verdict. An interval that
+    contains zero says the data do not separate the probes; how tightly it
+    brackets zero says how much of a difference could still be hiding. Only a
+    narrow interval around zero supports "the probes perform the same".
+
+    Args:
+        scores_a, scores_b: per-fold AUROC of each probe. Entry j of both must
+            come from the same train/test partition; only the first
+            min(len) entries are used, which is what pairs a probe run with R
+            repeats against one run with fewer.
+        n_train, n_test: fold sizes, for the correction term.
+
+    Returns:
+        dict with the mean of each probe over the paired folds, the mean
+        difference (a - b), its corrected SE, the interval and a two-sided p.
+    """
+    m = min(len(scores_a), len(scores_b))
+    nan = float("nan")
+    if m < 2 or n_train <= 0:
+        return {"n_paired_folds": m, "mean_a": nan, "mean_b": nan,
+                "difference": nan, "se_corrected": nan,
+                "ci_lower": nan, "ci_upper": nan, "p_value": nan}
+
+    a = np.asarray(scores_a[:m], dtype=float)
+    b = np.asarray(scores_b[:m], dtype=float)
+    d = a - b
+    mean = float(d.mean())
+    se = float(np.sqrt((1.0 / m + n_test / n_train) * np.var(d, ddof=1)))
+
+    from scipy import stats as _stats
+    t_crit = float(_stats.t.ppf(0.5 + ci_level / 2.0, df=m - 1))
+    p = float(2 * _stats.t.sf(abs(mean) / se, df=m - 1)) if se > 0 else nan
+
+    return {
+        "n_paired_folds": int(m),
+        "mean_a": float(a.mean()),
+        "mean_b": float(b.mean()),
+        "difference": mean,
+        "se_corrected": se,
+        "ci_lower": mean - t_crit * se,
+        "ci_upper": mean + t_crit * se,
+        "p_value": p,
+    }
+
+
+def compare_linear_vs_mlp(
+    linear_suite: "ProbingSuiteResult",
+    mlp_suite: "ProbingSuiteResult",
+) -> Dict[int, Dict[str, float]]:
+    """
+    Per-layer paired comparison MLP - linear on the folds both probes ran.
+
+    Repeat r of either probe is drawn with seed + 1000*r, so the partitions
+    coincide repeat for repeat. With fewer MLP repeats than linear ones only
+    the shared repeats are paired, and the interval widens accordingly.
+    """
+    out: Dict[int, Dict[str, float]] = {}
+    for layer, lin in linear_suite.per_layer.items():
+        mlp = mlp_suite.per_layer.get(layer)
+        if mlp is None or not lin.auroc_folds or not mlp.auroc_folds:
+            continue
+        n = lin.n_samples or 0
+        k = lin.n_folds or 1
+        n_test = int(round(n / k)) if n else 0
+        out[layer] = paired_fold_difference(
+            mlp.auroc_folds, lin.auroc_folds,
+            n_train=n - n_test, n_test=n_test,
+        )
+    return out
 
 
 # ============================================================
@@ -700,6 +821,7 @@ def run_probing_suite(
     use_cv: bool = True,
     n_label_permutations: int = 10,
     seed: int = 42,
+    groups: Optional[np.ndarray] = None,
 ) -> Tuple[ProbingSuiteResult, ProbingSuiteResult]:
     """
     Run the probing suite (linear + MLP) across all layers.
@@ -732,6 +854,9 @@ def run_probing_suite(
             it costs K fits per repeat and the linear probe is the one whose
             perfect AUROC is under dispute.
         seed: Random seed.
+        groups: Prompt-pair id per row; folds then hold out whole pairs. Both
+            probes receive the same groups and the same seeds, so their folds
+            coincide and `compare_linear_vs_mlp` can pair them.
 
     Returns:
         Tuple of (linear_results, mlp_results)
@@ -750,12 +875,14 @@ def run_probing_suite(
                 X, labels, layer_idx=layer_idx, probe_type="linear",
                 n_folds=n_folds, n_repeats=n_repeats,
                 n_label_permutations=n_label_permutations, seed=seed,
+                groups=groups,
             )
             mlp_results[layer_idx] = cross_validate_probe(
                 X, labels, layer_idx=layer_idx, probe_type="mlp",
                 n_folds=n_folds,
                 n_repeats=n_repeats if mlp_n_repeats is None else mlp_n_repeats,
                 n_label_permutations=0, seed=seed,
+                groups=groups,
             )
             continue
 

@@ -473,6 +473,74 @@ def run_paired_suite(
 
 
 # ============================================================
+# 1b. PAIR-RESPECTING PARTITIONS
+# ============================================================
+#
+# A harmful prompt and its benign counterpart are written from the same seed:
+# same structure, same vocabulary, same tools, opposite intent. They are one
+# unit of the design, not two observations. Any partition that sends one to
+# training and the other to evaluation lets the fitted object see the very
+# contrast it is then scored on.
+#
+# Every estimator in this module used to partition ROWS (StratifiedKFold over
+# the 84 stacked rows, or an independent permutation of the benign arm), which
+# is not what the methodology states and not what the held-out AUROC of d_chat
+# already did. The two helpers below are the single place the partition is
+# drawn, so the rule cannot drift between estimators again.
+
+def pair_groups(n_harmful: int, n_benign: int) -> Optional[np.ndarray]:
+    """
+    Group id for each row of a stacked [harmful; benign] matrix.
+
+    Row i of each arm is the same prompt pair (the pipeline asserts this in
+    `_assert_pairing`), so both rows receive group i. Returns None when the
+    arms differ in size, in which case no pairing can be assumed and callers
+    fall back to a stratified partition over rows.
+    """
+    if n_harmful != n_benign:
+        return None
+    return np.concatenate([np.arange(n_harmful), np.arange(n_benign)])
+
+
+def grouped_fold_indices(
+    y: np.ndarray,
+    n_folds: int,
+    seed: int,
+    groups: Optional[np.ndarray] = None,
+) -> List[Tuple[np.ndarray, np.ndarray]]:
+    """
+    (train_idx, test_idx) for K-fold cross-validation.
+
+    With `groups`, whole groups are held out together: the group ids are
+    shuffled and cut into K blocks, and a fold tests on every row whose group
+    falls in its block. In the balanced design (one harmful and one benign row
+    per pair) each fold is therefore class-balanced by construction, so no
+    separate stratification is needed.
+
+    Without `groups` this is StratifiedKFold over rows, the previous behaviour.
+    """
+    y = np.asarray(y)
+    if groups is None:
+        skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+        return list(skf.split(np.zeros(len(y)), y))
+
+    groups = np.asarray(groups)
+    if len(groups) != len(y):
+        raise ValueError(f"groups has {len(groups)} entries for {len(y)} rows.")
+    unique = np.unique(groups)
+    k = min(n_folds, len(unique))
+    if k < 2:
+        raise ValueError("Need at least two groups to cross-validate.")
+    order = np.random.default_rng(seed).permutation(unique)
+
+    folds: List[Tuple[np.ndarray, np.ndarray]] = []
+    for block in np.array_split(order, k):
+        test = np.isin(groups, block)
+        folds.append((np.flatnonzero(~test), np.flatnonzero(test)))
+    return folds
+
+
+# ============================================================
 # 2. CROSS-FITTED PROJECTION GAP  (Observation 2)
 # ============================================================
 
@@ -494,6 +562,7 @@ def cross_fitted_projection_gap(
     n_permutations: int = 10000,
     n_boot: int = 10000,
     seed: int = 42,
+    paired_arms: bool = True,
 ) -> CrossFittedGapResult:
     """
     Cross-fitted estimate of DeltaP, removing the own-sample bias.
@@ -513,6 +582,12 @@ def cross_fitted_projection_gap(
     Pairing is preserved: folds are assigned over PROMPT indices, and a
     prompt's chat and agent activations are always projected onto the same
     held-out direction d_k.
+
+    The benign arm follows the SAME folds when it is matched to the harmful one
+    (`paired_arms`, the default, and equal row counts). Folding it
+    independently, as this function used to, left the benign twin of a
+    held-out harmful prompt in the training set four times out of five, so the
+    direction had already seen the contrast it was then scored on.
 
     Args:
         chat_harmful:  (n, hidden_dim) chat-format harmful activations.
@@ -552,10 +627,14 @@ def cross_fitted_projection_gap(
     order = rng.permutation(n)
     folds = np.array_split(order, n_folds)
 
-    # Benign rows are folded independently; they may differ in count from n.
+    # A matched benign arm is held out with its harmful twin. Only an
+    # unmatched arm (different row count) is folded on its own.
     m = len(chat_benign)
-    order_b = rng.permutation(m)
-    folds_b = np.array_split(order_b, n_folds)
+    if paired_arms and m == n:
+        folds_b = folds
+    else:
+        order_b = rng.permutation(m)
+        folds_b = np.array_split(order_b, n_folds)
 
     proj_chat_oof = np.empty(n)
     proj_agent_oof = np.empty(n)
@@ -598,17 +677,38 @@ def cross_fitted_projection_gap(
 # 3. CROSS-VALIDATED AGENT DIRECTION  (Observations 3 and 9)
 # ============================================================
 
-def _fit_agent_direction(X: np.ndarray, y: np.ndarray, C: float = 1.0,
-                         seed: int = 42) -> np.ndarray:
-    """
-    Fit a logistic probe and return its normal in the ORIGINAL activation space.
+DIRECTION_METHODS = ("logistic", "diff_means")
 
-    The probe trains on standardised features, so the raw coefficient lives in
-    the scaled space. Since z_j = (a_j - mu_j)/s_j, the hyperplane normal in
-    the original space is w_j / s_j (element-wise). Skipping this rescaling
-    would make any cosine against d_chat meaningless, because the two vectors
-    would inhabit different metric spaces.
+
+def _fit_agent_direction(X: np.ndarray, y: np.ndarray, C: float = 1.0,
+                         seed: int = 42, method: str = "logistic") -> np.ndarray:
     """
+    Unit direction separating the two classes of (X, y).
+
+    method="diff_means": the normalised difference between the class
+    centroids - the estimator that defines d_chat. No fitting, no
+    hyperparameter, no rescaling of the axes.
+
+    method="logistic": a logistic probe, returned as its normal in the
+    ORIGINAL activation space. The probe trains on standardised features, so
+    the raw coefficient lives in the scaled space. Since z_j = (a_j -
+    mu_j)/s_j, the hyperplane normal in the original space is w_j / s_j
+    (element-wise). Skipping this rescaling would make any cosine against
+    d_chat meaningless, because the two vectors would inhabit different metric
+    spaces.
+
+    The two are different objects, not two estimates of one. With 84 points in
+    thousands of dimensions infinitely many hyperplanes separate the classes;
+    the probe returns one of them, reweighted by 1/s_j, and it need not point
+    along the centroid difference at all. Compare a direction only with
+    another obtained by the same method (see `format_rotation`).
+    """
+    if method == "diff_means":
+        y = np.asarray(y)
+        return _diff_in_means_direction(X[y == 1], X[y == 0])
+    if method != "logistic":
+        raise ValueError(f"method must be one of {DIRECTION_METHODS}, got {method!r}")
+
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
@@ -628,6 +728,8 @@ def _split_half_reliability(
     C: float = 1.0,
     n_repeats: int = 20,
     seed: int = 42,
+    groups: Optional[np.ndarray] = None,
+    method: str = "logistic",
 ) -> Tuple[float, float]:
     """
     Reproducibility of w_agent measured on DISJOINT halves of the data.
@@ -654,20 +756,32 @@ def _split_half_reliability(
     cosines: List[float] = []
 
     for _ in range(n_repeats):
-        # Stratified disjoint halves: split each class separately so both
-        # halves keep both classes.
-        idx_pos = rng.permutation(np.flatnonzero(y == 1))
-        idx_neg = rng.permutation(np.flatnonzero(y == 0))
-        half_a = np.concatenate([idx_pos[: len(idx_pos) // 2],
-                                 idx_neg[: len(idx_neg) // 2]])
-        half_b = np.concatenate([idx_pos[len(idx_pos) // 2:],
-                                 idx_neg[len(idx_neg) // 2:]])
+        if groups is not None:
+            # Disjoint halves of PAIRS. Splitting the classes separately put a
+            # prompt's harmful row in one half and its benign twin in the
+            # other, so the two halves shared every prompt's content and their
+            # noise was not independent - the condition the attenuation
+            # correction rests on.
+            order = rng.permutation(np.unique(groups))
+            in_a = np.isin(groups, order[: len(order) // 2])
+            half_a, half_b = np.flatnonzero(in_a), np.flatnonzero(~in_a)
+        else:
+            # Stratified disjoint halves: split each class separately so both
+            # halves keep both classes.
+            idx_pos = rng.permutation(np.flatnonzero(y == 1))
+            idx_neg = rng.permutation(np.flatnonzero(y == 0))
+            half_a = np.concatenate([idx_pos[: len(idx_pos) // 2],
+                                     idx_neg[: len(idx_neg) // 2]])
+            half_b = np.concatenate([idx_pos[len(idx_pos) // 2:],
+                                     idx_neg[len(idx_neg) // 2:]])
 
         if len(np.unique(y[half_a])) < 2 or len(np.unique(y[half_b])) < 2:
             continue
         try:
-            w_a = _fit_agent_direction(X[half_a], y[half_a], C=C, seed=seed)
-            w_b = _fit_agent_direction(X[half_b], y[half_b], C=C, seed=seed)
+            w_a = _fit_agent_direction(X[half_a], y[half_a], C=C, seed=seed,
+                                       method=method)
+            w_b = _fit_agent_direction(X[half_b], y[half_b], C=C, seed=seed,
+                                       method=method)
         except ValueError:
             continue
         cosines.append(float(np.dot(w_a, w_b)))
@@ -688,6 +802,7 @@ def cross_validated_agent_direction(
     n_folds: int = 5,
     C: float = 1.0,
     seed: int = 42,
+    method: str = "logistic",
 ) -> CrossValidatedDirectionResult:
     """
     Estimate w_agent with honest out-of-fold evaluation and a reliability ceiling.
@@ -722,17 +837,18 @@ def cross_validated_agent_direction(
     hidden_dim = X.shape[1]
 
     # ---- In-sample value: the inflated number, kept for explicit comparison ----
-    w_full = _fit_agent_direction(X, y, C=C, seed=seed)
+    w_full = _fit_agent_direction(X, y, C=C, seed=seed, method=method)
     auroc_in_sample = float(roc_auc_score(y, X @ w_full))
 
     # ---- Out-of-fold evaluation ----
-    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+    groups = pair_groups(len(agent_harmful), len(agent_benign))
     fold_dirs: List[np.ndarray] = []
     fold_aurocs: List[float] = []
     fold_cosines: List[float] = []
 
-    for train_idx, test_idx in skf.split(X, y):
-        w_k = _fit_agent_direction(X[train_idx], y[train_idx], C=C, seed=seed)
+    for train_idx, test_idx in grouped_fold_indices(y, n_folds, seed, groups):
+        w_k = _fit_agent_direction(X[train_idx], y[train_idx], C=C, seed=seed,
+                                   method=method)
         scores = X[test_idx] @ w_k
         # A fold with a single class present cannot yield an AUROC.
         if len(np.unique(y[test_idx])) > 1:
@@ -752,7 +868,9 @@ def cross_validated_agent_direction(
     ]
 
     # ---- Reliability from DISJOINT split-halves ----
-    sh_mean, sh_std = _split_half_reliability(X, y, C=C, seed=seed)
+    sh_mean, sh_std = _split_half_reliability(
+        X, y, C=C, seed=seed, groups=groups, method=method
+    )
 
     # Correction for attenuation (Spearman). If the estimate is
     #     w_est = b * w_true + noise,  noise ~ orthogonal
@@ -832,6 +950,7 @@ def cross_validated_monitor(
     n_folds: int = 5,
     C: float = 1.0,
     seed: int = 42,
+    method: str = "logistic",
 ) -> CrossValidatedMonitorResult:
     """
     Evaluate the safety monitor with direction AND threshold fitted on train only.
@@ -851,17 +970,18 @@ def cross_validated_monitor(
     y = np.concatenate([np.ones(len(agent_harmful)), np.zeros(len(agent_benign))])
 
     # In-sample reference (what the old pipeline reported)
-    w_full = _fit_agent_direction(X, y, C=C, seed=seed)
+    w_full = _fit_agent_direction(X, y, C=C, seed=seed, method=method)
     s_full = X @ w_full
     t_full = _calibrate_threshold(s_full, y)
     f1_in_sample = float(f1_score(y, (s_full > t_full).astype(int), zero_division=0))
 
-    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+    groups = pair_groups(len(agent_harmful), len(agent_benign))
     y_pred = np.zeros(len(y), dtype=int)
     thresholds: List[float] = []
 
-    for train_idx, test_idx in skf.split(X, y):
-        w_k = _fit_agent_direction(X[train_idx], y[train_idx], C=C, seed=seed)
+    for train_idx, test_idx in grouped_fold_indices(y, n_folds, seed, groups):
+        w_k = _fit_agent_direction(X[train_idx], y[train_idx], C=C, seed=seed,
+                                   method=method)
         tau_k = _calibrate_threshold(X[train_idx] @ w_k, y[train_idx])
         thresholds.append(tau_k)
         y_pred[test_idx] = (X[test_idx] @ w_k > tau_k).astype(int)
@@ -891,6 +1011,138 @@ def cross_validated_monitor(
 
 
 # ============================================================
+# 4b. ROTATION BETWEEN FORMATS, LIKE FOR LIKE
+# ============================================================
+
+def format_rotation(
+    chat_harmful: np.ndarray,
+    chat_benign: np.ndarray,
+    agent_harmful: np.ndarray,
+    agent_benign: np.ndarray,
+    method: str = "diff_means",
+    n_repeats: int = 50,
+    C: float = 1.0,
+    seed: int = 42,
+    layer_idx: int = -1,
+) -> Dict:
+    """
+    How far does the harmful/benign direction turn between chat and agent?
+
+    The number first reported for this was cos(w_agent, d_chat), with w_agent
+    a logistic probe and d_chat a difference of centroids. That cosine cannot
+    be read as an angle, for three separate reasons:
+
+    1. DIFFERENT ESTIMATORS. A probe normal and a centroid difference are not
+       the same object. Fitted on the SAME chat prompts, the probe normal and
+       d_chat already disagree (cosine around 0.4-0.5 in the Llama-3.3 run), so
+       a low cosine across formats mixes "the format changed" with "the method
+       changed". Here both directions come from one method.
+
+    2. BOTH DIRECTIONS ARE NOISY. Each is estimated from a few dozen prompts in
+       thousands of dimensions, and noise pulls any cosine toward zero. The
+       reference is therefore not 1 but what the method achieves against
+       ITSELF on fresh prompts of the same format.
+
+    3. SHARED PROMPTS. Chat and agent activations of one prompt share that
+       prompt's content. Two directions fitted on the same prompts share its
+       noise, which pulls their cosine UP. Fitting the two directions on
+       disjoint halves of the pairs removes it.
+
+    So the pairs are split in two halves A and B, a direction is fitted per
+    format on each half, and three cosines are averaged over many splits:
+
+        within chat   cos(c_A, c_B)   -> reliability of the chat direction
+        within agent  cos(a_A, a_B)   -> reliability of the agent direction
+        across        cos(c_A, a_B)   -> agreement between formats
+
+    With d_est = b * d_true + noise and independent noise in the two halves,
+    the within-format cosines estimate b_chat^2 and b_agent^2 and the across
+    one estimates b_chat * b_agent * cos(true). Their ratio
+
+        across / sqrt(within_chat * within_agent)
+
+    is the cosine between the two TRUE directions: 1 if the format does not
+    turn the axis, 0 if it turns it by a right angle. It is reported only when
+    both reliabilities are high enough for the division to mean something.
+
+    Args:
+        the four arrays are (n_pairs, hidden_dim), row-aligned by pair.
+        method: "diff_means" or "logistic" (see `_fit_agent_direction`).
+
+    Returns:
+        dict with the three mean cosines, the same-half cosine for reference,
+        the full-sample cosine, and the normalised cosine with its angle.
+    """
+    arms = [np.asarray(a, dtype=np.float64) for a in
+            (chat_harmful, chat_benign, agent_harmful, agent_benign)]
+    n = len(arms[0])
+    if any(len(a) != n for a in arms):
+        raise ValueError("format_rotation needs four arms row-aligned by pair.")
+    if n < 4:
+        raise ValueError("format_rotation needs at least 4 pairs.")
+    ch, cb, ah, ab = arms
+
+    def fit(h: np.ndarray, b: np.ndarray, idx: np.ndarray) -> np.ndarray:
+        X = np.concatenate([h[idx], b[idx]], axis=0)
+        y = np.concatenate([np.ones(len(idx)), np.zeros(len(idx))])
+        return _fit_agent_direction(X, y, C=C, seed=seed, method=method)
+
+    everything = np.arange(n)
+    cos_full = float(np.dot(fit(ch, cb, everything), fit(ah, ab, everything)))
+
+    rng = np.random.default_rng(seed)
+    within_c: List[float] = []
+    within_a: List[float] = []
+    across: List[float] = []
+    same_half: List[float] = []
+    for _ in range(n_repeats):
+        perm = rng.permutation(n)
+        A, B = perm[: n // 2], perm[n // 2:]
+        try:
+            c_a, c_b = fit(ch, cb, A), fit(ch, cb, B)
+            a_a, a_b = fit(ah, ab, A), fit(ah, ab, B)
+        except ValueError:
+            continue
+        within_c.append(float(c_a @ c_b))
+        within_a.append(float(a_a @ a_b))
+        across.append(0.5 * float(c_a @ a_b + c_b @ a_a))
+        same_half.append(0.5 * float(c_a @ a_a + c_b @ a_b))
+
+    nan = float("nan")
+    if not across:
+        return {"layer_idx": layer_idx, "method": method, "n_pairs": n,
+                "cosine_full_sample": cos_full, "cosine_normalised": nan}
+
+    rel_c, rel_a = float(np.mean(within_c)), float(np.mean(within_a))
+    cross = float(np.mean(across))
+    ceiling = float(np.sqrt(rel_c * rel_a)) if rel_c > 0 and rel_a > 0 else nan
+
+    # Below the floor the division amplifies noise more than it corrects, and
+    # the result would be a plausible-looking number with nothing behind it.
+    if np.isfinite(ceiling) and ceiling >= MIN_RELIABILITY_FOR_CORRECTION:
+        cos_norm = float(np.clip(cross / ceiling, -1.0, 1.0))
+        angle = float(np.degrees(np.arccos(cos_norm)))
+    else:
+        cos_norm, angle = nan, nan
+
+    return {
+        "layer_idx": layer_idx,
+        "method": method,
+        "n_pairs": n,
+        "n_repeats": len(across),
+        "cosine_full_sample": cos_full,
+        "cosine_same_half": float(np.mean(same_half)),
+        "cosine_across_formats": cross,
+        "cosine_across_formats_sd": float(np.std(across, ddof=1)) if len(across) > 1 else nan,
+        "reliability_chat": rel_c,
+        "reliability_agent": rel_a,
+        "ceiling": ceiling,
+        "cosine_normalised": cos_norm,
+        "angle_deg_normalised": angle,
+    }
+
+
+# ============================================================
 # 5. LAYER SELECTION WITHOUT POST-HOC INFLATION  (Observation 4)
 # ============================================================
 
@@ -901,6 +1153,8 @@ def select_layer_and_test(
     n_folds: int = 5,
     n_permutations: int = 10000,
     seed: int = 42,
+    agent_benign: Optional[Dict[int, np.ndarray]] = None,
+    n_splits: int = 200,
 ) -> Dict:
     """
     Split-sample layer selection, avoiding the winner's-curse in the reported p.
@@ -909,42 +1163,74 @@ def select_layer_and_test(
     that same layer is post-hoc inference: the statistic is biased upward and
     the type-I error rate exceeds the nominal level.
 
-    Here the prompts are split in half. The selection half picks the layer; the
-    inference half runs the test on the pre-committed layer only. The test is
-    therefore performed on data that played no part in the selection.
+    Here the prompt PAIRS are split in half. The selection half picks the
+    layer; the inference half runs the test on the pre-committed layer only.
+    The test is therefore performed on data that played no part in the
+    selection, and every figure quoted for the selected layer - the count of
+    pairs that decrease included - must be the one from the inference half.
+    Quoting the full-sample count for a layer chosen on half of it re-admits
+    the selection half through the back door.
+
+    Two things changed relative to the first version of this routine:
+
+      - The split is over pairs. The benign arm used to be permuted
+        independently, so a harmful prompt in the inference half could have
+        its benign twin in the selection half, where it helped fit the
+        direction that ranked the layers.
+      - One random split is one draw. The procedure is repeated over
+        `n_splits` partitions, with the direction fitted on the selection half
+        and the inference pairs projected onto it untouched, to report how
+        often each layer is chosen and how the inference-half result varies.
+        A conclusion that holds in one partition and not in most others is not
+        a conclusion.
 
     The Bonferroni-adjusted alpha over all candidate layers is also returned,
     so the alternative correction is available without a second run.
 
-    Returns a dict with the selected layer, the inference-half test result, the
-    per-layer selection scores, and the adjusted alpha.
+    Args:
+        agent_benign: optional, row-aligned with the other arms. When given,
+            the harmful-vs-benign interaction is also tested on the inference
+            half, out-of-fold, paired by prompt.
+        n_splits: random partitions for the stability summary. 0 disables it.
+
+    Returns a dict with the selected layer, the inference-half test result,
+    the per-layer selection scores, the stability summary and the adjusted
+    alpha.
     """
     layers = sorted(set(chat_harmful) & set(chat_benign) & set(agent_harmful))
     if not layers:
         raise ValueError("No layer is present in all three activation dicts.")
 
     n = len(chat_harmful[layers[0]])
-    rng = np.random.default_rng(seed)
-    perm = rng.permutation(n)
-    sel_idx, inf_idx = perm[: n // 2], perm[n // 2:]
-
     m = len(chat_benign[layers[0]])
-    perm_b = rng.permutation(m)
-    sel_idx_b, inf_idx_b = perm_b[: m // 2], perm_b[m // 2:]
+    paired = m == n
 
-    # --- Selection half: rank layers by DeltaP ---
-    selection_scores: Dict[int, float] = {}
-    for l in layers:
-        d_l = _diff_in_means_direction(
-            chat_harmful[l][sel_idx], chat_benign[l][sel_idx_b]
-        )
-        gap = float(
-            (chat_harmful[l][sel_idx] @ d_l).mean()
-            - (agent_harmful[l][sel_idx] @ d_l).mean()
-        )
-        selection_scores[l] = gap
+    def _split(rng):
+        perm = rng.permutation(n)
+        sel, inf = perm[: n // 2], perm[n // 2:]
+        if paired:
+            return sel, inf, sel, inf
+        perm_b = rng.permutation(m)
+        return sel, inf, perm_b[: m // 2], perm_b[m // 2:]
 
-    chosen = max(selection_scores, key=selection_scores.get)
+    def _select(sel, sel_b):
+        scores: Dict[int, float] = {}
+        dirs: Dict[int, np.ndarray] = {}
+        for l in layers:
+            d_l = _diff_in_means_direction(
+                chat_harmful[l][sel], chat_benign[l][sel_b]
+            )
+            dirs[l] = d_l
+            scores[l] = float(
+                ((chat_harmful[l][sel] - agent_harmful[l][sel]) @ d_l).mean()
+            )
+        best = max(scores, key=scores.get)
+        return best, scores, dirs[best]
+
+    # --- The reported split ---
+    sel_idx, inf_idx, sel_idx_b, inf_idx_b = _split(np.random.default_rng(seed))
+    chosen, selection_scores, _ = _select(sel_idx, sel_idx_b)
+    k_inf = max(2, min(n_folds, len(inf_idx)))
 
     # --- Inference half: cross-fitted test on the pre-committed layer only ---
     result = cross_fitted_projection_gap(
@@ -952,17 +1238,68 @@ def select_layer_and_test(
         chat_benign[chosen][inf_idx_b],
         agent_harmful[chosen][inf_idx],
         layer_idx=chosen,
-        n_folds=min(n_folds, len(inf_idx)),
+        n_folds=k_inf,
         n_permutations=n_permutations,
         seed=seed,
     )
+
+    # --- Same half, harmful-vs-benign interaction, paired by prompt ---
+    interaction: Optional[PairedTestResult] = None
+    if paired and agent_benign is not None and chosen in agent_benign:
+        held = crossfit_condition_projections(
+            {
+                "chat_harmful": chat_harmful[chosen][inf_idx],
+                "chat_benign": chat_benign[chosen][inf_idx],
+                "agent_harmful": agent_harmful[chosen][inf_idx],
+                "agent_benign": agent_benign[chosen][inf_idx],
+            },
+            n_folds=k_inf, seed=seed, layer_idx=chosen,
+        ).projections
+        interaction = run_paired_suite(
+            held["chat_harmful"] - held["agent_harmful"],
+            held["chat_benign"] - held["agent_benign"],
+            n_permutations, n_permutations, "greater", seed,
+        )
+
+    # --- Stability across partitions ---
+    stability: Dict = {}
+    if n_splits > 0:
+        rng = np.random.default_rng(seed + 1)
+        picks: List[int] = []
+        frac_dec: List[float] = []
+        deltas: List[float] = []
+        for _ in range(n_splits):
+            s, i, s_b, _ = _split(rng)
+            layer_s, _, d_s = _select(s, s_b)
+            # d_s was fitted on the selection half alone, so the inference
+            # pairs are out-of-sample for it without any further folding.
+            diff = (chat_harmful[layer_s][i] - agent_harmful[layer_s][i]) @ d_s
+            picks.append(int(layer_s))
+            frac_dec.append(float((diff > 0).mean()))
+            deltas.append(float(diff.mean()))
+        counts = {l: picks.count(l) for l in sorted(set(picks))}
+        stability = {
+            "n_splits": int(n_splits),
+            "selected_layer_frequency": {
+                int(l): c / n_splits for l, c in counts.items()
+            },
+            "fraction_decreasing_mean": float(np.mean(frac_dec)),
+            "fraction_decreasing_p05": float(np.percentile(frac_dec, 5)),
+            "fraction_decreasing_min": float(np.min(frac_dec)),
+            "delta_p_mean": float(np.mean(deltas)),
+            "delta_p_p05": float(np.percentile(deltas, 5)),
+            "share_splits_positive": float(np.mean(np.asarray(deltas) > 0)),
+        }
 
     return {
         "selected_layer": int(chosen),
         "selection_scores": selection_scores,
         "n_selection": int(len(sel_idx)),
         "n_inference": int(len(inf_idx)),
+        "split_over_pairs": bool(paired),
         "result": result,
+        "interaction": interaction,
+        "stability": stability,
         "bonferroni_alpha": 0.05 / len(layers),
         "n_layers_tested": len(layers),
     }

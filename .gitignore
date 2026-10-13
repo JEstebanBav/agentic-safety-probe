@@ -17,3 +17,7 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Extracted activations: hundreds of MB per run, regenerable, over GitHub's
+# file limit. Keep them next to the results locally; do not commit them.
+activations.npz

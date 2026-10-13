@@ -332,12 +332,21 @@ Recommended GPU: RTX A5000 ($0.27/hr, 24GB). Full experiment costs ~$0.20.
 | `--agency-level LEVEL` | Agentic scaffolding: `tools`, `workflow`, `autonomous`, `trajectory`. Default: the system prompt stored in each entry, which `tools` reproduces exactly |
 | `--toolbox N` | Offer a box of N tools (case tools + distractors, identical in both arms) instead of only the 2–8 the task needs. 0 = off |
 | `--layers 10,20,30` | Specific layers to analyze |
-| `--n-samples N` | Prompts for the **intervention stage only** — does not reduce extraction |
+| `--n-samples N` | Prompts for the optional `--agent-intervention` stage only — does not reduce extraction |
 | `--limit-pairs N` | Keep only N prompt pairs across all variants. The flag that makes a dry run cheap |
 | `--no-quantize` | Force FP16 |
-| `--decompose` | Enable 4-condition decomposition |
+| `--decompose` | Enable 4-condition decomposition (needs `role_only` / `role_plus_tools` variants in the corpus) |
+| `--factorial` | Derive two intermediate conditions per prompt — agentic system message without tools, and tools under the chat system message — and split the format effect between them |
 | `--skip-probes` | Skip probing classifiers |
-| `--skip-intervention` | Skip generation-based intervention |
+| `--skip-intervention` | Skip the generation stages (behavioural baseline and causal test) |
+| `--intervention-layers 52,28` | Layers for the causal test. Default: the layer chosen by split-sample selection |
+| `--intervention-doses 0.5,1,2,4` | Doses as multiples of the projection gap at that layer; 1 restores exactly what the agentic format removed |
+| `--intervention-pairs N` | Prompt pairs used by the generation stages, spread evenly over the corpus. Default: all |
+| `--max-new-tokens N` | Tokens generated per response in the generation stages (default 64) |
+| `--agent-intervention` | Also run the older w_agent stage over a fixed alpha grid |
+| `--save-activations` / `--no-save-activations` | Write `activations.npz` next to the results (default on) |
+| `--load-activations PATH` | Re-run every analysis stage from a saved `activations.npz`, with no model and no GPU |
+| `--n-selection-splits N` | Random pair partitions used to report how stable the split-sample layer choice is (default 200) |
 | `--include-history` | Add multi-turn tool-use history |
 | `--n-folds N` | Folds for cross-validation and cross-fitting (default 5) |
 | `--n-repeats N` | Random partitions to average the probe CV over (default 1; use 10 for a reported run) |
@@ -350,23 +359,73 @@ Recommended GPU: RTX A5000 ($0.27/hr, 24GB). Full experiment costs ~$0.20.
 
 ### Statistical Re-analysis Without a GPU
 
-Two of the validity checks run on a laptop, from results already on disk:
+The forward passes are the only stage that needs a GPU. A run writes its
+activations to `activations.npz`, and every analysis stage can then be repeated
+on a laptop — different partitions, more probe repeats, another control —
+without renting hardware again:
+
+```bash
+python run_experiment.py --load-activations results/llama33_v2/activations.npz \
+    --n-repeats 10 --mlp-n-repeats 10 --output-dir results/llama33_v2_local
+```
+
+Only the generation stages (behavioural baseline, causal test) are skipped,
+since they need the model. The statistics modules import without torch.
+
+Three more checks run from results already on disk:
 
 ```bash
 # Bootstrap CIs for DeltaP at every layer, from the saved projections.
 # Percentile + BCa, paired resampling, sign test. No model needed.
-python bootstrap_delta_p.py --n-boot 10000
+python scripts/bootstrap_delta_p.py --n-boot 10000
+
+# For a run made BEFORE activations were saved: the interaction tested within
+# pairs, the split-sample layer choice read on the inference half only, and
+# the linear-vs-MLP comparison on shared folds, all from the saved projections.
+python scripts/reanalisis_observaciones.py --results results/llama33/results.json
 
 # Controlled proof that the estimators do what they claim, on synthetic data
 # with known ground truth. Includes the fold-hygiene experiment (E), the
 # benign control (F: two ground truths with the same DeltaP, separated only by
-# the interaction) and the held-out AUROC of d_chat (G: 1.00 in-sample with
-# nothing to detect, 0.50 out-of-fold).
-python validate_corrections.py --trials 20
+# the interaction), the held-out AUROC of d_chat (G: 1.00 in-sample with
+# nothing to detect, 0.50 out-of-fold), folds over pairs versus rows (H) and
+# the paired interaction (I).
+python scripts/validate_corrections.py --trials 20
 ```
 
-The probe cross-validation needs the full `(n, 8192)` activations, which are not
-saved, so it requires a GPU pass of `run_experiment.py`.
+### Partitions Respect Prompt Pairs
+
+A harmful prompt and its benign counterpart share a template, so they are one
+unit of the design. Every partition in the pipeline holds a pair out whole:
+probe cross-validation, the cross-fitted DeltaP, the agent direction and its
+monitor, the split-half reliability, and the split-sample layer selection.
+Folding the 84 rows freely trains on one twin and tests on the other with the
+opposite label; experiment H of `validate_corrections.py` shows that this
+drives the AUROC far BELOW chance when nothing is there to detect.
+
+The harmful-versus-benign interaction is likewise tested within pairs
+(sign-flip on the per-pair double difference), with the two-sample analysis
+reported beside it.
+
+### Behaviour and the Causal Test
+
+The projection analysis links the format to the representation. Two generation
+stages link the representation to behaviour (`src/causal_test.py`):
+
+1. **Behavioural baseline** — the model answers every prompt in the four
+   conditions, unsteered. Gives the refusal rate per condition and whether
+   higher projection goes with refusal.
+2. **Causal test** — on agentic harmful prompts the model complied with,
+   `alpha * d_chat` is added at one layer, with `alpha` in units of the measured
+   gap. A random direction of the same norm is the control, and the same push
+   on benign prompts measures over-steering. The hook records the projection
+   before and after, so the report shows the push did what it was meant to.
+
+Every generated text is written to `behavior_generations.jsonl` beside its
+label. Only interventions that move the model toward refusing are implemented.
+
+See [docs/guia_runpod_llama33.md](docs/guia_runpod_llama33.md) for the
+step-by-step re-run of Llama-3.3-70B.
 
 ### Running a Larger Model
 

@@ -9,8 +9,12 @@ mkdir -p "$OUT"
 echo "modelo: $MODEL"
 echo "salida: $OUT"
 echo "extra : $*"
+# --factorial replaces --decompose: the corpus has no role_only /
+# role_plus_tools variants, so --decompose only renamed the agent arm and then
+# skipped its own analysis. --factorial derives the two intermediate
+# conditions (system message without tools, tools without it) on the fly.
 python run_experiment.py \
   --model "$MODEL" \
   --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 \
-  --n-label-permutations 10 --n-bootstrap 10000 --decompose \
+  --n-label-permutations 10 --n-bootstrap 10000 --factorial \
   --output-dir "$OUT" "$@"

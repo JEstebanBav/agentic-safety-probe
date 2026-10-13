@@ -10,6 +10,8 @@ import numpy as np
 from typing import List, Dict, Optional, Tuple
 from tqdm import tqdm
 
+from src.model_loader import encode_prompt
+
 
 class ActivationExtractor:
     """
@@ -50,6 +52,9 @@ class ActivationExtractor:
         # When set, hooks keep only this token position and copy a single
         # hidden_dim vector to host memory instead of the whole sequence.
         self._capture_position: Optional[int] = None
+        # Token ids of the most recent prompt, kept so the caller can report
+        # prompt lengths and show which token the activation was read from.
+        self.last_input_ids: List[int] = []
 
     def _get_layer_module(self, layer_idx: int):
         """Get the residual stream output of a specific layer."""
@@ -142,15 +147,12 @@ class ActivationExtractor:
         """
         # Tokenize first: the capture position must be known before the forward
         # pass so the hooks can slice on-device.
-        inputs = self.tokenizer(
-            prompt,
-            return_tensors="pt",
-            padding=False,
-            truncation=True,
-            max_length=self.max_length,
+        inputs = encode_prompt(
+            self.tokenizer, prompt, self.max_length
         ).to(self.model.device)
 
         seq_len = inputs["input_ids"].shape[1]
+        self.last_input_ids = inputs["input_ids"][0].tolist()
         pos = seq_len + position if position < 0 else min(position, seq_len - 1)
 
         # A truncated prompt no longer ends where the instruction ends, so the
@@ -269,12 +271,8 @@ class ActivationExtractor:
         self._capture_position = None
         self._register_hooks(layers)
 
-        inputs = self.tokenizer(
-            prompt,
-            return_tensors="pt",
-            padding=False,
-            truncation=True,
-            max_length=self.max_length,
+        inputs = encode_prompt(
+            self.tokenizer, prompt, self.max_length
         ).to(self.model.device)
 
         with torch.inference_mode():
