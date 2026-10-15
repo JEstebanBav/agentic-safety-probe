@@ -85,8 +85,16 @@ class ActivationExtractor:
             if self._capture_position is not None:
                 hidden_states = hidden_states[:, self._capture_position, :]
 
+            # The copy MUST block. With non_blocking=True the host tensor is
+            # returned before the device has written it, and nothing
+            # synchronises before extract_single reads it. On Llama-3.3-70B
+            # (20 layers, 0..76) that race left layers 0-52 intact, corrupted
+            # some rows at 56 and EVERY row at 60-76, with errors growing to
+            # 19 units at layer 76 - plausible-looking values that moved the
+            # selected layer from 76 to 56. Blocking costs one 16 KB transfer
+            # per layer per prompt.
             self.activations[layer_idx] = hidden_states.detach().to(
-                "cpu", non_blocking=True
+                "cpu", non_blocking=False
             )
         return hook
 
