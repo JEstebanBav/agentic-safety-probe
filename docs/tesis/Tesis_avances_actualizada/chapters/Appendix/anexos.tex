@@ -1,0 +1,29 @@
+\chapter{Trazabilidad y material complementario}
+\label{app:trazabilidad}
+\section{Corpus construido y muestra ejecutada}
+
+El archivo \texttt{dataset\_v2.jsonl} contiene 96 pares, 384 entradas, 62 pares propios y 34 derivados de AgentHarm. El informe de construcción se adjunta en \texttt{evidencia/}. La identidad del texto entre formatos y la simetría de sistema, herramientas y esquemas dentro de cada formato se verificaron en 96/96 pares. Hay 64 herramientas distintas utilizadas. Los conteos por explicitud son 42, 24 y 30. El corpus original ejecutado tiene 42 pares, con estratos de 18, 14 y 10. Estos dos conjuntos no se intercambian al informar denominadores.
+
+La revisión asistida de pares no sustituye una segunda anotación humana independiente. El cálculo de acuerdo entre anotadores permanece pendiente. Las etiquetas y el informe del corpus acompañan el material complementario; las instrucciones completas y las generaciones se conservan en el repositorio de investigación y no se reproducen aquí como un catálogo de tareas.
+
+\section{Configuración de la corrida principal}
+
+Llama V3 emplea \texttt{meta-llama/Llama-3.3-70B-Instruct}, precisión FP16, semilla 42, cinco folds, diez repeticiones de la sonda lineal, una de MLP, diez controles permutados, 10.000 remuestreos y 200 divisiones de selección. El barrido usa capas 0, 4, 8, hasta 76. El corpus se carga por la opción predeterminada original, con \texttt{dataset\_path=null}; las activaciones y sus metadatos identifican 42 pares. Las intervenciones declaradas son en capas 56, 52 y 28, con dosis 0,5; 1; 2 y 4 y un máximo de 64 tokens nuevos.
+
+La configuración exportada de Mistral declara FP16, barrido de 16 capas y 42 pares. Su registro contiene PCA, evaluación retenida y selección de capa, pero el archivo termina durante la etapa causal. La ausencia local del JSON y de sus activaciones limita la reproducción de ese análisis. Los resultados redondeados se identifican como tales.
+
+\section{Control de versiones de resultados}
+
+La versión anterior de la tesis empleaba para Llama la capa 56 y $\Delta p\simeq5{,}74$. Esta versión utiliza Llama V3, capa 76, y reporta como principal el valor fuera de muestra $15{,}7244$. El código documenta la sustitución de una copia asíncrona GPU--CPU por una bloqueante y la corrección de duplicación de BOS. Por eso las diferencias entre ejecuciones no se interpretan como fluctuación estadística sin verificar implementación. El repositorio conserva las corridas anteriores para inspección; sus cifras no se mezclan con V3.
+
+Los archivos de evidencia adjuntos incluyen métricas extraídas y un manifiesto SHA-256 de las fuentes originales. El hash identifica el contenido revisado, pero no reconstruye una revisión de código de entrenamiento ni certifica una ejecución externa que no esté archivada. La regeneración de tablas y figuras se realiza con \texttt{scripts/actualizar\_tesis\_avances.py}, incluido también como \texttt{regenerar\_avances.py} en este paquete, para ejecutarse desde el repositorio original con sus resultados.
+
+\section{Estado de las observaciones del tutor}
+
+Se actualizaron resumen y abstract; se definieron los conceptos desde la introducción; se precisó el formato como sistema y herramientas; se verificó simetría entre ramas; se documentó autoría y apoyo de anotación; se distinguió proyección de rechazo; se incorporaron PCA y su procedimiento; se corrigió la interpretación de la prueba de signos; se separaron selección e inferencia y se retiró cualquier equivalencia inferida solo de cercanía entre sonda y MLP. También se añadieron discusión, conclusiones del avance y este material complementario.
+
+La revisión ortográfica normaliza los demostrativos del texto editado. No se dispone de la nota original para certificar el fragmento concreto señalado por el tutor. La recomendación de retroalimentación externa es de proceso y no se marca como realizada a partir de los archivos. La réplica de 96 pares, la segunda anotación, la auditoría humana conductual y la validación externa permanecen abiertas.
+
+\section{Guion breve para presentar el avance}
+
+La presentación puede organizarse en seis pasos: problema y pregunta; diseño pareado y corpus ampliado construido; evidencia ejecutada sobre 42 pares; pérdida de margen y control benigno; validación con PCA, cross-fitting y selección separada; e intervención exploratoria, limitaciones y siguiente ejecución. En cada diapositiva de resultados debe indicarse modelo, capa, estimador y denominador. Las figuras de esta versión están disponibles en PDF y PNG y pueden reutilizarse directamente.

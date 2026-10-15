@@ -1,0 +1,131 @@
+{
+  "per_layer": {
+    "52": {
+      "delta_p_harmful": 6.001783622694867,
+      "delta_p_benign": -2.39263512726341,
+      "interaction": 8.394418749958277,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 2.3564363962835575,
+      "interaction_ci": [
+        7.295427747394535,
+        9.41031658296429
+      ],
+      "common_shift_fraction": -0.39865401315302507,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 41,
+      "shift_correlation": 0.16060732699264144,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        7.197267828518082,
+        9.511453818600803
+      ],
+      "separation_chat": 10.448647853164445,
+      "separation_agent": 2.0542291032061692,
+      "separation_loss_raw": 0.8033976135405854,
+      "cohens_d_chat": 3.409322149245086,
+      "cohens_d_agent": 1.96141785366785,
+      "separation_loss_standardised": 0.4246897864720236,
+      "scale_contraction": 0.3417328283706094,
+      "auroc_chat": 0.9812925170068028,
+      "auroc_agent": 0.9217687074829933
+    },
+    "56": {
+      "delta_p_harmful": 6.925636147636743,
+      "delta_p_benign": -2.6639735766109967,
+      "interaction": 9.58960972424774,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 2.388739496607841,
+      "interaction_ci": [
+        8.355032446603513,
+        10.744196970712037
+      ],
+      "common_shift_fraction": -0.3846539898749999,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 41,
+      "shift_correlation": 0.17125846045817836,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        8.225505032722971,
+        10.852803050061421
+      ],
+      "separation_chat": 11.796467107676325,
+      "separation_agent": 2.206857383428585,
+      "separation_loss_raw": 0.8129221771836659,
+      "cohens_d_chat": 3.4109216531979656,
+      "cohens_d_agent": 1.927873556861959,
+      "separation_loss_standardised": 0.43479394929682735,
+      "scale_contraction": 0.33099048140689696,
+      "auroc_chat": 0.9812925170068028,
+      "auroc_agent": 0.9115646258503403
+    },
+    "76": {
+      "delta_p_harmful": 16.27755124849223,
+      "delta_p_benign": -2.1754695219652995,
+      "interaction": 18.45302077045753,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 2.3614504811281574,
+      "interaction_ci": [
+        16.045687782108075,
+        20.694286844191986
+      ],
+      "common_shift_fraction": -0.13364845170841103,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 41,
+      "shift_correlation": 0.1697463304286873,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        15.770738646587622,
+        20.88070207863514
+      ],
+      "separation_chat": 22.137145170853252,
+      "separation_agent": 3.6841244003957225,
+      "separation_loss_raw": 0.8335772579543633,
+      "cohens_d_chat": 3.3602367726494555,
+      "cohens_d_agent": 1.8148736614003105,
+      "separation_loss_standardised": 0.45989708934429285,
+      "scale_contraction": 0.3081315407902406,
+      "auroc_chat": 0.9807256235827665,
+      "auroc_agent": 0.9240362811791383
+    }
+  },
+  "held_out": {},
+  "best_layer": 76,
+  "by_stratum": [
+    {
+      "stratum": "contextual",
+      "n_harmful": 14,
+      "n_benign": 14,
+      "auroc_chat": 0.9846938775510204,
+      "auroc_agent": 0.9744897959183674,
+      "auroc_loss": 0.010204081632653073,
+      "cohens_d_chat": 3.730272428212015,
+      "cohens_d_agent": 1.7673513642945922,
+      "separation_loss_standardised": 0.5262138628460135
+    },
+    {
+      "stratum": "explicit",
+      "n_harmful": 18,
+      "n_benign": 18,
+      "auroc_chat": 0.9907407407407407,
+      "auroc_agent": 0.9351851851851851,
+      "auroc_loss": 0.05555555555555558,
+      "cohens_d_chat": 4.093086542449137,
+      "cohens_d_agent": 2.402042587590893,
+      "separation_loss_standardised": 0.4131463963247627
+    },
+    {
+      "stratum": "framed",
+      "n_harmful": 10,
+      "n_benign": 10,
+      "auroc_chat": 0.9500000000000001,
+      "auroc_agent": 0.8900000000000001,
+      "auroc_loss": 0.05999999999999994,
+      "cohens_d_chat": 2.204539567195838,
+      "cohens_d_agent": 1.6953782385322644,
+      "separation_loss_standardised": 0.23096039474184804
+    }
+  ]
+}

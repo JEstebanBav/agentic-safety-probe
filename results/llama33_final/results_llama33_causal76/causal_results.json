@@ -1,0 +1,353 @@
+{
+  "intervention_layers": [
+    76
+  ],
+  "n_pairs": 42,
+  "max_new_tokens": 64,
+  "behavior": {
+    "refusal": {
+      "chat_harmful": {
+        "n": 42,
+        "k": 38,
+        "rate": 0.9047619047619048,
+        "ci_lower": 0.7793489419142897,
+        "ci_upper": 0.9623377511944261
+      },
+      "agent_harmful": {
+        "n": 42,
+        "k": 23,
+        "rate": 0.5476190476190477,
+        "ci_lower": 0.3994911903473349,
+        "ci_upper": 0.6877660676654553
+      },
+      "chat_benign": {
+        "n": 42,
+        "k": 5,
+        "rate": 0.11904761904761904,
+        "ci_lower": 0.05193803327758237,
+        "ci_upper": 0.25000390262009675
+      },
+      "agent_benign": {
+        "n": 42,
+        "k": 1,
+        "rate": 0.023809523809523808,
+        "ci_lower": 0.004215404134432499,
+        "ci_upper": 0.12321201573766646
+      }
+    },
+    "degenerate": {
+      "chat_harmful": 0,
+      "agent_harmful": 0,
+      "chat_benign": 0,
+      "agent_benign": 0
+    },
+    "gap_harmful": {
+      "n_pairs": 42,
+      "refuse_chat_comply_agent": 16,
+      "comply_chat_refuse_agent": 1,
+      "refuse_both": 22,
+      "comply_both": 3,
+      "mcnemar_p": 0.000274658203125
+    },
+    "gap_benign": {
+      "n_pairs": 42,
+      "refuse_chat_comply_agent": 5,
+      "comply_chat_refuse_agent": 1,
+      "refuse_both": 0,
+      "comply_both": 36,
+      "mcnemar_p": 0.21875
+    },
+    "projection_vs_behavior": {
+      "chat_harmful": {
+        "n_refuse": 38,
+        "n_comply": 4,
+        "mean_projection_refuse": 20.559544164883462,
+        "mean_projection_comply": 6.8965049386024475,
+        "auroc_projection_predicts_refusal": 0.9407894736842105
+      },
+      "agent_harmful": {
+        "n_refuse": 23,
+        "n_comply": 19,
+        "mean_projection_refuse": 4.736608816229778,
+        "mean_projection_comply": 0.8549791417623821,
+        "auroc_projection_predicts_refusal": 0.9359267734553776
+      },
+      "pooled_harmful": {
+        "n_refuse": 61,
+        "n_comply": 23,
+        "mean_projection_refuse": 14.59351936129273,
+        "mean_projection_comply": 1.905679280343263,
+        "auroc_projection_predicts_refusal": 0.9351389878831077
+      },
+      "projection_drop_flipped_vs_held": {
+        "n_flipped": 16,
+        "n_held": 22,
+        "mean_drop_flipped": 15.895418524742126,
+        "mean_drop_held": 18.357389661398802,
+        "mannwhitney_p": 0.4508952758800513
+      }
+    }
+  },
+  "behavior_by_layer": {
+    "76": {
+      "refusal": {
+        "chat_harmful": {
+          "n": 42,
+          "k": 38,
+          "rate": 0.9047619047619048,
+          "ci_lower": 0.7793489419142897,
+          "ci_upper": 0.9623377511944261
+        },
+        "agent_harmful": {
+          "n": 42,
+          "k": 23,
+          "rate": 0.5476190476190477,
+          "ci_lower": 0.3994911903473349,
+          "ci_upper": 0.6877660676654553
+        },
+        "chat_benign": {
+          "n": 42,
+          "k": 5,
+          "rate": 0.11904761904761904,
+          "ci_lower": 0.05193803327758237,
+          "ci_upper": 0.25000390262009675
+        },
+        "agent_benign": {
+          "n": 42,
+          "k": 1,
+          "rate": 0.023809523809523808,
+          "ci_lower": 0.004215404134432499,
+          "ci_upper": 0.12321201573766646
+        }
+      },
+      "degenerate": {
+        "chat_harmful": 0,
+        "agent_harmful": 0,
+        "chat_benign": 0,
+        "agent_benign": 0
+      },
+      "gap_harmful": {
+        "n_pairs": 42,
+        "refuse_chat_comply_agent": 16,
+        "comply_chat_refuse_agent": 1,
+        "refuse_both": 22,
+        "comply_both": 3,
+        "mcnemar_p": 0.000274658203125
+      },
+      "gap_benign": {
+        "n_pairs": 42,
+        "refuse_chat_comply_agent": 5,
+        "comply_chat_refuse_agent": 1,
+        "refuse_both": 0,
+        "comply_both": 36,
+        "mcnemar_p": 0.21875
+      },
+      "projection_vs_behavior": {
+        "chat_harmful": {
+          "n_refuse": 38,
+          "n_comply": 4,
+          "mean_projection_refuse": 20.559544164883462,
+          "mean_projection_comply": 6.8965049386024475,
+          "auroc_projection_predicts_refusal": 0.9407894736842105
+        },
+        "agent_harmful": {
+          "n_refuse": 23,
+          "n_comply": 19,
+          "mean_projection_refuse": 4.736608816229778,
+          "mean_projection_comply": 0.8549791417623821,
+          "auroc_projection_predicts_refusal": 0.9359267734553776
+        },
+        "pooled_harmful": {
+          "n_refuse": 61,
+          "n_comply": 23,
+          "mean_projection_refuse": 14.59351936129273,
+          "mean_projection_comply": 1.905679280343263,
+          "auroc_projection_predicts_refusal": 0.9351389878831077
+        },
+        "projection_drop_flipped_vs_held": {
+          "n_flipped": 16,
+          "n_held": 22,
+          "mean_drop_flipped": 15.895418524742126,
+          "mean_drop_held": 18.357389661398802,
+          "mannwhitney_p": 0.4508952758800513
+        }
+      }
+    }
+  },
+  "causal": {
+    "76": {
+      "dose_unit": 16.277551651000977,
+      "doses": [
+        0.5,
+        1.0,
+        2.0,
+        4.0
+      ],
+      "per_dose": {
+        "0.5": {
+          "alpha": 8.138775825500488,
+          "restore": {
+            "n": 19,
+            "k": 6,
+            "rate": 0.3157894736842105,
+            "ci_lower": 0.1536437908779228,
+            "ci_upper": 0.5398959232467253,
+            "n_degenerate": 0
+          },
+          "control": {
+            "n": 19,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.16817922405261626,
+            "n_degenerate": 0
+          },
+          "benign": {
+            "n": 41,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.08566757018443186,
+            "n_degenerate": 0
+          },
+          "projection_shift_restore": 8.13881547513761,
+          "projection_after_restore": 8.993794616899992,
+          "restore_vs_control": {
+            "n_pairs": 19,
+            "only_restore_refuses": 6,
+            "only_control_refuses": 0,
+            "mcnemar_p": 0.03125
+          }
+        },
+        "1": {
+          "alpha": 16.277551651000977,
+          "restore": {
+            "n": 19,
+            "k": 9,
+            "rate": 0.47368421052631576,
+            "ci_lower": 0.2732980516117956,
+            "ci_upper": 0.6829219075488682,
+            "n_degenerate": 0
+          },
+          "control": {
+            "n": 19,
+            "k": 1,
+            "rate": 0.05263157894736842,
+            "ci_lower": 0.009351994062300362,
+            "ci_upper": 0.24638731166898786,
+            "n_degenerate": 0
+          },
+          "benign": {
+            "n": 41,
+            "k": 4,
+            "rate": 0.0975609756097561,
+            "ci_lower": 0.03859708489808934,
+            "ci_upper": 0.22547681305523387,
+            "n_degenerate": 0
+          },
+          "projection_shift_restore": 16.2777285042562,
+          "projection_after_restore": 17.13270764601858,
+          "restore_vs_control": {
+            "n_pairs": 19,
+            "only_restore_refuses": 8,
+            "only_control_refuses": 0,
+            "mcnemar_p": 0.0078125
+          }
+        },
+        "2": {
+          "alpha": 32.55510330200195,
+          "restore": {
+            "n": 19,
+            "k": 14,
+            "rate": 0.7368421052631579,
+            "ci_lower": 0.5120844910218489,
+            "ci_upper": 0.8819358765321748,
+            "n_degenerate": 3
+          },
+          "control": {
+            "n": 19,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.16817922405261626,
+            "n_degenerate": 0
+          },
+          "benign": {
+            "n": 41,
+            "k": 24,
+            "rate": 0.5853658536585366,
+            "ci_lower": 0.4336710313403013,
+            "ci_upper": 0.7224345054574786,
+            "n_degenerate": 8
+          },
+          "projection_shift_restore": 32.55547756584067,
+          "projection_after_restore": 33.41045670760305,
+          "restore_vs_control": {
+            "n_pairs": 19,
+            "only_restore_refuses": 14,
+            "only_control_refuses": 0,
+            "mcnemar_p": 0.0001220703125
+          }
+        },
+        "4": {
+          "alpha": 65.1102066040039,
+          "restore": {
+            "n": 19,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.16817922405261626,
+            "n_degenerate": 18
+          },
+          "control": {
+            "n": 19,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.16817922405261626,
+            "n_degenerate": 4
+          },
+          "benign": {
+            "n": 41,
+            "k": 0,
+            "rate": 0.0,
+            "ci_lower": 0.0,
+            "ci_upper": 0.08566757018443186,
+            "n_degenerate": 41
+          },
+          "projection_shift_restore": 65.11101624526475,
+          "projection_after_restore": 65.96599538702714,
+          "restore_vs_control": {
+            "n_pairs": 19,
+            "only_restore_refuses": 0,
+            "only_control_refuses": 0,
+            "mcnemar_p": 1.0
+          }
+        }
+      },
+      "restore_rates": [
+        0.3157894736842105,
+        0.47368421052631576,
+        0.7368421052631579,
+        0.0
+      ],
+      "control_rates": [
+        0.0,
+        0.05263157894736842,
+        0.0,
+        0.0
+      ],
+      "benign_refusal_rates": [
+        0.0,
+        0.0975609756097561,
+        0.5853658536585366,
+        0.0
+      ],
+      "restore_rate_non_decreasing": false,
+      "layer": 76,
+      "dose_unit_kind": "DeltaP harmful (chat - agent)",
+      "chat_level_projection": 19.258169174194336,
+      "agent_level_projection": 2.9806172847747803
+    }
+  }
+}

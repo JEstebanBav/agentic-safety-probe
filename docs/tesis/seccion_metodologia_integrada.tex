@@ -1,0 +1,948 @@
+% ======================================================================
+%  SECCIONES 5 Y 6 — PARA INTEGRAR EN «tesis primera parte.tex»
+%  Insertar entre la sección 4 (Objetivos) y la sección de Referencias.
+%
+%  REQUIERE añadir al preámbulo (ver instrucciones al final del archivo):
+%      \usepackage{amsmath}
+%      \usepackage{amssymb}
+%      \usepackage{booktabs}
+% ======================================================================
+
+
+% ==================== 5. FUNDAMENTO MATEMÁTICO ====================
+\section{Fundamento matemático del problema}
+
+\justifying
+
+Los objetivos planteados exigen medir algo que no es directamente observable:
+lo que un modelo de lenguaje representa internamente antes de decidir si
+atiende o rechaza una solicitud. Esta sección construye, desde sus elementos
+más básicos, el aparato matemático que hace posible esa medición. El orden es
+deliberado: primero se establece qué es exactamente el objeto que se observa,
+después por qué ese objeto admite una descripción geométrica, y solo entonces
+se definen las cantidades que el estudio calcula. Cada expresión formal se
+presenta acompañada de la intuición que la motiva y de su lectura en lenguaje
+corriente, de modo que el argumento pueda seguirse sin conocimiento previo del
+área.
+
+\subsection{Qué se observa: la activación como vector}
+
+Un modelo de lenguaje no procesa texto, procesa números. El texto de entrada se
+divide primero en unidades mínimas llamadas \textit{tokens} —fragmentos de
+palabra, palabras completas o signos de puntuación— y cada token se convierte
+en una lista de números que el modelo puede manipular. A medida que el texto
+atraviesa las sucesivas capas de la red, esa lista de números se transforma. En
+cualquier punto del recorrido, el estado interno del modelo respecto de un
+token determinado es, literalmente, una lista de números reales.
+
+Esa lista recibe el nombre de \textit{activación}. Su longitud es una
+característica fija de la arquitectura, denominada dimensión del estado oculto
+y denotada $d_{\text{model}}$. En el modelo empleado en este trabajo,
+$d_{\text{model}} = 8192$ y la red consta de $L = 80$ capas. Cada token, en
+cada capa, tiene asociada una activación de 8192 números.
+
+Conviene detenerse en por qué esta lista se trata como un \textit{vector} y no
+simplemente como una colección de mediciones. Un vector no es cualquier lista:
+es una lista sobre la cual las operaciones de suma y de multiplicación por un
+número tienen un significado consistente. Que las activaciones de un modelo de
+lenguaje cumplan esa condición no es una convención adoptada por comodidad
+analítica, sino una consecuencia de cómo está construida la arquitectura, y es
+lo que se establece a continuación.
+
+\subsection{Por qué el estado interno forma un espacio vectorial}
+
+La arquitectura \textit{transformer} \parencite{vaswani2017} organiza el
+cómputo de una manera particular: cada capa no reemplaza el estado que recibe,
+sino que le \textit{suma} su contribución. Formalmente, para la capa
+$l \in \{1,\dots,L\}$,
+
+\begin{equation}
+  x^{(l)} \;=\; x^{(l-1)}
+  \;+\; \operatorname{Attn}^{(l)}\!\left(\operatorname{LN}\!\left(x^{(l-1)}\right)\right)
+  \;+\; \operatorname{MLP}^{(l)}\!\left(\operatorname{LN}(\cdot)\right),
+  \label{eq:residual}
+\end{equation}
+
+\noindent
+donde $x^{(l)}$ es el estado tras la capa $l$, $\operatorname{Attn}^{(l)}$ es el
+bloque de atención de esa capa, $\operatorname{MLP}^{(l)}$ el bloque de
+perceptrón multicapa, y $\operatorname{LN}$ una operación de normalización. El
+estado inicial $x^{(0)}$ es la representación numérica del texto de entrada.
+
+Leída en palabras, la ecuación~\eqref{eq:residual} dice que el estado tras una
+capa es el estado anterior más lo que aporta la atención más lo que aporta el
+perceptrón. El elemento decisivo es el signo de suma. Si cada capa sustituyera
+el estado recibido, no habría continuidad entre capas y no tendría sentido
+hablar de un canal común. Al sumar, en cambio, todas las capas escriben sobre
+un mismo soporte compartido, que en la literatura de interpretabilidad se
+denomina \textit{flujo residual} \parencite{elhage2021}. Una analogía útil es
+la de una grabación multipista: cada músico añade su pista sobre una mezcla
+común en lugar de borrar lo que había antes, de modo que la mezcla final
+contiene la suma de todos los aportes y es posible preguntarse cuánto hay de
+cada instrumento en ella.
+
+Desarrollando la recursión de la ecuación~\eqref{eq:residual} desde la primera
+capa hasta la última se obtiene una forma que hace explícita esa acumulación:
+
+\begin{equation}
+  x^{(L)} \;=\; \operatorname{Embed}(t)
+  \;+\; \sum_{l=1}^{L}\left[\operatorname{Attn}^{(l)} + \operatorname{MLP}^{(l)}\right],
+  \label{eq:residual-desarrollado}
+\end{equation}
+
+\noindent
+donde $t$ denota la secuencia de tokens de entrada. El estado final es la
+representación inicial más la suma de todas las contribuciones intermedias.
+
+Esta propiedad aditiva es la que convierte el conjunto de activaciones posibles
+en un espacio vectorial genuino de dimensión 8192, dentro del cual la suma de
+vectores posee interpretación semántica y las nociones geométricas habituales
+—distancia, ángulo, proyección— están bien definidas. Toda la metodología de
+este trabajo descansa sobre ella: sin aditividad no sería posible ni proyectar
+una activación sobre una dirección ni, como se verá más adelante, intervenir
+sumando una dirección al estado interno.
+
+\subsection{Por qué un concepto puede ser una dirección}
+
+Establecido que las activaciones habitan un espacio vectorial, queda por
+justificar el supuesto central de la interpretabilidad mecánica: que los
+conceptos que el modelo maneja se codifican como \textit{direcciones} de ese
+espacio. La formulación es la siguiente: si el modelo representa internamente
+una noción determinada, existe un vector $v$ tal que la magnitud del producto
+interno $\langle x, v\rangle$ indica en qué grado esa noción está activa en el
+estado $x$.
+
+La analogía geográfica resulta esclarecedora. En un mapa, «norte» no es un
+lugar sino una dirección; de cualquier ciudad puede preguntarse qué tan al
+norte se encuentra y obtener un número. El supuesto sostiene que «peligrosidad»
+opera de manera equivalente dentro del modelo: no reside en una neurona ni en
+una región concreta, sino que corresponde a una dirección, y de cualquier
+activación puede preguntarse cuánto apunta hacia ella.
+
+Este supuesto no es arbitrario, y conviene poder defenderlo porque de él
+depende todo lo demás. Su motivación proviene de cómo el modelo \textit{lee} su
+propio estado interno para producir la salida. La capa final, denominada
+\textit{unembedding}, es una operación lineal:
+
+\begin{equation}
+  \operatorname{logits} \;=\; W_U \cdot \operatorname{LN}\!\left(x^{(L)}\right),
+  \qquad
+  \operatorname{logit}(k) \;=\; \left\langle W_U[k],\; \operatorname{LN}\!\left(x^{(L)}\right)\right\rangle,
+  \label{eq:unembedding}
+\end{equation}
+
+\noindent
+donde $W_U$ es la matriz que proyecta el estado interno sobre el vocabulario y
+$W_U[k]$ es la fila correspondiente al token $k$. La ecuación~\eqref{eq:unembedding}
+establece que la puntuación asignada a cada token candidato es exactamente un
+producto interno entre el estado del modelo y una fila de esa matriz. Dicho de
+otro modo, la decisión final se toma mediante productos internos. Resulta
+entonces coherente esperar que las nociones que alimentan esa decisión estén
+codificadas de una forma que un producto interno pueda leer. El supuesto de
+representación lineal queda así motivado por la arquitectura y no impuesto
+desde fuera \parencite{elhage2021,zou2023}.
+
+Conviene precisar el alcance de este argumento. Lo que se establece es que la
+\textit{lectura} final del estado es lineal, no que el cómputo interno que
+genera cada noción lo sea. Se trata de evidencia sólida a favor del supuesto,
+no de una demostración, razón por la cual el diseño incorpora una comprobación
+empírica específica descrita en la sección~\ref{subsec:validacion}.
+
+\subsection{La dirección de rechazo}
+\label{subsec:direccion}
+
+\textcite{arditi2024} mostraron que el rechazo a solicitudes dañinas está
+mediado por una sola dirección del espacio de activaciones, y propusieron un
+procedimiento para estimarla que este trabajo adopta por dos razones: es
+transparente y permite replicación directa de sus resultados.
+
+La idea subyacente es sencilla. Si se dispone de un conjunto de solicitudes
+dañinas y otro de solicitudes inofensivas, cada uno produce una nube de puntos
+en el espacio de activaciones. Calculando el centro de cada nube y trazando la
+flecha que va de la inofensiva a la dañina se obtiene, precisamente, la
+dirección que separa ambas condiciones. Formalmente, sean
+
+\begin{equation}
+  \mu_H \;=\; \frac{1}{n_H}\sum_{i=1}^{n_H} a_{H,i},
+  \qquad
+  \mu_B \;=\; \frac{1}{n_B}\sum_{i=1}^{n_B} a_{B,i}
+  \label{eq:centroides}
+\end{equation}
+
+\noindent
+los centroides de las activaciones dañinas e inofensivas respectivamente,
+donde $a_{H,i}$ y $a_{B,i}$ denotan activaciones individuales y $n_H$, $n_B$
+el número de observaciones en cada grupo. La dirección de rechazo se define
+como la diferencia de esos centroides, normalizada a longitud unitaria:
+
+\begin{equation}
+  d_{\text{chat}} \;=\; \frac{\mu_H - \mu_B}{\lVert \mu_H - \mu_B \rVert_2}.
+  \label{eq:direccion}
+\end{equation}
+
+El símbolo $\lVert \cdot \rVert_2$ denota la longitud euclídea del vector, es
+decir, la raíz cuadrada de la suma de los cuadrados de sus componentes. Dividir
+por ella garantiza que $d_{\text{chat}}$ tenga longitud exactamente uno, lo que
+lo convierte en una regla de medir de escala fija y permite comparar ángulos
+con otras direcciones más adelante.
+
+Este estimador, conocido como diferencia de medias, no es una simplificación
+adoptada por conveniencia. El discriminante lineal óptimo para separar dos
+clases, formulado por \textcite{fisher1936}, es
+
+\begin{equation}
+  w^{*} \;=\; \Sigma^{-1}\left(\mu_H - \mu_B\right),
+  \label{eq:fisher}
+\end{equation}
+
+\noindent
+donde $\Sigma$ es la matriz de covarianza intraclase, que describe cómo varían
+conjuntamente las distintas dimensiones dentro de cada grupo. El factor
+$\Sigma^{-1}$ cumple la función de descontar aquellas direcciones que son
+intrínsecamente ruidosas antes de efectuar la comparación. Si todas las
+direcciones fuesen igualmente ruidosas —condición conocida como covarianza
+isotrópica, $\Sigma \approx \sigma^2 I$— no habría nada que descontar y la
+ecuación~\eqref{eq:fisher} se reduciría a $w^{*} \propto \mu_H - \mu_B$, es
+decir, exactamente a la ecuación~\eqref{eq:direccion}.
+
+Adoptar ese supuesto no responde a una preferencia teórica sino a una
+imposibilidad práctica. Estimar $\Sigma$ requeriría del orden de
+$d_{\text{model}}^{2}/2 \approx 3{,}4 \times 10^{7}$ parámetros, mientras que
+el estudio dispone de 42 observaciones por condición. La matriz de covarianza
+muestral resultante es singular, con rango a lo sumo $n-1 = 41$, y por tanto no
+admite inversión. En este régimen la diferencia de medias es el estimador
+disponible que está bien condicionado, y la limitación que ello impone se
+retoma en la sección~\ref{subsec:supuestos}.
+
+\subsection{La proyección: de ocho mil dimensiones a un número}
+
+Disponer de una dirección permite reducir cada activación a una sola cantidad
+interpretable. Para una activación $a$ y una dirección unitaria $d$, se define
+la proyección como
+
+\begin{equation}
+  P(a) \;=\; \langle a, d\rangle \;=\; \sum_{j=1}^{d_{\text{model}}} a_j\, d_j,
+  \label{eq:proyeccion}
+\end{equation}
+
+\noindent
+donde el subíndice $j$ recorre las 8192 componentes de ambos vectores. En
+palabras: se multiplican componente a componente y se suman todos los
+productos.
+
+Geométricamente, la proyección corresponde a la sombra del vector $a$ sobre el
+eje que define $d$. Si se ilumina perpendicularmente a ese eje, la sombra
+proyectada tiene una longitud determinada, y esa longitud es $P(a)$. El valor
+lleva signo: resulta negativo cuando el vector apunta en sentido opuesto al de
+la dirección. Que $d$ tenga longitud unitaria es lo que permite esta lectura
+directa; sin normalizar, la escala de la sombra sería arbitraria y las
+comparaciones perderían sentido.
+
+La ecuación~\eqref{eq:proyeccion} realiza una compresión considerable: convierte
+un objeto de 8192 dimensiones en un único número real, conservando íntegramente
+la variable de interés. La interpretación operativa que la sustenta es que un
+valor alto de $P(a)$ indica que el mecanismo de rechazo está activo y el modelo
+tenderá a negarse, mientras que un valor bajo indica lo contrario. Todo el
+análisis estadístico posterior opera sobre este escalar.
+
+\subsection{La brecha de proyección}
+\label{subsec:deltap}
+
+Con las piezas anteriores puede formularse ya la cantidad que responde al
+tercer objetivo específico. Si una misma solicitud dañina se presenta al modelo
+en formato conversacional y en formato agéntico, y en cada caso se mide cuánto
+se activa la dirección de rechazo, la diferencia entre ambas mediciones
+cuantifica el efecto del formato. Esa diferencia se denomina brecha de
+proyección y se define como
+
+\begin{equation}
+  \Delta P
+  \;=\;
+  \frac{1}{n}\sum_{i=1}^{n}\left\langle a_{\text{chat},i}, d_{\text{chat}}\right\rangle
+  \;-\;
+  \frac{1}{n}\sum_{i=1}^{n}\left\langle a_{\text{agent},i}, d_{\text{chat}}\right\rangle,
+  \label{eq:deltap}
+\end{equation}
+
+\noindent
+donde $a_{\text{chat},i}$ y $a_{\text{agent},i}$ son las activaciones
+correspondientes a la solicitud $i$ en cada formato, y $n$ es el número de
+solicitudes.
+
+La expresión admite una reescritura que ilumina su significado. Puesto que el
+producto interno es una operación lineal, promediar las proyecciones equivale a
+proyectar el promedio, de donde
+
+\begin{equation}
+  \Delta P
+  \;=\;
+  \left\langle\; \bar{a}_{\text{chat}} - \bar{a}_{\text{agent}},\;\; d_{\text{chat}} \;\right\rangle,
+  \label{eq:deltap-lineal}
+\end{equation}
+
+\noindent
+siendo $\bar{a}$ el centroide de la condición respectiva. La
+ecuación~\eqref{eq:deltap-lineal} muestra que $\Delta P$ es la proyección, sobre
+el eje de rechazo, del vector que describe cómo se desplaza la nube de
+activaciones al cambiar de formato. El cambio de formato mueve el estado
+interno en alguna dirección del espacio; $\Delta P$ mide qué porción de ese
+movimiento ocurre precisamente a lo largo del eje que gobierna la decisión de
+rechazar. Un desplazamiento perpendicular a $d_{\text{chat}}$, por grande que
+sea, no contribuye a la brecha.
+
+La lectura de la cantidad es directa. Un valor positivo y estadísticamente
+significativo indica que el formato agéntico desplaza las activaciones en
+sentido contrario a la activación del rechazo, lo que constituiría evidencia de
+que la defensa se atenúa. Un valor próximo a cero indicaría que la
+representación se mantiene y que el fallo conductual documentado por
+\textcite{andriushchenko2024} se origina en etapas posteriores del
+procesamiento. Ambos desenlaces son informativos.
+
+\subsection{Cuando la dirección deja de servir: la rotación}
+\label{subsec:rotacion}
+
+Una brecha positiva admite al menos dos explicaciones que conviene distinguir,
+porque tienen implicaciones distintas para el quinto objetivo específico. Puede
+ocurrir que el modelo deje de codificar la peligrosidad de la solicitud, o
+puede ocurrir que siga codificándola pero en una dirección distinta, que el
+mecanismo original ya no consulta. Separar ambas posibilidades requiere una
+segunda medición.
+
+Para ello se estima una dirección adicional, denotada $w_{\text{agent}}$,
+entrenando un clasificador lineal exclusivamente sobre activaciones de formato
+agéntico. El clasificador empleado es una regresión logística, que modela la
+probabilidad de que una activación corresponda a contenido dañino mediante
+
+\begin{equation}
+  \Pr(y = 1 \mid z) \;=\; \sigma\!\left(w^{\!\top} z + b\right),
+  \qquad
+  \sigma(u) \;=\; \frac{1}{1 + e^{-u}},
+  \label{eq:logistica}
+\end{equation}
+
+\noindent
+donde $y$ vale uno para las solicitudes dañinas y cero para las inofensivas,
+$z$ es la activación, $w$ el vector de pesos, $b$ un término independiente y
+$\sigma$ la función logística, que transforma cualquier número real en un valor
+entre cero y uno interpretable como probabilidad. El vector $w$ resultante es
+perpendicular a la frontera que el clasificador traza entre ambas clases y,
+normalizado, constituye la dirección que mejor discrimina la peligrosidad en
+contexto agéntico.
+
+Comparar ambas direcciones equivale a medir el ángulo que las separa. Siendo
+las dos de longitud unitaria, el coseno de ese ángulo es simplemente su
+producto interno:
+
+\begin{equation}
+  \cos\theta \;=\; \left\langle w_{\text{agent}},\, d_{\text{chat}}\right\rangle,
+  \qquad
+  \theta \;=\; \arccos\!\left(\cos\theta\right).
+  \label{eq:coseno}
+\end{equation}
+
+Un coseno próximo a uno indicaría que ambas direcciones coinciden y que no hay
+reorganización alguna; un coseno próximo a cero indicaría que son
+perpendiculares, es decir, que la información sobre peligrosidad se ha
+reubicado por completo en un eje que el mecanismo original no examina; y
+valores intermedios corresponderían a una rotación parcial.
+
+Interpretar esta cantidad exige una advertencia que resulta contraintuitiva y
+que es propia de los espacios de dimensión elevada. En $\mathbb{R}^{8192}$, dos
+vectores tomados al azar son casi perpendiculares entre sí con altísima
+probabilidad: su coseno se distribuye aproximadamente como
+
+\begin{equation}
+  \cos\theta_{\text{azar}} \;\sim\; \mathcal{N}\!\left(0,\; \tfrac{1}{d_{\text{model}}}\right),
+  \qquad
+  \sigma_{\text{azar}} \;=\; \frac{1}{\sqrt{d_{\text{model}}}} \;\approx\; 0{,}011.
+  \label{eq:coseno-azar}
+\end{equation}
+
+La ecuación~\eqref{eq:coseno-azar} proporciona la escala de referencia
+indispensable para leer cualquier coseno observado. Sin ella, un valor de
+$0{,}2$ parecería indicar ausencia de alineación; con ella se comprende que
+equivale a unas dieciocho desviaciones estándar por encima de lo esperable por
+azar. En dimensión elevada, la ausencia de alineación no se sitúa
+intuitivamente cerca de cero: se sitúa a una distancia de cero que hay que
+calcular.
+
+Finalmente, es necesario distinguir dos propiedades que suelen confundirse y
+cuya separación constituye un aspecto central de este trabajo. Una dirección
+puede conservar intacta su capacidad de \textit{ordenar} correctamente las
+solicitudes —situando siempre las dañinas por encima de las inofensivas— y
+simultáneamente perder el \textit{nivel absoluto} de activación necesario para
+que el mecanismo de rechazo se dispare. La primera propiedad se mide mediante
+el área bajo la curva característica del receptor y la segunda mediante
+$\Delta P$. Que ambas puedan disociarse implica que el modelo podría seguir
+distinguiendo perfectamente lo dañino de lo inofensivo mientras deja de actuar
+en consecuencia, escenario que este estudio está diseñado para detectar.
+
+
+% ==================== 6. DISEÑO METODOLÓGICO ====================
+\section{Diseño metodológico}
+
+\justifying
+
+\subsection{Enfoque, tipo y alcance}
+
+La investigación adopta un enfoque cuantitativo, en tanto la totalidad de sus
+inferencias descansa sobre magnitudes numéricas medidas en el espacio de
+activaciones y contrastadas mediante pruebas estadísticas formales. El tipo de
+estudio es experimental: la variable independiente se manipula deliberadamente,
+manteniendo constantes el contenido textual de la solicitud, los pesos del
+modelo y los parámetros de generación. No se trata de un estudio observacional,
+pues las condiciones comparadas no se registran tal como ocurren en la
+naturaleza sino que se construyen expresamente.
+
+El alcance es explicativo. El trabajo no se limita a describir la brecha
+conductual entre formatos, ya documentada \parencite{andriushchenko2024}, sino
+que busca identificar el mecanismo representacional que la acompaña. Dos
+elementos sostienen esa pretensión: el control experimental del contenido
+mediante emparejamiento, descrito enseguida, y la incorporación de un
+procedimiento de intervención sobre las activaciones orientado a contrastar
+suficiencia causal y no únicamente asociación. El estudio es además de corte
+transversal, pues todas las mediciones se obtienen sobre un mismo estado de los
+pesos del modelo, sin reentrenamiento ni seguimiento temporal.
+
+\subsection{El diseño pareado y por qué es la decisión central}
+
+El primer objetivo específico exige aislar el efecto del formato manteniendo
+constante el contenido de la instrucción. La forma de lograrlo es un diseño
+intrasujeto de medidas repetidas, en el cual cada solicitud se presenta al
+modelo bajo todas las condiciones experimentales en lugar de asignar
+solicitudes distintas a condiciones distintas.
+
+La razón es la misma por la que, para evaluar un tratamiento médico, comparar a
+un paciente consigo mismo antes y después resulta más informativo que comparar
+dos pacientes diferentes: en el segundo caso las diferencias individuales
+contaminan la medición. Aquí el papel del paciente lo desempeña el texto de la
+solicitud. Denotando por $a_{\text{chat},i}$ y $a_{\text{agent},i}$ las
+activaciones de la solicitud $i$ en cada formato, y siendo el mensaje del
+usuario idéntico en ambos casos, se cumple
+
+\begin{equation}
+  a_{\text{agent},i} - a_{\text{chat},i}
+  \;=\;
+  f(\text{formato}) \;+\; \underbrace{0}_{\text{aporte del contenido}},
+  \label{eq:cancelacion}
+\end{equation}
+
+\noindent
+donde $f(\cdot)$ representa el efecto atribuible al andamiaje del formato. La
+ecuación~\eqref{eq:cancelacion} expresa que, al restar dentro del par, el
+contenido se cancela algebraicamente y toda diferencia observada queda
+imputada al formato. El contenido deja de ser una variable capaz de confundir
+la comparación y pasa a ser una constante del diseño.
+
+El emparejamiento aporta además una ganancia estadística que conviene explicitar.
+Para dos variables aleatorias cualesquiera,
+
+\begin{equation}
+  \operatorname{Var}(A - B)
+  \;=\;
+  \operatorname{Var}(A) + \operatorname{Var}(B) - 2\operatorname{Cov}(A,B),
+  \label{eq:varianza-diferencia}
+\end{equation}
+
+\noindent
+donde $\operatorname{Cov}(A,B)$ mide en qué grado ambas cantidades varían de
+forma conjunta. Como las dos condiciones comparten el texto de la solicitud,
+esa covarianza es elevada y, al sustraerse, reduce la varianza del contraste.
+En términos prácticos, el diseño pareado alcanza la misma potencia estadística
+con un número menor de observaciones, lo que resulta determinante dado el costo
+computacional de cada medición.
+
+\subsection{Corpus contrastivo}
+
+El corpus fue construido específicamente para este estudio, dado que los
+conjuntos de datos disponibles no satisfacen el requisito de emparejamiento:
+en el \textit{benchmark} AgentHarm, por ejemplo, las solicitudes empleadas en
+cada condición son textos distintos, de modo que cualquier diferencia observada
+resultaría indistinguible de una diferencia de contenido
+\parencite{andriushchenko2024}. Su elaboración se realizó en el marco de una
+\textit{hackathon} de seguridad en inteligencia artificial.
+
+\medskip
+\noindent
+\textbf{[Pendiente por completar: responsables de la construcción del corpus,
+protocolo de redacción de las solicitudes, criterios operativos aplicados para
+asignar el grado de explicitud, número de evaluadores que participaron en el
+etiquetado y coeficiente de concordancia obtenido entre ellos.]}
+\medskip
+
+El corpus consta de 42 solicitudes base, cada una presente en cuatro variantes
+resultantes de cruzar formato (conversacional o agéntico) con contenido
+(dañino o inofensivo), lo que arroja un total de 168 registros. Las solicitudes
+se distribuyen en siete categorías de daño —fraude, cibercrimen,
+desinformación, acoso, odio, derechos de autor y drogas— y en tres grados de
+explicitud de la intención dañina, definidos operativamente así: explícito,
+cuando la intención es manifiesta en el léxico de la solicitud; contextual,
+cuando el daño se infiere del contexto y no de los términos literales; y
+encubierto, cuando la acción dañina se presenta bajo un marco de legitimidad
+profesional. El cuadro~\ref{tab:corpus} resume la distribución.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Distribución del corpus, expresada en solicitudes base.}
+  \label{tab:corpus}
+  \begin{tabular}{@{}lr@{\hspace{3em}}lr@{}}
+    \toprule
+    \textbf{Categoría} & \textbf{$n$} & \textbf{Explicitud} & \textbf{$n$} \\
+    \midrule
+    Fraude            & 7 & Explícito   & 18 \\
+    Cibercrimen       & 7 & Contextual  & 14 \\
+    Desinformación    & 6 & Encubierto  & 10 \\
+    Acoso             & 6 &             &    \\
+    Odio              & 6 &             &    \\
+    Derechos de autor & 5 &             &    \\
+    Drogas            & 5 &             &    \\
+    \midrule
+    \textbf{Total}    & \textbf{42} & \textbf{Total} & \textbf{42} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Dado que la validez de la ecuación~\eqref{eq:cancelacion} depende íntegramente
+de que el texto sea idéntico entre condiciones, se ejecutó una verificación
+programática que comparó carácter a carácter el mensaje del usuario en ambos
+formatos para cada combinación de solicitud base y contenido. La verificación
+confirmó la identidad textual en la totalidad de los 84 pares, lo que valida la
+premisa sobre la que se apoya el diseño.
+
+La condición inofensiva en formato agéntico, que podría parecer redundante,
+cumple una función de control indispensable. Si el formato agéntico desplazara
+todas las activaciones por igual —por efecto, por ejemplo, de una mayor
+longitud del contexto— ese desplazamiento carecería de relación con la
+seguridad. Solo disponiendo del par inofensivo puede distinguirse un efecto
+específico sobre la representación de peligrosidad de un corrimiento global
+inducido por el formato.
+
+\subsection{Operacionalización del formato agéntico}
+
+La distinción entre ambos formatos se implementó mediante la instrucción de
+sistema que precede al mensaje del usuario. En la condición conversacional
+dicha instrucción describe al modelo como un asistente que responde
+solicitudes. En la condición agéntica lo describe como un asistente con acceso
+a herramientas, al que se indica que responda mediante una invocación de
+herramienta cuando corresponda.
+
+\medskip
+\noindent
+\textbf{[Observación que debe consignarse con precisión: en la ejecución
+realizada, las especificaciones de las herramientas asociadas a cada solicitud
+—almacenadas en el corpus como estructuras independientes— no llegaron a
+incorporarse al texto del \textit{prompt}. Una verificación programática
+confirmó que en ninguno de los 84 registros agénticos la instrucción de sistema
+menciona las herramientas correspondientes. En consecuencia, lo efectivamente
+manipulado en dicha ejecución fue el encuadre de rol y la instrucción de
+invocar herramientas, no la presencia de las especificaciones en el contexto.
+Esta precisión no invalida la comparación —la manipulación resulta, de hecho,
+más económica, pues descarta que un eventual efecto se deba al volumen de texto
+añadido— pero sí acota lo que puede afirmarse: la evidencia obtenida concierne
+al encuadre de rol. Determinar la contribución específica de las
+especificaciones de herramientas requiere una ejecución adicional en la que
+estas se inyecten efectivamente, prevista como trabajo inmediato.]}
+\medskip
+
+\subsection{Modelo y extracción de las activaciones}
+
+El sistema analizado es un modelo de lenguaje autorregresivo con ajuste por
+instrucciones, de 80 capas y dimensión de estado oculto 8192. Su elección
+respondió a tres criterios: disponer de un entrenamiento de seguridad
+suficientemente robusto para que el mecanismo de rechazo resulte observable,
+contar con soporte nativo de invocación de herramientas, y tratarse de un
+modelo ampliamente estudiado, lo que facilita la comparación con la literatura.
+
+La recolección de activaciones se realizó mediante \textit{ganchos de
+propagación}, funciones que el entorno de ejecución invoca automáticamente tras
+el cómputo de cada capa y que permiten registrar su salida sin alterar el
+resultado del modelo. Su papel durante esta etapa es estrictamente pasivo:
+observan sin modificar, del mismo modo que un caudalímetro mide sin perturbar
+el flujo de la tubería.
+
+De la secuencia completa se retiene una única posición: la del último token.
+La justificación es estructural. La atención del modelo es causal, condición
+que se implementa mediante una máscara
+
+\begin{equation}
+  M_{ij} \;=\;
+  \begin{cases}
+    0        & \text{si } j \le i,\\[2pt]
+    -\infty  & \text{si } j > i,
+  \end{cases}
+  \label{eq:mascara-causal}
+\end{equation}
+
+\noindent
+donde $i$ indexa la posición que consulta y $j$ la posición consultada. El valor
+$-\infty$ se suma a las puntuaciones antes de normalizarlas, de modo que el peso
+asignado a cualquier posición futura resulta exactamente nulo. Se sigue de la
+ecuación~\eqref{eq:mascara-causal} que cada token únicamente integra información
+de los que le preceden, y por tanto que el último token es el único que ha
+incorporado la totalidad del contexto. Es además el estado desde el cual se
+computa la distribución del siguiente token según la
+ecuación~\eqref{eq:unembedding}, esto es, el punto exacto en que la decisión se
+produce. Una consideración adicional refuerza la elección: al variar la longitud
+de las solicitudes, la última posición es la única cuyo significado es
+equivalente entre condiciones.
+
+Las activaciones se convirtieron a precisión de 32 bits antes del análisis. La
+razón es que la ecuación~\eqref{eq:proyeccion} acumula 8192 sumandos, y en
+precisión reducida el error de redondeo acumulado podría alcanzar el orden de
+magnitud de la señal que se pretende medir.
+
+\subsection{Variables}
+
+El cuadro~\ref{tab:variables} distingue explícitamente entre lo que se
+manipula, lo que se mide, lo que se mantiene fijo y lo que se obtiene como
+resultado del procedimiento.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Clasificación de las variables del estudio.}
+  \label{tab:variables}
+  \begin{tabular}{@{}llp{5.6cm}@{}}
+    \toprule
+    \textbf{Clase} & \textbf{Elemento} & \textbf{Naturaleza} \\
+    \midrule
+    Independiente & Formato de presentación & Categórica: conversacional / agéntico \\
+    Estratificación & Grado de explicitud & Categórica ordinal: explícito / contextual / encubierto \\
+    \addlinespace
+    Dependiente & Proyección $P(a)$ & Continua, en unidades del espacio de activación \\
+    Dependiente & Brecha $\Delta P$ & Continua, mismas unidades \\
+    Dependiente & Alineación $\cos\theta$ & Adimensional, entre $-1$ y $1$ \\
+    \addlinespace
+    Controlada & Texto de la solicitud & Idéntico entre formatos \\
+    Controlada & Pesos del modelo & Constantes; no se reentrena \\
+    Controlada & Posición tokénica & Fija: último token \\
+    Controlada & Generación & Determinista, sin muestreo \\
+    \addlinespace
+    Resultado & $d_{\text{chat}}$, $w_{\text{agent}}$ & Vectores unitarios en $\mathbb{R}^{8192}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Una precisión sobre las unidades resulta necesaria para interpretar
+correctamente los valores. La proyección se expresa en las unidades arbitrarias
+del espacio de activación, y la norma del estado interno crece
+sistemáticamente con la profundidad de la capa. En consecuencia, los valores de
+$P$ y $\Delta P$ \textit{no son directamente comparables entre capas} sin una
+normalización previa. Las cantidades adimensionales —el coseno y el área bajo
+la curva— sí admiten esa comparación, y son las que se emplean cuando el
+interés recae sobre la evolución del fenómeno a lo largo de la red.
+
+\subsection{Inferencia estadística}
+
+El contraste de la hipótesis se apoya en tres pruebas que descansan sobre
+supuestos distintos, de modo que la coincidencia entre ellas ofrece garantías
+que ninguna proporcionaría por separado.
+
+La primera es la prueba $t$ para muestras pareadas. Definiendo la diferencia
+dentro de cada par como $D_i = P_{\text{chat},i} - P_{\text{agent},i}$, el
+estadístico de contraste es
+
+\begin{equation}
+  t \;=\; \frac{\bar{D}}{s_D/\sqrt{n}},
+  \qquad \text{con } n-1 \text{ grados de libertad},
+  \label{eq:t-pareado}
+\end{equation}
+
+\noindent
+donde $\bar{D}$ es la media de las diferencias y $s_D$ su desviación estándar.
+El cociente compara la magnitud del cambio promedio con la variabilidad de ese
+cambio: un valor elevado indica que la caída es consistente entre solicitudes y
+no producto del azar. Conviene señalar que esta prueba supone normalidad de las
+\textit{diferencias}, no de las proyecciones, supuesto considerablemente más
+débil.
+
+La segunda prueba prescinde por completo de supuestos distribucionales. Bajo la
+hipótesis nula de que el formato no influye, las etiquetas de condición serían
+intercambiables dentro de cada par; puede entonces construirse la distribución
+nula invirtiendo aleatoriamente el signo de cada diferencia y repitiendo el
+procedimiento un número elevado de veces. El valor de probabilidad empírico es
+
+\begin{equation}
+  \hat{p} \;=\; \frac{1}{B}\sum_{b=1}^{B}
+  \mathbb{1}\!\left[\Delta P^{(b)}_{\text{nula}} \;\ge\; \Delta P_{\text{obs}}\right],
+  \label{eq:permutacion}
+\end{equation}
+
+\noindent
+donde $B$ es el número de permutaciones, $\mathbb{1}[\cdot]$ vale uno cuando la
+condición se cumple y cero en caso contrario, y $\Delta P_{\text{obs}}$ es la
+brecha efectivamente observada. Se emplea $B = 10\,000$, lo que fija la
+resolución del procedimiento: un valor reportado como nulo debe leerse como
+inferior a $1/B$, nunca como cero exacto.
+
+La tercera es un intervalo de confianza por remuestreo \parencite{efron1979},
+que aporta lo que ninguna prueba de hipótesis proporciona: una estimación de la
+precisión. Se extraen repetidamente muestras con reemplazo de los pares
+observados y se recalcula la brecha en cada réplica, tomando después los
+percentiles correspondientes al nivel de confianza deseado. Resulta esencial
+que el mismo vector de índices se aplique a ambas condiciones, pues extraer
+índices independientes destruiría la estructura de emparejamiento y estimaría
+una cantidad distinta de la buscada.
+
+Junto a las pruebas se reportan tamaños de efecto, que informan sobre la
+magnitud del fenómeno con independencia del tamaño muestral \parencite{cohen1988}.
+Se emplean dos versiones que no son intercambiables y cuya distinción debe
+explicitarse: la pareada, $\bar{D}/s_D$, que responde a qué tan consistente es
+el cambio dentro de cada par; y la agrupada, que trata ambas condiciones como
+independientes y responde a qué tan separadas están las dos distribuciones. Ambas
+se relacionan mediante la correlación intra-par $r$ según
+
+\begin{equation}
+  d_{\text{pareado}} \;=\; \frac{d_{\text{agrupado}}}{\sqrt{2\,(1-r)}},
+  \label{eq:relacion-d}
+\end{equation}
+
+\noindent
+expresión que permite recuperar $r$ a partir de ambos valores y constituye, por
+tanto, un diagnóstico directo de en qué medida el emparejamiento cumplió su
+función.
+
+Finalmente, la capacidad de una dirección para ordenar correctamente
+solicitudes dañinas e inofensivas se evalúa mediante el área bajo la curva
+característica del receptor, cuya interpretación probabilística es exacta:
+corresponde a la probabilidad de que una solicitud dañina tomada al azar reciba
+una proyección mayor que una inofensiva tomada al azar. Un valor de $0{,}5$
+equivale a decidir al azar y uno de $1{,}0$ a separación perfecta.
+
+El cuarto objetivo específico se atiende replicando este conjunto de
+procedimientos de forma independiente dentro de cada grado de explicitud, lo
+que permite determinar si el efecto depende de cuán manifiesta sea la intención
+dañina.
+
+\subsection{Procedimientos de validación}
+\label{subsec:validacion}
+
+Se contemplan tres estrategias de validación, cada una dirigida a una pregunta
+distinta.
+
+La validación en el espacio de activaciones examina si la dirección estimada
+constituye un eje real de variación o un artefacto del ruido muestral. Para
+ello se contrasta $d_{\text{chat}}$ con la primera componente principal de los
+datos y se comparan además dos clasificadores: uno lineal y uno no lineal. Este
+segundo contraste es la comprobación empírica del supuesto de representación
+lineal anunciada anteriormente: si ambos alcanzan un desempeño equivalente, la
+información se organiza efectivamente como una dirección; si el no lineal
+resulta marcadamente superior, la información existe pero no admite descripción
+mediante un vector único, lo que obligaría a revisar el marco formal adoptado.
+
+La validación causal responde a una objeción de fondo: todo lo anterior es
+observacional, y la asociación entre proyección y comportamiento no demuestra
+que la primera cause el segundo. Para contrastarlo se implementa una
+intervención en tiempo de inferencia consistente en sumar la dirección al flujo
+residual durante la generación,
+
+\begin{equation}
+  x^{(l)} \;\longleftarrow\; x^{(l)} \;+\; \alpha\, d,
+  \label{eq:intervencion}
+\end{equation}
+
+\noindent
+donde $\alpha$ regula la intensidad de la perturbación \parencite{turner2023,zou2023}.
+Esta operación es posible precisamente por la aditividad establecida en la
+ecuación~\eqref{eq:residual}: sumar un vector al flujo residual en una capa hace
+que ese aporte se propague a las capas siguientes. El criterio de contraste es
+la existencia de un valor mínimo de $\alpha$ que restituya el rechazo; si
+existe, la dirección es causalmente suficiente para inducirlo. Debe precisarse
+que este procedimiento demuestra suficiencia, no necesidad: no descarta que
+existan otras vías capaces de producir el mismo efecto.
+
+La validación conductual, por último, contrasta sobre un corpus complementario
+si los patrones de activación se corresponden con el comportamiento
+efectivamente emitido por el modelo.
+
+El quinto objetivo específico se aborda evaluando la viabilidad de un
+mecanismo de monitoreo que opere sobre la dirección estimada. Su formulación es
+deliberadamente simple: se calcula la proyección de la activación y se emite
+una alerta cuando supera un umbral calibrado. Su interés práctico radica en el
+costo: la operación requiere $d_{\text{model}}$ multiplicaciones, cantidad
+constante respecto del número de herramientas de que disponga el agente, lo que
+contrasta con los esquemas de filtrado que exigen una regla por herramienta y
+cuyo costo crece con la superficie de exposición.
+
+\subsection{Estimación con corrección de sesgo}
+
+La combinación de un tamaño muestral reducido con una dimensionalidad muy
+elevada introduce sesgos que no son evidentes y que, de no corregirse, conducen
+a sobrestimar sistemáticamente los efectos. El procedimiento incorpora tres
+correcciones cuya necesidad se verificó mediante simulación con datos de verdad
+conocida.
+
+La primera atiende una circularidad. La dirección $d_{\text{chat}}$ se estima a
+partir de las activaciones conversacionales dañinas, y esas mismas activaciones
+se proyectan después sobre ella para calcular el primer término de la
+ecuación~\eqref{eq:deltap}. Como el centroide muestral incorpora una componente
+de ruido que se transfiere a la dirección, proyectarlo de vuelta recupera parte
+de ese ruido e infla la medición; la condición agéntica, que no participa en la
+estimación, no experimenta esa inflación, de modo que la brecha absorbe la
+diferencia. La corrección consiste en estimación cruzada
+\parencite{chernozhukov2018}: se divide la muestra en subconjuntos, se estima
+la dirección excluyendo uno de ellos y se proyecta únicamente ese subconjunto
+excluido, garantizando que ninguna proyección se realice sobre una dirección
+ajustada con la misma observación.
+
+La segunda atiende la evaluación de $w_{\text{agent}}$ y del monitor. Cuando el
+número de observaciones es inferior a la dimensión del espacio, el teorema de
+\textcite{cover1965} garantiza que cualquier asignación de etiquetas es
+separable linealmente. Con 84 observaciones en 8192 dimensiones, un desempeño
+perfecto sobre los mismos datos empleados para el ajuste es una certeza
+geométrica y no constituye evidencia alguna sobre la información contenida en
+ellos. La corrección consiste en evaluar el clasificador y calibrar el umbral
+exclusivamente sobre observaciones que no intervinieron en el ajuste.
+
+La tercera atiende la medición del ángulo. La estimación de $w_{\text{agent}}$
+a partir de una muestra reducida está dominada por el ruido, y en dimensión
+elevada ese ruido es prácticamente perpendicular a cualquier dirección fija, lo
+que atenúa el coseno hacia cero. El ángulo medido resulta así una cota superior
+del verdadero. Para cuantificar esta limitación se estima la reproducibilidad
+de $w_{\text{agent}}$ comparando estimaciones obtenidas de mitades disjuntas de
+la muestra, cantidad que determina con qué precisión puede reportarse el ángulo,
+o si puede reportarse en absoluto \parencite{spearman1904}.
+
+\subsection{Supuestos y limitaciones}
+\label{subsec:supuestos}
+
+El procedimiento descansa sobre un conjunto de supuestos cuyo incumplimiento
+comprometería la validez de las inferencias, y que conviene enunciar sin
+atenuantes. Se asume que los conceptos relevantes se codifican como direcciones
+del espacio de activaciones y que el rechazo está mediado por una dirección
+única y no por un subespacio de dimensión mayor. Se asume la isotropía de la
+covarianza intraclase, necesaria para que la ecuación~\eqref{eq:direccion}
+aproxime a la ecuación~\eqref{eq:fisher}. Se asume que el estado en la última
+posición contiene la información determinante de la decisión. Y se asume
+intercambiabilidad dentro de cada par, supuesto sobre el que se construye la
+distribución nula de la ecuación~\eqref{eq:permutacion}.
+
+Las limitaciones del diseño son las siguientes. El corpus es de construcción
+intencional y no procede de un muestreo probabilístico, por lo que las
+inferencias conciernen al efecto del formato dentro del conjunto de estímulos
+empleado y su extensión a la población de solicitudes posibles constituye un
+argumento de cobertura, no de representatividad estadística. El tamaño muestral,
+42 pares en un espacio de 8192 dimensiones, sitúa toda estimación vectorial en
+el régimen de alta dimensionalidad con las consecuencias descritas en el
+apartado anterior. El análisis abarcó un subconjunto de capas que cubre el
+tercio inicial de la red, lo que impide formular afirmaciones sobre el
+comportamiento en capas profundas. El estudio se aplica a un modelo principal,
+de modo que la dependencia de los hallazgos respecto de la escala o de la
+familia arquitectónica no puede establecerse con esta evidencia. El corpus está
+redactado en un solo idioma. Y, conforme a lo consignado anteriormente, la
+ejecución realizada manipuló el encuadre de rol sin incorporar las
+especificaciones de herramientas al contexto, lo que acota el alcance de las
+afirmaciones sobre la condición agéntica hasta que se complete la ejecución
+prevista.
+
+Finalmente, el diseño aborda el daño contenido semánticamente en una única
+solicitud. Quedan explícitamente fuera de alcance el daño que emerge de la
+historia conversacional acumulada y el que se distribuye entre sesiones
+distintas, casos en los que la información necesaria no está disponible en una
+sola pasada del modelo y que requieren aproximaciones de otra naturaleza.
+
+\subsection{Consideraciones éticas}
+
+La investigación no involucra participantes humanos ni datos personales, por lo
+que no requiere consentimiento informado ni tratamiento de información
+identificable. El corpus contiene solicitudes formuladas deliberadamente con
+contenido dañino, cuya única finalidad es activar los mecanismos de rechazo del
+modelo en condiciones controladas. Dichas solicitudes no se ejecutan contra
+sistemas reales: las herramientas son especificaciones declarativas sin
+implementación funcional, y el procedimiento analiza representaciones internas
+sin materializar acción alguna.
+
+La finalidad del trabajo es defensiva, en tanto busca caracterizar una
+vulnerabilidad representacional para hacer posible su mitigación. Se reconoce,
+no obstante, el carácter de doble uso del conocimiento generado, pues la
+descripción del mecanismo que atenúa el rechazo podría orientar su elusión
+deliberada. Dos consideraciones atenúan esta tensión: el fenómeno se encontraba
+ya documentado públicamente en el plano conductual con anterioridad a este
+trabajo \parencite{andriushchenko2024}, y la contribución se orienta a la
+detección antes que a la evasión.
+
+\medskip
+\noindent
+\textbf{[Pendiente por completar: constancia de aprobación del comité de ética
+institucional, si el programa lo requiere; condiciones de licencia y política de
+uso aceptable del modelo empleado; y política de publicación del corpus, con la
+justificación correspondiente.]}
+
+
+% ======================================================================
+%  INSTRUCCIONES DE INTEGRACIÓN
+% ----------------------------------------------------------------------
+%
+%  1) AÑADIR AL PREÁMBULO, después de \usepackage{lmodern}:
+%
+%       % ==================== MATEMÁTICAS Y TABLAS ====================
+%       \usepackage{amsmath}
+%       \usepackage{amssymb}
+%       \usepackage{booktabs}
+%
+%     amsmath  -> entornos equation, cases, align y \text dentro de fórmulas
+%     amssymb  -> símbolos \mathbb (usado en R^8192 y en la indicadora)
+%     booktabs -> reglas \toprule, \midrule, \bottomrule de los dos cuadros
+%
+%  2) INSERTAR el contenido de este archivo entre la sección 4 (Objetivos)
+%     y el bloque «% ==================== REFERENCIAS ====================».
+%
+%  3) AÑADIR AL bibliography las ocho entradas nuevas que aparecen abajo,
+%     manteniendo el orden alfabético del listado existente.
+%
+% ======================================================================
+%
+%  ENTRADAS BIBLIOGRÁFICAS NUEVAS
+%  (copiar dentro del entorno thebibliography ya existente)
+%
+% \bibitem[Chernozhukov et al.(2018)]{chernozhukov2018}
+% Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C.,
+% Newey, W., \& Robins, J. (2018). Double/debiased machine learning for
+% treatment and structural parameters. \textit{The Econometrics Journal},
+% 21(1), C1--C68.
+%
+% \bibitem[Cohen(1988)]{cohen1988}
+% Cohen, J. (1988). \textit{Statistical power analysis for the behavioral
+% sciences} (2.ª ed.). Lawrence Erlbaum Associates.
+%
+% \bibitem[Cover(1965)]{cover1965}
+% Cover, T. M. (1965). Geometrical and statistical properties of systems of
+% linear inequalities with applications in pattern recognition.
+% \textit{IEEE Transactions on Electronic Computers}, EC-14(3), 326--334.
+%
+% \bibitem[Efron(1979)]{efron1979}
+% Efron, B. (1979). Bootstrap methods: Another look at the jackknife.
+% \textit{The Annals of Statistics}, 7(1), 1--26.
+%
+% \bibitem[Elhage et al.(2021)]{elhage2021}
+% Elhage, N., Nanda, N., Olsson, C., Henighan, T., Joseph, N., Mann, B.,
+% \ldots\ Olah, C. (2021). \textit{A mathematical framework for transformer
+% circuits}. Transformer Circuits Thread.
+% \url{https://transformer-circuits.pub/2021/framework/index.html}
+%
+% \bibitem[Fisher(1936)]{fisher1936}
+% Fisher, R. A. (1936). The use of multiple measurements in taxonomic
+% problems. \textit{Annals of Eugenics}, 7(2), 179--188.
+%
+% \bibitem[Spearman(1904)]{spearman1904}
+% Spearman, C. (1904). The proof and measurement of association between two
+% things. \textit{The American Journal of Psychology}, 15(1), 72--101.
+%
+% \bibitem[Turner et al.(2023)]{turner2023}
+% Turner, A. M., Thiergart, L., Leech, G., Udell, D., Vazquez, J. J., Mini, U.,
+% \& MacDiarmid, M. (2023). \textit{Activation addition: Steering language
+% models without optimization}. arXiv:2308.10248.
+% \url{https://arxiv.org/abs/2308.10248}
+%
+% \bibitem[Vaswani et al.(2017)]{vaswani2017}
+% Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N.,
+% Kaiser, L., \& Polosukhin, I. (2017). Attention is all you need.
+% \textit{Advances in Neural Information Processing Systems}, 30.
+%
+% \bibitem[Zou et al.(2023)]{zou2023}
+% Zou, A., Phan, L., Chen, S., Campbell, J., Guo, P., Ren, R., \ldots\
+% Hendrycks, D. (2023). \textit{Representation engineering: A top-down approach
+% to AI transparency}. arXiv:2310.01405. \url{https://arxiv.org/abs/2310.01405}
+%
+% ======================================================================

@@ -21,3 +21,23 @@ Thumbs.db
 # Extracted activations: hundreds of MB per run, regenerable, over GitHub's
 # file limit. Keep them next to the results locally; do not commit them.
 activations.npz
+
+# Keep thesis sources and downloadable Overleaf projects in version control.
+!docs/tesis/*.zip
+
+# Preserve experimental run logs; compiler logs remain ignored.
+!results/**/*.log
+
+# LaTeX build intermediates (sources, figures and final PDFs are retained).
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc

@@ -1,0 +1,92 @@
+\chapter{Introducción}
+\label{chap:introduccion}
+
+Los modelos de lenguaje de gran escala han dejado de ser sistemas que solo
+producen texto para desplegarse como agentes capaces de ejecutar acciones
+en el mundo. Ese tránsito ha ocurrido más rápido que la comprensión de sus
+consecuencias para la seguridad, y ha dejado en pie un supuesto que la
+evidencia disponible no respalda: que las garantías obtenidas al evaluar un
+modelo conversando se conservan cuando ese mismo modelo actúa.
+
+Este trabajo examina ese supuesto desde dentro del modelo. En lugar de
+observar qué hace un agente ante una petición dañina, examina qué ocurre con
+la representación interna que gobierna su capacidad de rechazarla cuando
+pasa de un contexto de operación al otro. El capítulo presenta el problema
+que origina la investigación, la pregunta que la orienta, las razones que la
+justifican y los objetivos mediante los cuales se aborda.
+
+
+En este trabajo, \emph{dirección de rechazo} designa operativamente la diferencia normalizada entre los centroides de activaciones de instrucciones dañinas y benignas en formato conversacional. La \emph{proyección} es el producto escalar de una activación con ese eje, y el \emph{AUROC} mide su capacidad para ordenar las dos clases. Son medidas de representación; ninguna equivale por sí sola a observar un rechazo. El \emph{formato agéntico} estudiado combina un mensaje de sistema y esquemas de herramientas simuladas: describe capacidad de acción, sin ejecutar acciones reales.
+
+Esta versión presenta avances sustentados en los artefactos experimentales disponibles. Distingue el corpus ampliado construido, de 96 pares, de las ejecuciones analizadas, de 42 pares por modelo. La evaluación sobre el corpus ampliado y la validación externa permanecen como trabajo pendiente.
+
+\section{Planteamiento del proyecto}
+\label{sec:planteamiento}
+
+En los últimos dos años, los modelos de lenguaje de gran escala (\textit{Large Language Models}, LLM) dejaron de operar como sistemas puramente conversacionales para desplegarse como agentes: sistemas capaces de ejecutar código, enviar correos, consultar bases de datos o iniciar transacciones mediante el uso de herramientas externas, sin intervención humana en cada paso. La adopción ha sido veloz. De acuerdo con reportes del sector, se estima que para finales de 2026 cerca del 40\,\% de las aplicaciones empresariales incorporarán agentes de tarea específica, frente a menos del 5\,\% dos años atrás \parencite{miniorange2026}. Aquello que era un experimento se ha vuelto infraestructura.
+
+El cambio altera la naturaleza del riesgo. Un fallo en un sistema conversacional produce texto inadecuado; un fallo en un sistema agéntico produce acciones con efectos reales sobre datos, dinero o infraestructura \parencite{andriushchenko2024}. Como las tareas agénticas se componen de múltiples pasos encadenados, un error en un punto se propaga a toda la operación, y el acceso a herramientas amplifica su alcance, de modo que un mismo fallo puede afectar a una cuenta o a cientos. Esta diferencia empieza a reflejarse en la experiencia del sector. Según un reporte de industria, el 88\,\% de las organizaciones consultadas registró incidentes de seguridad vinculados a agentes durante el último año, cifra que asciende al 92{,}7\,\% en el sector salud, y ubica la pérdida de control sobre el comportamiento de los agentes como el riesgo predominante \parencite{gravitee2026}. Se trata de datos de percepción y experiencia del sector, no de mediciones controladas, pero coinciden con la evidencia académica que se expone a continuación.
+
+La raíz de esta vulnerabilidad se encuentra en un supuesto que el despliegue de estos sistemas ha dado por válido: que las garantías de seguridad obtenidas al evaluar un modelo en formato conversacional se conservan cuando ese mismo modelo opera como agente. \textcite{andriushchenko2024} mostraron que el supuesto es falso. A través del \textit{benchmark} AgentHarm documentaron que modelos de frontera ejecutan tareas dañinas en formato agéntico sin necesidad de técnicas de evasión, que las evasiones diseñadas para el chat se transfieren con facilidad al contexto agéntico, y que un modelo cuyas defensas han sido vulneradas conserva intactas sus capacidades, ejecutando la tarea dañina con la misma competencia con que ejecutaría una legítima. La seguridad evaluada en un contexto, en suma, no se traslada al otro.
+
+Ahora bien, este tipo de evidencia describe el fallo sin explicarlo. Mide que las salvaguardas ceden en contexto agéntico, pero no qué ocurre dentro del modelo para que cedan. Aproximarse a esa explicación exige mirar los mecanismos internos que sostienen la seguridad. \textcite{arditi2024} mostraron que el rechazo a solicitudes dañinas no está repartido de manera difusa por la red, sino gobernado por una sola dirección en el espacio de activaciones, un hallazgo que replicaron en trece modelos abiertos de hasta 72 mil millones de parámetros: al remover esa dirección el modelo pierde la capacidad de rechazar, y al reforzarla rechaza incluso peticiones inofensivas. El rechazo, entonces, tiene una forma geométrica concreta, medible y ligada de manera causal al comportamiento. Y no es un caso único; trabajos posteriores hallaron representaciones internas identificables para otros comportamientos sensibles, como el engaño o la escritura de código inseguro \parencite{templeton2024}, lo que indica que la seguridad de un modelo no se apoya en un mecanismo aislado sino en un conjunto más amplio de representaciones internas.
+
+Dos aspectos de estos mecanismos requieren, sin embargo, un diagnóstico específico. El primero es su sensibilidad al modo en que se presenta el daño. Un modelo alineado rechaza sin dificultad una instrucción abiertamente dañina, pero los casos que importan en la práctica rara vez son abiertos: son solicitudes de apariencia legítima cuya intención dañina queda implícita en el contexto. No se sabe si la representación interna de la peligrosidad se activa con igual fuerza ante una instrucción explícita que ante una encubierta, o si se atenúa a medida que el daño se disimula en la superficie del texto. El segundo aspecto es el contexto de operación. La dirección de rechazo se ha caracterizado casi por completo en formato conversacional \parencite{arditi2024}; su comportamiento cuando el modelo dispone de herramientas apenas se ha tocado. El trabajo más cercano, de \textcite{lermen2024}, removió el vector de rechazo de un modelo de gran escala y confirmó que el agente resultante completaba tareas dañinas, pero procedió eliminando el mecanismo por diseño, sin llegar a medir si este se debilita por sí solo al pasar al formato agéntico.
+
+De este modo, la evidencia disponible deja abierto un punto preciso. Se sabe, en el plano del comportamiento, que las salvaguardas fallan cuando el modelo actúa como agente \parencite{andriushchenko2024}, y se sabe, en el plano mecánico, que el rechazo está mediado por una dirección en el espacio de activaciones caracterizada en el formato conversacional \parencite{arditi2024}. Lo que no se ha determinado es si, al transitar el modelo al formato agéntico, esa representación conserva su capacidad para detectar la intención dañina, y si esa capacidad se mantiene frente a solicitudes de distinto grado de explicitud. Esa es la pregunta que este trabajo aborda.
+
+\section{Pregunta o propósito central}
+\label{sec:pregunta}
+
+Cuando un modelo de lenguaje pasa de conversar a actuar como agente, ¿conserva su dirección de rechazo la capacidad de detectar intenciones dañinas, incluso cuando estas se presentan de forma encubierta?
+
+La pregunta reúne dos dimensiones de un mismo fenómeno —la robustez de la representación de rechazo—, y ambas se encuentran dentro del alcance del estudio. La primera es el cambio de formato, del conversacional al agéntico. La segunda es el grado de explicitud con que se presenta la intención dañina. El diseño contrastivo descrito en la metodología, que cruza estos dos factores, permite abordarlas de manera conjunta y no como problemas separados.
+
+\section{Justificación y valor esperado}
+\label{sec:justificacion}
+
+Comprender qué ocurre con las representaciones internas de seguridad cuando un modelo opera como agente no es una cuestión de interés únicamente teórico. La brecha entre la velocidad con que estos sistemas se despliegan y la madurez de sus controles de seguridad es hoy uno de los puntos críticos del uso de inteligencia artificial. Reportes del sector describen esta desconexión con claridad. Si bien el 82\,\% de los directivos confía en que sus políticas actuales previenen acciones no autorizadas de los agentes, más de la mitad de los agentes en producción operan sin supervisión ni registro, situación que se atribuye a que las organizaciones aplican a los agentes marcos de seguridad pensados para software convencional, cuando los agentes deciden de forma autónoma e invocan herramientas de maneras que esos marcos no anticipan \parencite{gravitee2026}. Los controles predominantes actúan desde fuera del modelo, mediante permisos, credenciales y límites de autorización. Sin embargo, el fallo relevante para este estudio no ocurre únicamente fuera del modelo, sino también en su decisión interna de ejecutar o rechazar una acción, de modo que una defensa que no considere lo que el modelo representa internamente antes de actuar atiende el síntoma y no la causa.
+
+La aproximación conductual, dominante en la evaluación de estos sistemas, resulta insuficiente para cerrar esa brecha. Los \textit{benchmarks} miden qué hace el modelo, no por qué lo hace, y esa distinción tiene consecuencias prácticas: sin una explicación del mecanismo no es posible distinguir un fallo puntual de una vulnerabilidad estructural, ni anticipar en qué condiciones volverá a producirse. A ello se añade una limitación de fondo, y es que un modelo puede comportarse de manera distinta cuando infiere que está siendo evaluado, lo que impone un techo a cualquier método basado solo en observar la conducta \parencite{greenblatt2024}. La interpretabilidad mecánica ofrece una vía complementaria. Al examinar las representaciones internas, y mediante intervenciones controladas sobre mecanismos específicos, permite aproximarse a explicaciones causales sobre el origen del fallo y, a partir de ellas, a intervenciones dirigidas \parencite{arditi2024}. Que este enfoque es viable lo respalda el que laboratorios de frontera dediquen esfuerzo a auditar las representaciones de seguridad de sus propios modelos en producción \parencite{templeton2024}; si el alineamiento por entrenamiento bastara, ese esfuerzo sería innecesario.
+
+El estudio de la dirección de rechazo constituye un punto de entrada idóneo a este problema. Es el mecanismo de seguridad mejor caracterizado matemáticamente, con un método de cálculo transparente y reproducible y una relación causal con el comportamiento ya demostrada \parencite{arditi2024}, lo que lo convierte en un caso donde el método puede validarse con solidez antes de extenderse a representaciones más complejas. Diagnosticar cómo se transforma esta dirección al pasar al formato agéntico, y si su capacidad de detección resiste ante intenciones dañinas de distinta explicitud, aporta la explicación mecánica que la evidencia conductual no proporciona. Este diagnóstico, además, podría sentar las bases para trabajos futuros orientados a restaurar la representación cuando se degrada. Aunque tal restauración excede el alcance de la presente investigación, de naturaleza diagnóstica, abriría en principio una estrategia de protección basada en las representaciones internas, aplicable al conjunto más amplio de comportamientos de seguridad que el modelo codifica y complementaria a los controles externos que la industria reconoce como insuficientes.
+
+Finalmente, esta línea de trabajo se inscribe en un campo de expansión acelerada pero de participación aún concentrada en unos pocos países de América Latina. Según el Índice Latinoamericano de Inteligencia Artificial, solo siete países de la región tienen presencia en los \textit{main tracks} de las conferencias internacionales de élite, y el 82\,\% de los autores regionales que participan en ellas proviene únicamente de Chile y Brasil, lo que refleja la escasa presencia del resto de la región, Colombia incluida, en los espacios de investigación de frontera \parencite{ilia2025}. Desarrollar esta línea desde una universidad colombiana, con atención a las condiciones reales de despliegue de estos sistemas en la región, contribuye tanto al conocimiento del fenómeno como a diversificar las perspectivas desde las cuales se define la agenda de seguridad en inteligencia artificial.
+
+\section{Objetivos}
+\label{sec:objetivos}
+
+\subsection{Objetivo general}
+
+Analizar, mediante técnicas de interpretabilidad mecánica, cómo se transforma la dirección de rechazo en las representaciones internas de un modelo de lenguaje al pasar del formato conversacional al agéntico, y evaluar la estabilidad de su capacidad de detección según el grado de explicitud de la intención dañina, explorando de manera preliminar su potencial como base para un mecanismo de monitoreo de seguridad.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Construir un conjunto de datos contrastivo que permita aislar el efecto del formato agéntico sobre las representaciones internas del modelo. Dentro de cada par, el contenido de la instrucción se mantiene idéntico entre el formato conversacional y el agéntico, de modo que la manipulación dentro de la comparación es el formato compuesto por mensaje de sistema y herramientas; el conjunto, además, estratifica las instrucciones base según el grado de explicitud de la intención dañina, dimensión que distingue unos pares de otros y no introduce variación dentro de cada comparación pareada.
+
+  \item Calcular la dirección de rechazo a partir de las activaciones del modelo y caracterizar su comportamiento por capa en el formato conversacional como línea base.
+
+  \item Cuantificar la variación de la proyección sobre la dirección de rechazo entre el formato conversacional y el agéntico para instrucciones idénticas, evaluando la significancia estadística de la diferencia observada.
+
+  \item Evaluar la estabilidad de la capacidad de detección de la dirección de rechazo según el grado de explicitud de la intención dañina, comparando su respuesta frente a solicitudes con intención manifiesta y encubierta.
+
+  \item Explorar, con carácter preliminar, la viabilidad de emplear la dirección de rechazo como base para un mecanismo de monitoreo que detecte intención dañina en el formato agéntico, entendida esta exploración como una valoración de su potencial y no como el desarrollo de un sistema funcional.
+\end{enumerate}
+
+\section{Estructura del documento}
+\label{sec:estructura}
+
+El documento se organiza en cuatro capítulos adicionales al presente. El
+Capítulo~\ref{chap:contexto-antecedentes} sitúa el proyecto en su contexto y
+revisa los antecedentes y el estado actual de la literatura sobre alineamiento,
+interpretabilidad mecánica y dirección de rechazo, para precisar al final la
+brecha de conocimiento que el trabajo aborda. El
+Capítulo~\ref{chap:diseno-metodos} expone el diseño de la investigación, la
+construcción del conjunto de datos contrastivo, la formalización matemática del
+método y la estrategia de evaluación y validación empleada. El
+Capítulo~\ref{chap:resultados-evaluacion} presenta los resultados obtenidos en
+las corridas realizadas y su evaluación frente a los criterios definidos. El
+Capítulo~\ref{chap:discusion} los interpreta: sintetiza los hallazgos, expone
+el modo de fallo que describen, desarrolla sus implicaciones y delimita el
+alcance de su validez.

@@ -1,0 +1,49 @@
+{
+  "best_layer": 76,
+  "best_auroc_w_agent": 1.0,
+  "best_auroc_d_chat": 0.9240362811791383,
+  "best_cosine": 0.04986275959372148,
+  "monitor_threshold": -1.0925879087996615,
+  "monitor_precision": 1.0,
+  "monitor_recall": 1.0,
+  "monitor_f1": 1.0,
+  "monitor_fpr": 0.0,
+  "in_sample_warning": "best_auroc_w_agent, monitor_* and best_cosine are IN-SAMPLE: the direction and threshold were fitted on the same activations they are scored on. At n << d these saturate at 1.0 for any labelling (Cover's theorem). Report cross_validated.* instead.",
+  "cross_validated": {
+    "n_folds": 5,
+    "auroc_w_agent_oof": 0.9925925925925926,
+    "auroc_w_agent_oof_sd": 0.016563466499998417,
+    "auroc_w_agent_oof_folds": [
+      0.962962962962963,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "cosine_with_d_chat_oof": 0.053586309390451815,
+    "cosine_with_d_chat_oof_sd": 0.005165665058751751,
+    "split_half_reliability": 0.2832082418698311,
+    "attenuation_factor": 0.5321731314805653,
+    "monitor_f1_oof": 0.9367088607594937,
+    "monitor_precision_oof": 1.0,
+    "monitor_recall_oof": 0.8809523809523809,
+    "monitor_fpr_oof": 0.0
+  },
+  "per_layer": {
+    "52": {
+      "cosine": 0.04652787857892393,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.9217687074829933
+    },
+    "56": {
+      "cosine": 0.03957164075945819,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.9115646258503403
+    },
+    "76": {
+      "cosine": 0.04986275959372148,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.9240362811791383
+    }
+  }
+}
