@@ -1,0 +1,13 @@
+{
+  "name": "presentacion-sustentacion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genera la presentación de sustentación desde los resultados del repositorio (ver ../LEEME.md).",
+  "scripts": {
+    "build": "bash build.sh"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "pptxgenjs": "3.12.0"
+  }
+}
