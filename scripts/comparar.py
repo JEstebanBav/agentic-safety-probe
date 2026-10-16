@@ -4,10 +4,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 RUNS = {
-    "Mistral-7B  FP16 ": "results/mistral7b_fp16",
-    "Mistral-7B  4-bit": "results/mistral7b_4bit",
-    "Qwen3-32B   4-bit": "results/qwen32b",
-    "Llama-3.3-70B    ": "results/llama33",
+    "Mistral-7B  FP16 ": "results/corridas/mistral7b/v1_fp16",
+    "Mistral-7B  4-bit": "results/corridas/mistral7b/v1_4bit",
+    "Qwen3-32B   4-bit": "results/corridas/qwen3_32b/v1",
+    "Llama-3.3-70B    ": "results/corridas/llama33_70b/v1",
 }
 
 def at(pl, frac):

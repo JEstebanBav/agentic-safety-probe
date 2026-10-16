@@ -20,8 +20,8 @@ from scipy.stats import rankdata
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs/tesis/Tesis_avances_actualizada"
-LLAMA = ROOT / "results/llama33_final/results_llama33_v3"
-MLOG = ROOT / "results/results_mistralV3/results_mistral7b_v3.log"
+LLAMA = ROOT / "results/corridas/llama33_70b/v3"
+MLOG = ROOT / "results/corridas/mistral7b/v3/run.log"
 
 
 def read_json(path):
@@ -138,7 +138,7 @@ def main():
     assert abs(auc(p["chat_harmful"], p["chat_benign"]) - f["auroc_chat"]) < 1e-10
     qwen = {}
     for name in ["qwen8b", "qwen32b"]:
-        q = read_json(ROOT / "results" / name / "results.json")
+        q = read_json(ROOT / "results" / "corridas" / {"qwen8b": "qwen3_8b", "qwen32b": "qwen3_32b"}[name] / "v1" / "results.json")
         qwen[name] = {"n_pairs": len(q["projections"]["chat_harmful"]),
                       "layer": q["best_layer"], "heldout": q["auroc_heldout"],
                       "source_kind": "historico_sin_config_completa"}
@@ -589,7 +589,7 @@ La presentación puede organizarse en seis pasos: problema y pregunta; diseño p
     write("evidencia/metricas_avance.json",json.dumps(evidence,ensure_ascii=False,indent=2,allow_nan=False))
     sources=[LLAMA/"results.json",LLAMA/"robust_results.json",LLAMA/"causal_results.json",LLAMA/"activations.npz",MLOG,
              ROOT/"data/dataset_v2.jsonl",ROOT/"data/dataset_full.jsonl",ROOT/"src/activation_extractor.py",ROOT/"src/model_loader.py",ROOT/"run_experiment.py",
-             ROOT/"results/qwen8b/results.json",ROOT/"results/qwen32b/results.json"]
+             ROOT/"results/corridas/qwen3_8b/v1/results.json",ROOT/"results/corridas/qwen3_32b/v1/results.json"]
     manifest=[]
     for src in sources:
         manifest.append({"path":src.relative_to(ROOT).as_posix(),"bytes":src.stat().st_size,"sha256":hashlib.file_digest(src.open("rb"),"sha256").hexdigest()})

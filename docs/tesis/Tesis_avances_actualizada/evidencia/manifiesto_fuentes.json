@@ -1,26 +1,26 @@
 [
   {
-    "path": "results/llama33_final/results_llama33_v3/results.json",
+    "path": "results/corridas/llama33_70b/v3/results.json",
     "bytes": 11094365,
     "sha256": "046cd1db21f8d04479b0582f9a8d12569403cb4eed71a734ed08df9bf9037d00"
   },
   {
-    "path": "results/llama33_final/results_llama33_v3/robust_results.json",
+    "path": "results/corridas/llama33_70b/v3/robust_results.json",
     "bytes": 49177,
     "sha256": "02a3c20478c468e97681193bdd60dead29f6ac0b2843336344ba3aa8c0119510"
   },
   {
-    "path": "results/llama33_final/results_llama33_v3/causal_results.json",
+    "path": "results/corridas/llama33_70b/v3/causal_results.json",
     "bytes": 24893,
     "sha256": "032918075a32cda4e4719e8016c477c8b582582eacf927cd6fa029ce05af06d8"
   },
   {
-    "path": "results/llama33_final/results_llama33_v3/activations.npz",
+    "path": "results/corridas/llama33_70b/v3/activations.npz",
     "bytes": 220265134,
     "sha256": "10417fc83d840bf038eb28ced42ace3ca4489e9e88be3a4c2d9e049e1d0063dd"
   },
   {
-    "path": "results/results_mistralV3/results_mistral7b_v3.log",
+    "path": "results/corridas/mistral7b/v3/run.log",
     "bytes": 99434,
     "sha256": "5db8d72e0feb569f57dcff38dfa065456961e959973dabe614fb14be797aaad3"
   },
@@ -50,12 +50,12 @@
     "sha256": "1bcd0289a887917351294f9b2a5d47f103add6e37c64688718615f2a4a852684"
   },
   {
-    "path": "results/qwen8b/results.json",
+    "path": "results/corridas/qwen3_8b/v1/results.json",
     "bytes": 2887461,
     "sha256": "4ed423fcc02415efd67601212f82836741763d4e6b03b8b80b5098e75d4dfaed"
   },
   {
-    "path": "results/qwen32b/results.json",
+    "path": "results/corridas/qwen3_32b/v1/results.json",
     "bytes": 6077343,
     "sha256": "6cae3156bef06af7fab8d92dd481cff4415b80b480501a4412c8b5e40f47f4a8"
   }

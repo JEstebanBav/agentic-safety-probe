@@ -56,7 +56,7 @@ module.exports = function (pres, D) {
       guion: `Buenos días. Soy Juan Esteban Espitia Leiva y voy a sustentar mi trabajo de grado, dirigido por el profesor Julián Fernando Sánchez: «Transformación de la dirección de rechazo en modelos de lenguaje agénticos».
 Los puntos que ven abajo no son decoración: son datos del trabajo. Cada punto es una instrucción. Al final de la exposición los vamos a poder leer.`,
       transicion: "Empiezo por lo que está cambiando en el uso de estos modelos.",
-      fuentes: `Puntos: proyecciones fuera de muestra (dirección reajustada por fold) en la capa 76 de Llama‑3.3‑70B V3. results/llama33_final/results_llama33_v3/results.json → heldout.projections. Fila superior: chat; inferior: agente. Rojo arriba del eje: dañinas; azul abajo: benignas. Escala común de −10 a 28 unidades crudas de proyección.`,
+      fuentes: `Puntos: proyecciones fuera de muestra (dirección reajustada por fold) en la capa 76 de Llama‑3.3‑70B V3. results/corridas/llama33_70b/v3/results.json → heldout.projections. Fila superior: chat; inferior: agente. Rojo arriba del eje: dañinas; azul abajo: benignas. Escala común de −10 a 28 unidades crudas de proyección.`,
     });
   }
 

@@ -365,8 +365,8 @@ on a laptop — different partitions, more probe repeats, another control —
 without renting hardware again:
 
 ```bash
-python run_experiment.py --load-activations results/llama33_v2/activations.npz \
-    --n-repeats 10 --mlp-n-repeats 10 --output-dir results/llama33_v2_local
+python run_experiment.py --load-activations results/corridas/llama33_70b/v4/activations.npz \
+    --n-repeats 10 --mlp-n-repeats 10 --output-dir results/corridas/llama33_70b/v4_local
 ```
 
 Only the generation stages (behavioural baseline, causal test) are skipped,
@@ -382,7 +382,7 @@ python scripts/bootstrap_delta_p.py --n-boot 10000
 # For a run made BEFORE activations were saved: the interaction tested within
 # pairs, the split-sample layer choice read on the inference half only, and
 # the linear-vs-MLP comparison on shared folds, all from the saved projections.
-python scripts/reanalisis_observaciones.py --results results/llama33/results.json
+python scripts/reanalisis_observaciones.py --results results/corridas/llama33_70b/v1/results.json
 
 # Controlled proof that the estimators do what they claim, on synthetic data
 # with known ground truth. Includes the fold-hygiene experiment (E), the

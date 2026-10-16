@@ -36,9 +36,9 @@ Consulta principalmente:
 - `docs/tesis/Tesis_avances_actualizada_overleaf.zip` y la carpeta `docs/tesis/Tesis_avances_actualizada/`: fuentes LaTeX, bibliografía, figuras y material complementario.
 - `docs/tesis/Tesis_avances_actualizada/evidencia/metricas_avance.json`: cifras y protocolos del documento actualizado.
 - `docs/tesis/Tesis_avances_actualizada/evidencia/manifiesto_fuentes.json`: identificación de los archivos experimentales utilizados.
-- `results/llama33_final/results_llama33_v3/`: resultados, activaciones, validaciones, generaciones e intervenciones de la corrida principal de Llama.
-- `results/results_mistralV3/results_mistral7b_v3.log`: registro disponible de Mistral V3.
-- `results/qwen8b/` y `results/qwen32b/`: resultados históricos, cuyo alcance debes evaluar antes de incorporarlos.
+- `results/corridas/llama33_70b/v3/`: resultados, activaciones, validaciones, generaciones e intervenciones de la corrida principal de Llama.
+- `results/corridas/mistral7b/v3/run.log`: registro disponible de Mistral V3.
+- `results/corridas/qwen3_8b/v1/` y `results/corridas/qwen3_32b/v1/`: resultados históricos, cuyo alcance debes evaluar antes de incorporarlos.
 - `data/dataset_full.jsonl`, `data/dataset_v2.jsonl` y sus informes y etiquetas: construcción de los conjuntos de datos.
 - `run_experiment.py`, `src/` y la documentación metodológica: implementación de los procedimientos.
 - `docs/tesis/respuesta_observaciones_actualizada.pdf`: aclaraciones y correcciones solicitadas por el tutor.

@@ -1,0 +1,261 @@
+{
+  "_descripcion": "Lo que ningún archivo de resultados registra: modelo exacto en corridas antiguas, carpeta anterior, relación entre versiones y dónde se cita cada una. scripts/generar_fichas.py lo combina con los archivos de cada carpeta para escribir su FICHA.md. Claves: ruta relativa a results/.",
+  "corridas": {
+    "corridas/llama33_70b/v1": {
+      "etiqueta": "Llama-3.3-70B · V1",
+      "tipo": "corrida principal",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "≤ 2026-09-22 (fecha del commit; la corrida no la registró)",
+      "origen": "results/llama33",
+      "relacion": "Primera corrida de Llama-3.3, con el pipeline original.",
+      "citada_en": "Tesis original (capa 56, ΔP ≈ 5,74), según docs/tesis/revision_observaciones.md",
+      "uso": "Cifras de la tesis original; sustituida por V3",
+      "notas": [
+        "Pipeline anterior a las correcciones de los tutores: sin evaluación fuera de muestra por par, sin factorial ni test causal calibrado.",
+        "Tokenizaba cada prompt con dos tokens de inicio de secuencia (BOS)."
+      ]
+    },
+    "corridas/llama33_70b/v2": {
+      "etiqueta": "Llama-3.3-70B · V2",
+      "tipo": "corrida principal",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-14 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_v2",
+      "relacion": "Primera corrida con el pipeline corregido (particiones por par, PCA, factorial, test causal).",
+      "citada_en": "no",
+      "uso": "Sustituida por V3",
+      "notas": [
+        "Según docs/tesis/revision_observaciones.md, sus activaciones difieren de V3 en las capas profundas (60 y 76 en 42/42 filas), patrón que coincide con la carrera de copia GPU→CPU que el código actual corrige. Usar V3 para las capas profundas."
+      ]
+    },
+    "corridas/llama33_70b/v2_causal_capa56": {
+      "etiqueta": "Llama-3.3-70B · V2 · test causal en la capa 56",
+      "tipo": "corrida complementaria",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_causal56",
+      "relacion": "Hecha después de V2 y antes de V3 (deducido de las marcas de tiempo): repite la generación con intervención en la capa 56, sin sondas.",
+      "citada_en": "no",
+      "uso": "Complementaria"
+    },
+    "corridas/llama33_70b/v2_bos_antiguo": {
+      "etiqueta": "Llama-3.3-70B · V2 · token inicial antiguo (solo log)",
+      "tipo": "corrida complementaria",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_bos_antiguo.log",
+      "relacion": "Primer intento de la sensibilidad al token inicial (PROBE_LEGACY_BOS=1). Solo se conserva el log; V3_bos_antiguo es la versión completa.",
+      "citada_en": "no",
+      "uso": "Solo log"
+    },
+    "corridas/llama33_70b/v3": {
+      "etiqueta": "Llama-3.3-70B · V3",
+      "tipo": "corrida principal",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_v3",
+      "relacion": "Repetición de V2 con la copia de activaciones corregida y el test causal en las capas 56, 52 y 28.",
+      "citada_en": "Tesis (avances) y sustentación: capa de referencia 76; intervención en la capa 56",
+      "uso": "**Referencia de Llama en la tesis y la sustentación**",
+      "notas": [
+        "Corpus de 42 pares. La réplica con los 96 pares de dataset_v2 será V4.",
+        "Generación con 64 tokens de respuesta: el comportamiento y las llamadas a herramientas salen de behavior_generations.jsonl."
+      ]
+    },
+    "corridas/llama33_70b/v3_verificacion": {
+      "etiqueta": "Llama-3.3-70B · V3 · verificación",
+      "tipo": "corrida complementaria",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_check",
+      "relacion": "Hecha justo después de V3: extracción en las capas 28, 52 y 56 sin sondas ni generación, para comprobar las activaciones.",
+      "citada_en": "no",
+      "uso": "Complementaria"
+    },
+    "corridas/llama33_70b/v3_bos_antiguo": {
+      "etiqueta": "Llama-3.3-70B · V3 · token inicial antiguo",
+      "tipo": "corrida complementaria",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_bos_antiguo_v2",
+      "relacion": "Sensibilidad al token inicial: misma extracción que V3 con PROBE_LEGACY_BOS=1 (dos BOS, como V1).",
+      "citada_en": "no",
+      "uso": "Complementaria",
+      "notas": [
+        "La configuración guardada no registra PROBE_LEGACY_BOS porque es una variable de entorno; el modo se deduce del nombre original de la carpeta."
+      ]
+    },
+    "corridas/llama33_70b/v3_causal_capa76": {
+      "etiqueta": "Llama-3.3-70B · V3 · test causal en la capa 76",
+      "tipo": "corrida complementaria",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-15 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/results_llama33_causal76",
+      "relacion": "Hecha después de V3: test causal en la capa 76, la de referencia de V3, que V3 no intervino.",
+      "citada_en": "no",
+      "uso": "Complementaria"
+    },
+    "corridas/llama31_70b/v0_hackathon": {
+      "etiqueta": "Llama-3.1-70B · hackathon",
+      "tipo": "corrida exploratoria",
+      "modelo": "meta-llama/Llama-3.1-70B-Instruct",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/llama31_hackathon",
+      "relacion": "Anterior al corpus pareado de la tesis. La usa app.py (la demo).",
+      "citada_en": "no",
+      "uso": "Demo (app.py)",
+      "notas": [
+        "Modelo deducido del nombre de la carpeta y de la arquitectura guardada (80 capas, dimensión 8192).",
+        "No usa el corpus de 42 ni de 96 pares."
+      ]
+    },
+    "corridas/mistral7b/v1_fp16": {
+      "etiqueta": "Mistral-7B · V1 · FP16",
+      "tipo": "corrida principal",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/mistral7b_fp16",
+      "relacion": "Corrida FP16 con el pipeline original. Su log está compartido con Qwen3-8B V1 en logs/cola.log.",
+      "citada_en": "no",
+      "uso": "Histórica",
+      "notas": ["Intervención antigua con α arbitrarios: no es el test causal calibrado."]
+    },
+    "corridas/mistral7b/v1_4bit": {
+      "etiqueta": "Mistral-7B · V1 · 4 bits",
+      "tipo": "corrida complementaria",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/mistral7b_4bit",
+      "relacion": "Control de cuantización de V1: mismo modelo y prompts, solo cambia la precisión.",
+      "citada_en": "no",
+      "uso": "Control de precisión"
+    },
+    "corridas/mistral7b/v1_intervencion": {
+      "etiqueta": "Mistral-7B · V1 · intervención",
+      "tipo": "corrida complementaria",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/mistral7b_interv",
+      "relacion": "Variante de V1; por su nombre original (mistral7b_interv), centrada en la intervención antigua.",
+      "citada_en": "no",
+      "uso": "Histórica"
+    },
+    "corridas/mistral7b/v1_estadistica": {
+      "etiqueta": "Mistral-7B · V1 · estadística",
+      "tipo": "corrida complementaria",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/mistral7b_stats",
+      "relacion": "Variante de V1; por su nombre original (mistral7b_stats), centrada en el análisis estadístico.",
+      "citada_en": "no",
+      "uso": "Histórica"
+    },
+    "corridas/mistral7b/v2": {
+      "etiqueta": "Mistral-7B · V2 (96 pares)",
+      "tipo": "corrida principal",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "no registrada (carpeta no estaba en git)",
+      "origen": "results/mistral7b_v2",
+      "relacion": "Primera corrida de Mistral con el corpus ampliado.",
+      "corpus": "data/dataset_v2.jsonl — deducido: 96 pares, y la sustentación la identifica como V2 de 96",
+      "citada_en": "Sustentación (comparativa de 96 pares, capa 18)",
+      "uso": "**Sustentación, 96 pares**",
+      "notas": [
+        "Versión anterior del pipeline: sin línea base de comportamiento, test causal calibrado, factorial ni PCA, y sin activations.npz. Para tener esas etapas hay que repetirla (V4).",
+        "Sin log: la precisión se deduce de la memoria ocupada."
+      ]
+    },
+    "corridas/mistral7b/v3": {
+      "etiqueta": "Mistral-7B · V3 (solo log)",
+      "tipo": "corrida principal",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-10-15 (fecha del commit)",
+      "origen": "results/results_mistralV3",
+      "relacion": "Corrida sobre 42 pares (dataset_full, según el log) que ya imprime la validación PCA; solo se conserva el log.",
+      "citada_en": "Tesis (avances): valores redondeados del log, capa 30",
+      "uso": "Tesis, desde el log",
+      "notas": ["No hay results.json: las cifras salen de run.log y están redondeadas."]
+    },
+    "corridas/qwen3_8b/v1": {
+      "etiqueta": "Qwen3-8B · V1",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-8B",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/qwen8b",
+      "relacion": "Corrida FP16 con el pipeline original. Su log está compartido con Mistral V1 FP16 en logs/cola.log.",
+      "citada_en": "Tesis (avances): AUROC fuera de muestra",
+      "uso": "Tesis (avances)"
+    },
+    "corridas/qwen3_8b/v2": {
+      "etiqueta": "Qwen3-8B · V2 (96 pares)",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-8B",
+      "fecha": "no registrada (carpeta no estaba en git)",
+      "origen": "results/qwen8b_v2",
+      "relacion": "Primera corrida de Qwen3-8B con el corpus ampliado.",
+      "corpus": "data/dataset_v2.jsonl — deducido: 96 pares, y la sustentación la identifica como V2 de 96",
+      "citada_en": "Sustentación (comparativa de 96 pares, capa 22)",
+      "uso": "**Sustentación, 96 pares**",
+      "notas": [
+        "Versión anterior del pipeline: sin línea base de comportamiento, test causal calibrado, factorial ni PCA, y sin activations.npz. Para tener esas etapas hay que repetirla (V3).",
+        "Qwen3 razona antes de responder; esta versión del pipeline no lo manejaba. Las activaciones no se ven afectadas."
+      ]
+    },
+    "corridas/qwen3_32b/v1": {
+      "etiqueta": "Qwen3-32B · V1",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-32B",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/qwen32b",
+      "relacion": "Corrida con el pipeline original.",
+      "citada_en": "Tesis (avances): AUROC fuera de muestra",
+      "uso": "Tesis (avances)",
+      "notas": ["Cargado en 4 bits: el log dice 'Quantize: auto' y la memoria ocupada (18,7 GB) corresponde a 4 bits, no a FP16 (~64 GB)."]
+    },
+    "corridas/qwen3_32b/v2": {
+      "etiqueta": "Qwen3-32B · V2 (96 pares)",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-32B",
+      "fecha": "no registrada (carpeta no estaba en git)",
+      "origen": "results/qwen32b_v2",
+      "relacion": "Primera corrida de Qwen3-32B con el corpus ampliado.",
+      "corpus": "data/dataset_v2.jsonl — deducido: 96 pares, y la sustentación la identifica como V2 de 96",
+      "citada_en": "Sustentación (comparativa de 96 pares, capa 46)",
+      "uso": "**Sustentación, 96 pares**",
+      "notas": [
+        "Cargado en 4 bits (memoria ocupada 18,7 GB). Los demás modelos de la comparativa están en FP16: es una diferencia a declarar.",
+        "Versión anterior del pipeline: sin línea base de comportamiento, test causal calibrado, factorial ni PCA, y sin activations.npz."
+      ]
+    },
+    "pruebas/llama33_70b/v2": {
+      "etiqueta": "Llama-3.3-70B · prueba antes de V2",
+      "tipo": "corrida de prueba (4 pares)",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-10-14 (marca de tiempo local del archivo)",
+      "origen": "results/llama33_final/dryrun",
+      "relacion": "Comprobación del pipeline antes de V2. Sus estadísticas no significan nada.",
+      "citada_en": "no",
+      "uso": "Prueba"
+    },
+    "pruebas/mistral7b/v1": {
+      "etiqueta": "Mistral-7B · prueba",
+      "tipo": "corrida de prueba (4 pares)",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/dryrun/mistral7b",
+      "relacion": "Comprobación del pipeline, época de V1. Sus estadísticas no significan nada.",
+      "citada_en": "no",
+      "uso": "Prueba"
+    },
+    "pruebas/qwen3_32b/v1": {
+      "etiqueta": "Qwen3-32B · prueba",
+      "tipo": "corrida de prueba (4 pares)",
+      "modelo": "Qwen/Qwen3-32B",
+      "fecha": "≤ 2026-09-22 (fecha del commit)",
+      "origen": "results/dryrun/qwen32b",
+      "relacion": "Comprobación del pipeline, época de V1. Sus estadísticas no significan nada.",
+      "citada_en": "no",
+      "uso": "Prueba"
+    }
+  }
+}

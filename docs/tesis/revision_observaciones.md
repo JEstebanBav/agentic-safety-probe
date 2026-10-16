@@ -14,8 +14,8 @@ Fuentes principales:
 - `docs/tesis/Tesis_corta_v2.pdf`: versión revisada, 61 páginas físicas.
 - `docs/tesis/Tesis_corta_v2_overleaf.zip`: fuentes LaTeX, leídas desde una extracción temporal.
 - `docs/Tesis v2.pdf`: versión anterior, 80 páginas físicas.
-- `results/llama33_final/`: seis corridas completas de análisis sobre 42 pares, además de un ensayo de cuatro pares.
-- `results/results_mistralV3/results_mistral7b_v3.log`: único archivo encontrado en esa carpeta. **No hay JSON de Mistral V3 allí**.
+- `results/corridas/llama33_70b/`: seis corridas completas de análisis sobre 42 pares, además de un ensayo de cuatro pares.
+- `results/corridas/mistral7b/v3/run.log`: único archivo encontrado en esa carpeta. **No hay JSON de Mistral V3 allí**.
 - Resto de `results/`, `data/dataset_v2.jsonl` y `../docs/tesis/seccion_metodologia_integrada.tex`.
 
 Las anotaciones de ambos PDF de tesis no contienen comentarios de texto en el campo `/Contents`. El listado de observaciones se reconstruye desde la respuesta al tutor; no se puede cotejar literalmente cada comentario original con una nota incrustada. Tampoco se verificó bibliografía externa ni se ejecutaron modelos en GPU. Las páginas citadas abajo son físicas del PDF de 61 páginas.
@@ -61,11 +61,11 @@ Esto valida la construcción del corpus; **no demuestra que los resultados repor
 
 Se inspeccionaron los 17 `results.json` bajo `results/`: catorce corresponden a 42 pares y tres a ensayos de cuatro pares. No hay ninguno de 96. En cambio, la tabla de corridas del capítulo 4, p. 45, reporta Mistral con 96 pares/capa 18, Qwen3-8B con 96/capa 22 y Qwen3-32B con 96/capa 46.
 
-Los archivos locales `results/qwen8b/results.json` y `results/qwen32b/results.json` contienen 42 pares, con capas principales 32 y 46 respectivamente. El primero, además, tiene AUROC held-out conversacional/agéntico de aproximadamente 0,518/0,511 en su capa principal, que no corresponde a la corrida descrita en la tesis. Esto no refuta una ejecución externa de 96 pares; significa que **esa ejecución no es auditable con los archivos entregados aquí**. Las figuras incluidas en Overleaf no sustituyen sus datos fuente.
+Los archivos locales `results/corridas/qwen3_8b/v1/results.json` y `results/corridas/qwen3_32b/v1/results.json` contienen 42 pares, con capas principales 32 y 46 respectivamente. El primero, además, tiene AUROC held-out conversacional/agéntico de aproximadamente 0,518/0,511 en su capa principal, que no corresponde a la corrida descrita en la tesis. Esto no refuta una ejecución externa de 96 pares; significa que **esa ejecución no es auditable con los archivos entregados aquí**. Las figuras incluidas en Overleaf no sustituyen sus datos fuente.
 
 ### 2. Las tablas de Llama describen una corrida anterior
 
-Las cifras de la tesis, capa 56 y Δp ≈ 5,74, coinciden con `results/llama33/`, no con `results/llama33_final/results_llama33_v3/`.
+Las cifras de la tesis, capa 56 y Δp ≈ 5,74, coinciden con `results/corridas/llama33_70b/v1/`, no con `results/corridas/llama33_70b/v3/`.
 
 | Medida | Tesis / corrida anterior | Llama V3 guardado |
 |---|---:|---:|

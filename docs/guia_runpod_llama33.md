@@ -252,23 +252,46 @@ Descárgalo desde el explorador de JupyterLab o con `runpodctl send`. Verifica
 en el portátil que el archivo abre y contiene `activations.npz` y
 `results.json`.
 
+En el portátil, cada carpeta va en la siguiente versión libre de Llama (ver
+`results/README.md`):
+
+| En el pod | En el repositorio |
+|---|---|
+| `results_llama33_v2/` | `results/corridas/llama33_70b/v4/` |
+| `results_llama33_bos_antiguo/` | `results/corridas/llama33_70b/v4_bos_antiguo/` |
+| `dryrun/` y `dryrun.log` | `results/pruebas/llama33_70b/v4/` (el log como `run.log`) |
+
+Cada carpeta trae ya su `FICHA.md`, que `run_experiment.py` escribe al
+terminar. Añade sus entradas en `results/registro.json` (etiqueta, origen,
+relación, uso) y regenera fichas e índice:
+
+```bash
+python scripts/generar_fichas.py
+```
+
 Después **termina** el pod (no solo detenerlo): un pod detenido sigue cobrando
 el volumen de 200 GB.
 
 ## Mistral y Qwen con el mismo código
 
-Las corridas de 96 pares que hay en `results/mistral7b_v2`, `qwen8b_v2` y
-`qwen32b_v2` son de una versión anterior del pipeline: no tienen línea base de
-comportamiento, test causal, factorial ni validación PCA, y no guardaron
-`activations.npz`. Para compararlas con Llama hay que repetirlas en GPU.
-`scripts/run_modelo.sh` ya pasa `--dataset-path data/dataset_v2.jsonl` y
-`--factorial`:
+Las corridas de 96 pares que hay en `results/corridas/mistral7b/v2`,
+`qwen3_8b/v2` y `qwen3_32b/v2` son de una versión anterior del pipeline: no
+tienen línea base de comportamiento, test causal, factorial ni validación PCA,
+y no guardaron `activations.npz` (sus fichas lo marcan). Para compararlas con
+Llama hay que repetirlas en GPU. `scripts/run_modelo.sh` ya pasa
+`--dataset-path data/dataset_v2.jsonl` y `--factorial`. Cada una va en la
+siguiente versión libre de su modelo:
 
 ```bash
-./scripts/run_modelo.sh mistralai/Mistral-7B-Instruct-v0.3 /workspace/results_mistral7b_v3 --no-quantize
+./scripts/run_modelo.sh mistralai/Mistral-7B-Instruct-v0.3 /workspace/results_mistral7b_v4 --no-quantize
 ./scripts/run_modelo.sh Qwen/Qwen3-8B  /workspace/results_qwen8b_v3  --no-quantize
 ./scripts/run_modelo.sh Qwen/Qwen3-32B /workspace/results_qwen32b_v3 --no-quantize
 ```
+
+Al bajarlas: `results/corridas/mistral7b/v4/`, `qwen3_8b/v3/` y
+`qwen3_32b/v3/`. Las V2 de Qwen3-32B se cargaron en 4 bits; con
+`--no-quantize` la V3 queda en FP16 como los demás modelos, lo que necesita
+una GPU de 80 GB.
 
 Haz primero la corrida de prueba de cada uno añadiendo `--limit-pairs 4
 --n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000`. Tamaños de pod en
@@ -294,11 +317,11 @@ ninguna pregunta estadística. Todo el análisis se repite así:
 
 ```bash
 python run_experiment.py \
-  --load-activations results/llama33_v2/activations.npz \
+  --load-activations results/corridas/llama33_70b/v4/activations.npz \
   --dataset-path data/dataset_v2.jsonl \
   --n-folds 5 --n-repeats 10 --mlp-n-repeats 10 \
   --n-label-permutations 10 --n-bootstrap 10000 \
-  --output-dir results/llama33_v2_local
+  --output-dir results/corridas/llama33_70b/v4_local
 ```
 
 Con `--mlp-n-repeats 10` esta es la corrida que da la comparación sonda lineal

@@ -15,7 +15,7 @@ import numpy as np
 
 AQUI = Path(__file__).resolve().parent
 RAIZ = AQUI.parents[2]
-LLAMA = RAIZ / "results/llama33_final/results_llama33_v3"
+LLAMA = RAIZ / "results/corridas/llama33_70b/v3"
 TESIS = RAIZ / "docs/tesis/Tesis_avances_actualizada"
 
 
@@ -110,16 +110,16 @@ def main():
     tp_mi = tp_desde_f1(0.8250, fp_mi)
     assert (fp_dm, tp_dm, tp_lr, fp_mi, tp_mi) == (6, 35, 37, 5, 33)
 
-    q8 = leer(RAIZ / "results/qwen8b/results.json")["auroc_heldout"]
-    q32 = leer(RAIZ / "results/qwen32b/results.json")["auroc_heldout"]
+    q8 = leer(RAIZ / "results/corridas/qwen3_8b/v1/results.json")["auroc_heldout"]
+    q32 = leer(RAIZ / "results/corridas/qwen3_32b/v1/results.json")["auroc_heldout"]
 
     datos = {
         "fuente": {
-            "llama": "results/llama33_final/results_llama33_v3/results.json (heldout, pca_by_layer, linear_*), "
+            "llama": "results/corridas/llama33_70b/v3/results.json (heldout, pca_by_layer, linear_*), "
                      "factorial_results.json",
             "metricas": "docs/tesis/Tesis_avances_actualizada/evidencia/metricas_avance.json",
-            "mistral": "results/results_mistralV3/results_mistral7b_v3.log (valores impresos, redondeados)",
-            "qwen": "results/qwen8b/results.json, results/qwen32b/results.json (auroc_heldout)",
+            "mistral": "results/corridas/mistral7b/v3/run.log (valores impresos, redondeados)",
+            "qwen": "results/corridas/qwen3_8b/v1/results.json, results/corridas/qwen3_32b/v1/results.json (auroc_heldout)",
         },
         "llama": {
             "capa": 76,

@@ -171,7 +171,7 @@ module.exports = function (pres, D) {
       ["Correcciones de código entre ambas", "copia GPU → CPU de activaciones ahora bloqueante; eliminación del token BOS duplicado"]];
     v.forEach(([a, b], k) => txt(s, [R(a + ": ", { fontFace: F.demi, color: C.ink }), R(b)], { x: MX, y: 4.8 + k * 0.45, w: W - 2 * MX, h: 0.4, fontSize: 13.5, color: C.ink2 }));
     txt(s, "Las diferencias entre versiones no se interpretan como fluctuación estadística sin verificar la implementación.", { x: MX, y: 6.2, w: W - 2 * MX, h: 0.4, fontSize: 13, color: C.mute });
-    fuente(s, "results/qwen8b/results.json y results/qwen32b/results.json → auroc_heldout · tesis, sección 4.4 y anexo A.3 · historial del repositorio (PR #3 y #4).");
+    fuente(s, "results/corridas/qwen3_8b/v1/results.json y results/corridas/qwen3_32b/v1/results.json → auroc_heldout · tesis, sección 4.4 y anexo A.3 · historial del repositorio (PR #3 y #4).");
     nota(s, { titulo: "R7 · Qwen y control de versiones", respaldo: true, t: 0,
       guion: "Si preguntan por Qwen: las corridas son anteriores al pipeline corregido. En Qwen3‑8B, capa 32, la dirección no separa ni en chat (0,52), así que no hay línea base que degradar; en Qwen3‑32B la pérdida es pequeña. No las uso para sostener un patrón entre familias. Si preguntan por qué cambiaron las cifras respecto a la versión anterior: V3 corrige una copia asíncrona de activaciones y un token BOS duplicado; por eso no mezclo cifras de versiones distintas." });
   }
@@ -193,7 +193,7 @@ module.exports = function (pres, D) {
       { x: MX, y: 5.0, w: W - 2 * MX, h: 0.8, fontSize: 13.5, color: C.ink2 });
     txt(s, [R("Por qué no es concluyente: ", { fontFace: F.demi, color: C.ink }), R("dirección de muestra completa (sin cross‑fitting) y sin control de longitud: los esquemas añaden unos 478 tokens frente a 28 del sistema. Efecto de las herramientas y de la longitud quedan confundidos.")],
       { x: MX, y: 5.85, w: W - 2 * MX, h: 0.8, fontSize: 13.5, color: C.ink2 });
-    fuente(s, "results/llama33_final/results_llama33_v3/factorial_results.json → by_layer['76']; results.json → prompt_tokens. Intervalos: bootstrap percentil por pares.");
+    fuente(s, "results/corridas/llama33_70b/v3/factorial_results.json → by_layer['76']; results.json → prompt_tokens. Intervalos: bootstrap percentil por pares.");
     nota(s, { titulo: "R8 · Exploratorio: ¿sistema o herramientas?", respaldo: true, t: 0,
       guion: "Usar solo si preguntan cuál componente del formato produce el efecto. La respuesta del documento es: el diseño principal no lo separa. Aclarar que la corrida V3 tiene, además, una variante factorial no analizada en la tesis: con la dirección de muestra completa, añadir solo los esquemas de herramientas reproduce casi toda la caída (16,20 de 16,28), y el mensaje de sistema solo produce 4,32. Pero los esquemas también alargan el estímulo en unos 478 tokens, así que herramientas y longitud están confundidas; por eso el documento lo deja como trabajo pendiente con control de longitud.",
       fuentes: "factorial_results.json → by_layer['76'].harmful y .interaction (total, tools, system, non_additive). Estas cifras no aparecen en el documento de tesis; están en los archivos de la corrida V3 (run_factorial_analysis en run_experiment.py). Decidir antes de la sustentación si se muestra esta diapositiva." });
@@ -258,7 +258,7 @@ module.exports = function (pres, D) {
   {
     const s = nueva("Trazabilidad de las cifras");
     const filas = [["Diap.", "Cifras", "Archivo → clave"].map(cab),
-      ["1, 15, 16, 23", "proyecciones fuera de muestra, capa 76; S, d, κ", "results_llama33_v3/results.json → heldout.projections"],
+      ["1, 15, 16, 23", "proyecciones fuera de muestra, capa 76; S, d, κ", "corridas/llama33_70b/v3/results.json → heldout.projections"],
       ["13", "rechazo 38/42 → 23/42; McNemar; Wilson", "evidencia/metricas_avance.json → llama.behavior"],
       ["14", "AUROC por capa; PCA; sonda logística", "results.json → heldout.per_layer, pca_by_layer, linear_aurocs*"],
       ["15", "desplazamientos, interacción e intervalos", "results.json → heldout.paired_harmful, paired_benign; metricas → heldout_format"],
@@ -266,7 +266,7 @@ module.exports = function (pres, D) {
       ["17", "AUROC por estrato", "metricas → llama.strata_oof; registro de Mistral"],
       ["18 · 19", "cosenos y fiabilidad; monitores", "metricas → rotation_at_reference, monitors_at_reference"],
       ["20", "respuesta a la dosis, capa 56", "metricas → intervention_layer56"],
-      ["Mistral", "todas sus cifras (redondeadas)", "results/results_mistralV3/results_mistral7b_v3.log"],
+      ["Mistral", "todas sus cifras (redondeadas)", "results/corridas/mistral7b/v3/run.log"],
       ["6 · 7", "corpus 96/384; 42 ejecutados; tokens", "data/dataset_v2_report.json; data/dataset_full.jsonl; results.json → prompt_tokens"]];
     s.addTable(filas, Object.assign({}, TBL, { x: MX, y: 1.9, w: W - 2 * MX, colW: [1.35, 4.4, 6.38], fontSize: 12 }));
     txt(s, "SHA‑256 de las fuentes: evidencia/manifiesto_fuentes.json (p. ej., results.json 046cd1db…, registro de Mistral 5db8d72e…). Las cifras de la presentación se extraen con docs/sustentacion/fuente/datos.py, que verifica con aserciones su coincidencia con las tablas de la tesis.",

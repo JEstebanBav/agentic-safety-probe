@@ -191,8 +191,12 @@ def parse_args():
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="results",
-        help="Directory to save results",
+        default="results/pruebas/sin_nombre",
+        help="Directory to save results. Real runs go in "
+             "results/corridas/<model>/v<N>/, dry runs in "
+             "results/pruebas/<model>/v<N>/ (see results/README.md). The "
+             "default is a scratch folder so an unnamed run never lands on "
+             "top of the organised results",
     )
     parser.add_argument(
         "--skip-intervention",
@@ -3038,6 +3042,16 @@ def main():
     # 9. Save results. Before the figures, not after: a plotting error at the
     # very end must not be able to cost the numbers.
     save_results(results, args.output_dir)
+
+    # 9b. Run sheet: model, precision, corpus, parameters, stages, key numbers
+    # in one FICHA.md, so this version can be told apart from the others
+    # without opening the JSON. Same reasoning as the figures: never fatal.
+    try:
+        from src.ficha import write_ficha
+        print(f"\n  Run sheet: {write_ficha(args.output_dir)}")
+    except Exception as exc:                           # noqa: BLE001
+        print(f"\n  WARNING: run sheet not written ({exc!r}); regenerate it "
+              "with scripts/generar_fichas.py.")
 
     # 10. Generate visualizations
     if generate_all_figures is None:

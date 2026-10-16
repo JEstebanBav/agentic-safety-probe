@@ -18,7 +18,7 @@ from pathlib import Path
 # ============================================================
 
 DATA_DIR = Path(__file__).parent / "data"
-RESULTS_DIR = Path(__file__).parent / "results" / "llama31_hackathon"
+RESULTS_DIR = Path(__file__).parent / "results" / "corridas" / "llama31_70b" / "v0_hackathon"
 FIGURES_DIR = RESULTS_DIR / "figures"
 
 # Load datasets and results

@@ -231,13 +231,13 @@ python data/build_agentharm_pairs.py
 python data/build_agentharm_pairs.py --estilo pareado
 
 # Análisis principal, máxima potencia
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_ampliado --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/ampliado --no-quantize \
     --dataset-path data/dataset_expanded.jsonl
 
 # Metas frente a procedimientos: dos corridas, misma composición
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_proc --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/procedimientos --no-quantize \
     --dataset-path data/dataset_expanded_procedimientos.jsonl --agency-level autonomous
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/qwen8b_metas --no-quantize \
+./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/metas --no-quantize \
     --dataset-path data/dataset_expanded_metas.jsonl --agency-level autonomous
 
 # Sin --dataset-path, el pipeline usa dataset_full.jsonl como siempre

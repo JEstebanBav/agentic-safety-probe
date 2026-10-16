@@ -39,7 +39,7 @@ src/format_effect.specificity_from_projections).
 
 Run:
     python scripts/reanalisis_observaciones.py
-    python scripts/reanalisis_observaciones.py --results results/llama33/results.json
+    python scripts/reanalisis_observaciones.py --results results/corridas/llama33_70b/v1/results.json
 """
 
 from __future__ import annotations
@@ -207,7 +207,7 @@ def probe_comparison(results: Dict) -> Dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--results", default="results/llama33/results.json")
+    ap.add_argument("--results", default="results/corridas/llama33_70b/v1/results.json")
     ap.add_argument("--n-resamples", type=int, default=10000)
     ap.add_argument("--n-splits", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=42)
