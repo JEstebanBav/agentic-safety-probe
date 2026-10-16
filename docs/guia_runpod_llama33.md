@@ -5,6 +5,12 @@ particiones, la validación PCA, el factorial sistema × herramientas y la etapa
 causal nueva. Para elegir otro modelo o entender los problemas de memoria en
 detalle, ver `runpod_large_models.md`.
 
+**Corpus: `data/dataset_v2.jsonl` (96 pares, 384 entradas).** El valor por
+defecto de `run_experiment.py` sigue siendo `data/dataset_full.jsonl` (42
+pares), así que **todos** los comandos de esta guía pasan
+`--dataset-path data/dataset_v2.jsonl`. Si lo omites, la corrida termina sin
+error pero sobre el corpus equivocado.
+
 ## Qué comprar
 
 | | |
@@ -32,31 +38,36 @@ Variables de entorno de la plantilla (clave y valor en campos separados):
 
 ### Tiempo y presupuesto
 
-La corrida anterior tardó 39,6 minutos en esta misma máquina. La nueva genera
-más texto, así que es más larga. Estimación, no medición:
+La corrida anterior tardó 39,6 minutos en esta misma máquina con 42 pares. La
+nueva genera más texto y usa 96 pares: la extracción y la generación (línea
+base de comportamiento y test causal, que por defecto usan todos los pares)
+crecen aproximadamente en proporción, ≈ 2,3×. Estimación, no medición:
 
 | Etapa | Tiempo |
 |---|---|
 | Arranque, instalación, verificación | 10 min |
 | Descarga de los pesos (141 GB) | 15-30 min |
 | Corrida de prueba | 10 min |
-| Corrida real | 60-80 min |
+| Corrida real | 2,5-3 h |
 | Empaquetar y bajar resultados | 10 min |
-| **Total** | **≈ 2-2,5 h** |
+| **Total** | **≈ 3,5-4,5 h** |
 
-Con 2× H100 NVL eso es del orden de **US$ 12-18**; revisa el precio por hora
-el día que lo compres, porque cambia. Cargar **US$ 25** deja margen para
-repetir la corrida real una vez si algo falla.
+Con 2× H100 NVL eso es del orden de **US$ 25-30**; revisa el precio por hora
+el día que lo compres, porque cambia. Cargar **US$ 45** deja margen para
+repetir parte de la corrida si algo falla. La corrida de prueba da una medida
+mejor: su tiempo por par multiplicado por 96 es una cota razonable de la real.
+Si el presupuesto aprieta, `--intervention-layers 52` (una sola capa causal)
+o `--intervention-pairs N` recortan la parte de generación.
 
 ## Antes de encender el pod
 
-1. **Sube el código corregido.** El pod clona el repositorio, así que los
-   cambios tienen que estar en GitHub:
+1. **Comprueba que `main` en GitHub está al día.** El pod clona `main`, así
+   que cualquier cambio al código o a `data/dataset_v2.jsonl` tiene que estar
+   subido:
 
    ```bash
-   git add -A
-   git commit -m "fix: particiones por par, etapa causal y guardado de activaciones"
-   git push -u origin fix/observaciones-tutor
+   git status            # sin cambios pendientes en src/, data/ ni run_experiment.py
+   git push origin main
    ```
 
 2. **Acepta la licencia** de `meta-llama/Llama-3.3-70B-Instruct` en
@@ -67,7 +78,13 @@ repetir la corrida real una vez si algo falla.
    ```bash
    python scripts/validate_corrections.py          # debe terminar en ALL CHECKS PASSED
    python scripts/reanalisis_observaciones.py      # re-análisis de la corrida anterior
+   python scripts/check_token_budget.py --model meta-llama/Llama-3.3-70B-Instruct \
+       --dataset-path data/dataset_v2.jsonl      # la fila "(por defecto)" debe decir "cabe"
    ```
+
+   En `dataset_v2` la condición por defecto ocupa como máximo 1246 tokens de
+   4096. La única combinación que no cabe es `--agency-level trajectory
+   --toolbox 26`, que esta guía no usa.
 
 ## En el pod
 
@@ -78,7 +95,7 @@ conexión se cae, la corrida sigue.
 
 ```bash
 cd /workspace
-git clone -b fix/observaciones-tutor https://github.com/JEstebanBav/agentic-safety-probe.git
+git clone https://github.com/JEstebanBav/agentic-safety-probe.git   # rama main
 cd agentic-safety-probe
 
 pip install -r requirements_runpod.txt
@@ -123,6 +140,7 @@ corrida completa por un error de configuración:
 
 ```bash
 python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
+  --dataset-path data/dataset_v2.jsonl \
   --no-quantize --limit-pairs 4 --layers 28,52,56 --factorial \
   --n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000 \
   --intervention-layers 52 --intervention-doses 1,2 \
@@ -131,6 +149,9 @@ python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
 
 Sus estadísticas no significan nada con 4 pares. Lo que hay que mirar:
 
+- [ ] Al cargar el corpus aparece `Source: data/dataset_v2.jsonl (paired)` y
+      `Total entries: 384`, y luego `DRY RUN: limited to 4 of 96 pairs`. Si
+      dice `dataset_full.jsonl` o `of 42 pairs`, falta `--dataset-path`.
 - [ ] En `EXTRACTING ACTIVATIONS`, `first tokens` empieza con **un solo**
       `<|begin_of_text|>`.
 - [ ] `last tokens` termina igual en todas las variantes (la cabecera del
@@ -155,6 +176,7 @@ tmux new -s corrida
 mkdir -p /workspace/results_llama33_v2
 
 python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
+  --dataset-path data/dataset_v2.jsonl \
   --no-quantize \
   --layers 0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76 \
   --factorial --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 \
@@ -166,13 +188,16 @@ python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
 
 Qué hace cada grupo de opciones:
 
+- `--dataset-path data/dataset_v2.jsonl`: el corpus de 96 pares. Sin esta
+  opción se usa `dataset_full.jsonl` (42 pares).
 - `--layers`: las mismas 20 capas de la corrida reportada.
 - `--factorial`: extrae dos condiciones intermedias por instrucción (mensaje de
   sistema agéntico sin herramientas, y herramientas con el mensaje de chat).
   Duplica las pasadas de extracción, que son la parte barata.
 - `--intervention-layers 52,28`: el test causal en la capa de referencia y en
   la capa donde convergen los criterios libres de escala. Con una sola capa
-  (`52`) la corrida dura unos 20 minutos menos.
+  (`52`) la corrida se acorta: unos 20 minutos con 42 pares, del orden de
+  45 con 96.
 - `--intervention-doses`: múltiplos del gap de proyección medido en esa capa;
   `1` devuelve exactamente la proyección que el formato agéntico quitó.
 - `--mlp-n-repeats 1`: el MLP es lo más lento del análisis y no necesita GPU.
@@ -186,12 +211,13 @@ Si solo falla la generación y quieres repetirla sin rehacer el análisis:
 
 ```bash
 python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
+  --dataset-path data/dataset_v2.jsonl \
   --no-quantize --layers 28,52 --skip-probes --skip-heldout \
   --n-bootstrap 1000 --n-selection-splits 0 \
   --intervention-layers 52,28 --output-dir /workspace/results_llama33_gen
 ```
 
-### 5. Opcional: sensibilidad al token inicial (≈ 10 min)
+### 5. Opcional: sensibilidad al token inicial (≈ 20 min)
 
 Las corridas anteriores tokenizaban cada prompt con dos tokens de inicio de
 secuencia; ahora se usa uno. Los números nuevos no van a coincidir cifra por
@@ -201,6 +227,7 @@ eso, una pasada solo de extracción con el comportamiento anterior:
 ```bash
 PROBE_LEGACY_BOS=1 python run_experiment.py \
   --model meta-llama/Llama-3.3-70B-Instruct --no-quantize \
+  --dataset-path data/dataset_v2.jsonl \
   --layers 0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76 \
   --skip-intervention --skip-probes --n-selection-splits 0 \
   --output-dir /workspace/results_llama33_bos_antiguo
@@ -211,7 +238,7 @@ PROBE_LEGACY_BOS=1 python run_experiment.py \
 ```bash
 cd /workspace
 tar czf results_llama33_v2.tar.gz results_llama33_v2 results_llama33_bos_antiguo dryrun.log
-ls -lh results_llama33_v2.tar.gz      # ~250-500 MB: incluye las activaciones
+ls -lh results_llama33_v2.tar.gz      # ~0,5-1,2 GB con 96 pares: incluye las activaciones
 ```
 
 Descárgalo desde el explorador de JupyterLab o con `runpodctl send`. Verifica
@@ -229,6 +256,7 @@ ninguna pregunta estadística. Todo el análisis se repite así:
 ```bash
 python run_experiment.py \
   --load-activations results/llama33_v2/activations.npz \
+  --dataset-path data/dataset_v2.jsonl \
   --n-folds 5 --n-repeats 10 --mlp-n-repeats 10 \
   --n-label-permutations 10 --n-bootstrap 10000 \
   --output-dir results/llama33_v2_local

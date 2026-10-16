@@ -142,8 +142,13 @@ If the model is not cached yet:
     tmux new -s dl
     hf download meta-llama/Llama-3.3-70B-Instruct
 
-Dry run (4 pairs, EVERY stage including generation - a few minutes):
+Corpus: data/dataset_v2.jsonl (96 pairs). The default is still
+dataset_full.jsonl (42 pairs), so every command passes --dataset-path.
+
+Dry run (4 pairs, EVERY stage including generation - a few minutes).
+The log must say "limited to 4 of 96 pairs":
     python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
+      --dataset-path data/dataset_v2.jsonl \
       --no-quantize --limit-pairs 4 --layers 28,52,56 --factorial \
       --n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000 \
       --intervention-layers 52 --intervention-doses 1,2 \
@@ -152,6 +157,7 @@ Dry run (4 pairs, EVERY stage including generation - a few minutes):
 Real run (see docs/guia_runpod_llama33.md for what to check in the output):
     mkdir -p /workspace/results_llama33_v2
     python run_experiment.py --model meta-llama/Llama-3.3-70B-Instruct \
+      --dataset-path data/dataset_v2.jsonl \
       --no-quantize \
       --layers 0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76 \
       --factorial --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 \
