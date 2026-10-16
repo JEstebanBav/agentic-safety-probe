@@ -26,8 +26,57 @@ import numpy as np
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
-from src.causal_test import classify_response
+from transformers import StoppingCriteria, StoppingCriteriaList
+
+from src.causal_test import THINK_CLOSE, THINK_OPEN, classify_response
 from src.model_loader import encode_prompt
+
+
+def reasoning_token_ids(tokenizer) -> Optional[Tuple[int, int]]:
+    """
+    (<think>, </think>) token ids when the model reasons before answering.
+
+    Decided by the chat template, not the vocabulary: several tokenizers carry
+    the tokens without ever producing a reasoning block.
+    """
+    template = getattr(tokenizer, "chat_template", None) or ""
+    if not isinstance(template, str) or THINK_OPEN not in template:
+        return None
+    vocab = tokenizer.get_vocab()
+    if THINK_OPEN not in vocab or THINK_CLOSE not in vocab:
+        return None
+    return vocab[THINK_OPEN], vocab[THINK_CLOSE]
+
+
+class _AnswerBudget(StoppingCriteria):
+    """
+    Stop `answer_tokens` after the answer starts.
+
+    The answer starts at the first token when the model does not reason, and
+    right after </think> when it does. A fixed max_new_tokens cannot serve
+    both: 64 tokens label a direct answer and are exhausted by a reasoning
+    model before it has said anything to the user.
+    """
+
+    def __init__(self, n_prompt: int, answer_tokens: int, open_id: int,
+                 close_id: int, opened_in_prompt: bool):
+        self.n_prompt = n_prompt
+        self.answer_tokens = answer_tokens
+        self.open_id, self.close_id = open_id, close_id
+        self.opened_in_prompt = opened_in_prompt
+
+    def __call__(self, input_ids, scores, **kwargs):
+        gen = input_ids[0, self.n_prompt:].tolist()
+        reasoning = self.opened_in_prompt or self.open_id in gen[:4]
+        if not reasoning:
+            done = len(gen) >= self.answer_tokens
+        elif self.close_id in gen:
+            start = len(gen) - gen[::-1].index(self.close_id)
+            done = len(gen) - start >= self.answer_tokens
+        else:
+            done = False
+        return torch.full((input_ids.shape[0],), done, dtype=torch.bool,
+                          device=input_ids.device)
 
 
 @dataclass
@@ -55,9 +104,15 @@ class ActivationIntervention:
       next-token decision happens); `all_positions` pushes every position.
     """
 
-    def __init__(self, model, tokenizer, max_length: Optional[int] = None):
+    def __init__(self, model, tokenizer, max_length: Optional[int] = None,
+                 thinking_budget: int = 1024):
         self.model = model
         self.tokenizer = tokenizer
+        # Extra tokens a reasoning model may spend inside <think> before its
+        # answer; max_new_tokens then counts answer tokens only. Unused for
+        # models that do not reason.
+        self.thinking_budget = int(thinking_budget)
+        self.reasoning_ids = reasoning_token_ids(tokenizer)
         if max_length is None:
             max_length = min(
                 getattr(model.config, "max_position_embeddings", 8192), 8192
@@ -180,12 +235,28 @@ class ActivationIntervention:
         if pad_id is None:
             pad_id = self.tokenizer.eos_token_id
 
+        budget, extra, opened_in_prompt = max_new_tokens, {}, False
+        if self.reasoning_ids and self.thinking_budget > 0:
+            open_id, close_id = self.reasoning_ids
+            # Some templates open the block in the prompt itself; an empty
+            # <think></think> there means reasoning was switched off.
+            tail = inputs["input_ids"][0, -6:].tolist()
+            if open_id in tail:
+                last_open = len(tail) - tail[::-1].index(open_id)
+                last_close = (len(tail) - tail[::-1].index(close_id)
+                              if close_id in tail else -1)
+                opened_in_prompt = last_open > last_close
+            budget = max_new_tokens + self.thinking_budget
+            extra["stopping_criteria"] = StoppingCriteriaList([_AnswerBudget(
+                n_prompt, max_new_tokens, open_id, close_id, opened_in_prompt)])
+
         self._seen = set()
         self._recorded = {}
         with torch.inference_mode():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=max_new_tokens,
+                max_new_tokens=budget,
+                **extra,
                 # No `temperature`: with do_sample=False it is unused, and
                 # recent transformers versions warn or raise on 0.0. Greedy
                 # decoding is already deterministic, which is what the
@@ -197,6 +268,10 @@ class ActivationIntervention:
         text = self.tokenizer.decode(
             outputs[0, n_prompt:], skip_special_tokens=True
         )
+        # Keep the opening marker in the text when the prompt supplied it, so
+        # the classifier can tell an unfinished trace from a plain answer.
+        if opened_in_prompt and THINK_OPEN not in text:
+            text = THINK_OPEN + text
         return text, n_prompt
 
     def generate(self, prompt: str, max_new_tokens: int = 150) -> str:
@@ -251,7 +326,7 @@ class ActivationIntervention:
     # ------------------------------------------------------------------
 
     def classify_behavior(self, generated_text: str) -> str:
-        """'refuse', 'comply' or 'degenerate'. See causal_test.classify_response."""
+        """'refuse', 'comply', 'degenerate' or 'incomplete'. See causal_test.classify_response."""
         return classify_response(generated_text)
 
     # ------------------------------------------------------------------

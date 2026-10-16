@@ -166,6 +166,13 @@ Sus estadísticas no significan nada con 4 pares. Lo que hay que mirar:
 
       Si lo que aparece es la continuación de un JSON de herramientas, el
       prompt está mal construido: no sigas.
+- [ ] En `BEHAVIOURAL BASELINE`, la columna `tool call` es **alta en
+      `agent_*` y 0 en `chat_*`**. Es la comprobación de que el formato
+      agéntico funciona como tal: el modelo responde invocando una de las
+      herramientas ofrecidas. En la corrida de 42 pares Llama-3.3 llamó una
+      herramienta en 40/42 benignos y 18/42 dañinos, y nunca en chat. Si en
+      `agent_*` sale cerca de 0, las herramientas no están llegando al prompt:
+      no sigas.
 - [ ] En `CAUSAL TEST`, la columna `shift` es igual a `alpha`.
 - [ ] La corrida llega a `EXPERIMENT COMPLETE`.
 
@@ -247,6 +254,38 @@ en el portátil que el archivo abre y contiene `activations.npz` y
 
 Después **termina** el pod (no solo detenerlo): un pod detenido sigue cobrando
 el volumen de 200 GB.
+
+## Mistral y Qwen con el mismo código
+
+Las corridas de 96 pares que hay en `results/mistral7b_v2`, `qwen8b_v2` y
+`qwen32b_v2` son de una versión anterior del pipeline: no tienen línea base de
+comportamiento, test causal, factorial ni validación PCA, y no guardaron
+`activations.npz`. Para compararlas con Llama hay que repetirlas en GPU.
+`scripts/run_modelo.sh` ya pasa `--dataset-path data/dataset_v2.jsonl` y
+`--factorial`:
+
+```bash
+./scripts/run_modelo.sh mistralai/Mistral-7B-Instruct-v0.3 /workspace/results_mistral7b_v3 --no-quantize
+./scripts/run_modelo.sh Qwen/Qwen3-8B  /workspace/results_qwen8b_v3  --no-quantize
+./scripts/run_modelo.sh Qwen/Qwen3-32B /workspace/results_qwen32b_v3 --no-quantize
+```
+
+Haz primero la corrida de prueba de cada uno añadiendo `--limit-pairs 4
+--n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000`. Tamaños de pod en
+`runpod_large_models.md`.
+
+**Qwen3 razona antes de responder.** Por defecto abre un bloque
+`<think>...</think>` y solo después contesta. El pipeline lo detecta solo:
+deja hasta `--thinking-budget` tokens (1024 por defecto) para el bloque,
+genera `--max-new-tokens` de respuesta después de cerrarlo y etiqueta solo la
+respuesta. Las activaciones no cambian, porque se leen en el último token del
+prompt, antes de que empiece a razonar. En la corrida de prueba de Qwen revisa:
+
+- [ ] El log dice `Reasoning model: up to 1024 <think> tokens`.
+- [ ] La columna `incompl.` de `BEHAVIOURAL BASELINE` está en 0. Si no, el
+      razonamiento no cabe: sube `--thinking-budget` (por ejemplo, 2048).
+- [ ] La generación tarda más que con Llama por par; usa el tiempo de la
+      prueba para estimar la corrida real.
 
 ## De vuelta en el portátil
 

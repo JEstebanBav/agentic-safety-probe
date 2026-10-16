@@ -326,7 +326,18 @@ def parse_args():
         default=64,
         help="Tokens generated per response in the behavioural and causal "
              "stages. A refusal is stated in the first sentence, so 64 is "
-             "enough to label it (default: 64)",
+             "enough to label it. For a reasoning model these are ANSWER "
+             "tokens, counted after its <think> block (default: 64)",
+    )
+    parser.add_argument(
+        "--thinking-budget",
+        type=int,
+        default=1024,
+        help="Reasoning models only (Qwen3 in its default mode): tokens the "
+             "<think> block may use before the answer. Generation stops "
+             "--max-new-tokens after the block closes, so short traces cost "
+             "little. Answers whose block never closes are labelled "
+             "'incomplete'. Ignored for models that do not reason (default: 1024)",
     )
     parser.add_argument(
         "--agent-intervention",
@@ -1506,6 +1517,7 @@ def run_behavior_and_causal(
     agency_level: Optional[str] = None,
     toolbox: int = 0,
     seed: int = 42,
+    thinking_budget: int = 1024,
 ) -> Dict:
     """
     Behavioural baseline, then the causal test of the refusal direction.
@@ -1577,7 +1589,12 @@ def run_behavior_and_causal(
     print(f"  Prompt pairs: {len(pair_ids)} of {len(pair_ids_all)}, "
           f"max_new_tokens={max_new_tokens}")
 
-    intervention = ActivationIntervention(model, tokenizer)
+    intervention = ActivationIntervention(
+        model, tokenizer, thinking_budget=thinking_budget)
+    reasoning = intervention.reasoning_ids is not None
+    if reasoning:
+        print(f"  Reasoning model: up to {thinking_budget} <think> tokens, then "
+              f"{max_new_tokens} answer tokens. Labels read the answer only.")
     record_all = {l: refusal_directions[l] for l in intervention_layers}
     primary = intervention_layers[0]
     out_path = f"{output_dir}/behavior_generations.jsonl"
@@ -1669,6 +1686,8 @@ def run_behavior_and_causal(
         "intervention_layers": [int(l) for l in intervention_layers],
         "n_pairs": len(pair_ids),
         "max_new_tokens": int(max_new_tokens),
+        "reasoning_model": reasoning,
+        "thinking_budget": int(thinking_budget) if reasoning else 0,
         "behavior": baseline["summary"],
         "behavior_by_layer": behavior_by_layer,
         "causal": causal,
@@ -2996,6 +3015,7 @@ def main():
             agency_level=args.agency_level,
             toolbox=args.toolbox,
             seed=args.seed,
+            thinking_budget=args.thinking_budget,
         ))
 
         # 8b. w_agent at its own layer, fixed alpha grid (opt-in)
@@ -3075,6 +3095,10 @@ def main():
               f"{inf['n_decreasing']}/{inf['n_pairs']} inference pairs decrease, "
               f"DeltaP {inf['delta_p']:+.4f} "
               f"[{inf['ci_lower']:+.4f}, {inf['ci_upper']:+.4f}]")
+    tool_calls = (results.get("behavior") or {}).get("tool_call") or {}
+    if tool_calls:
+        print("Tool calls (answers invoking a tool): " + ", ".join(
+            f"{v} {t['k']}/{t['n']}" for v, t in sorted(tool_calls.items())))
     for layer, c in (results.get("causal") or {}).items():
         doses = ", ".join(
             f"x{d:g}: {r:.0%}" for d, r in zip(c["doses"], c["restore_rates"]))
