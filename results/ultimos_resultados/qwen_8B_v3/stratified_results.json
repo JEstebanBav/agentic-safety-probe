@@ -1,0 +1,32 @@
+[
+  {
+    "subtlety": "contextual",
+    "n_samples": 24,
+    "delta_p": 168.34425354003906,
+    "cohens_d": 2.521244525909424,
+    "p_value": 0.0,
+    "ci_lower": 139.12853664904833,
+    "ci_upper": 195.69205825775862,
+    "significant": true
+  },
+  {
+    "subtlety": "explicit",
+    "n_samples": 42,
+    "delta_p": 215.22198486328125,
+    "cohens_d": 4.388366222381592,
+    "p_value": 0.0,
+    "ci_lower": 197.4213544635546,
+    "ci_upper": 231.0181651827835,
+    "significant": true
+  },
+  {
+    "subtlety": "framed",
+    "n_samples": 30,
+    "delta_p": 137.77273559570312,
+    "cohens_d": 1.6651520729064941,
+    "p_value": 0.0,
+    "ci_lower": 102.94257751226425,
+    "ci_upper": 170.62543631354967,
+    "significant": true
+  }
+]
