@@ -1,0 +1,9 @@
+{
+  "pares_corpus_ampliado": 96,
+  "variantes_por_par": 4,
+  "pares_verificados_por_modelo": {"Llama-3.3-70B": 42, "Mistral-7B": 96, "Qwen3-8B": 96, "Qwen3-32B": 96},
+  "explicitud": {"explicit": 42, "contextual": 24, "framed": 30},
+  "fuente_cobertura": "Tamaños comprobados directamente en results.json de las exportaciones entregadas por el autor y en llama33_final/results_llama33_v3.",
+  "pares_exportacion_metricas": 42,
+  "nota_metricas": "Las comparativas de Mistral y Qwen usan sus resultados de 96 pares. Llama y los ensayos conductuales conservan los tamaños efectivos de sus archivos. No se extrapolan conteos, intervalos ni pruebas."
+}

@@ -23,7 +23,8 @@ function ejesGrafico(o) {
 // aparte con coma decimal para que no dependan de la configuración regional del equipo.
 function grafico(s, pres, series, box, o) {
   const lay = { x: 0.085, y: 0.05, w: 0.895, h: 0.76 };
-  s.addChart(pres.charts.LINE, series, ejesGrafico(Object.assign({ x: box.x, y: box.y, w: box.w, h: box.h, layout: lay, valAxisLabelColor: "FFFFFF" }, o)));
+  s.addChart(pres.charts.LINE, series, ejesGrafico(Object.assign({ x: box.x, y: box.y, w: box.w, h: box.h, layout: lay,
+    valAxisLabelColor: C.paper, chartArea: { fill: { color: C.paper } }, plotArea: { fill: { color: C.paper } } }, o)));
   const lo = o.valAxisMinVal, hi = o.valAxisMaxVal, u = o.valAxisMajorUnit;
   for (let k = 0; lo + k * u <= hi + 1e-9; k++) {
     const v = lo + k * u;
@@ -34,6 +35,7 @@ function grafico(s, pres, series, box, o) {
 
 module.exports = function (pres, D, ctx) {
   const L = D.llama, Mi = D.mistral;
+  const M96 = D.evaluacion96.mistral.formato;
   const sec = "III. Resultados";
   const capas = L.capas.map(String);
 
@@ -53,7 +55,7 @@ module.exports = function (pres, D, ctx) {
       txt(s, [R(`${n}  `, { fontFace: F.demi, color: C.ink }), R(lab)], { x: MX + 0.32, y: 5.63 + i * 0.3, w: 4.2, h: 0.3, fontSize: 12.5, color: C.ink2, valign: "middle" });
     });
     const X0 = 5.35;
-    rotulo(s, "Llama‑3.3‑70B · instrucciones dañinas rechazadas", X0, 1.95, 7);
+    rotulo(s, "Llama‑3.3‑70B · 42 pares", X0, 1.95, 7);
     const rf = L.conducta.refusal;
     txt(s, `${rf.chat_harmful.k}/42`, { x: X0, y: 2.25, w: 2.6, h: 0.95, fontFace: F.med, fontSize: 56, color: C.ink });
     flecha(s, pres, X0 + 2.75, 2.75, X0 + 3.55, 2.75, C.mute, 2);
@@ -86,7 +88,7 @@ El síntoma, entonces, se reproduce en nuestro sistema. La pregunta es qué camb
     const s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: sec });
     nav(s, 2);
     s.addText("En chat, la dirección conversacional sí separa las clases", { placeholder: "title" });
-    rotulo(s, "AUROC fuera de muestra por capa · Llama V3, 42 pares", MX, 1.88, 6);
+    rotulo(s, "AUROC fuera de muestra · Llama V3 · 42 pares", MX, 1.88, 6);
     txt(s, [R("━ ", { color: C.ink }), R("chat    "), R("━ ", { color: C.ag }), R("agente (misma dirección)")], { x: MX, y: 2.16, w: 6, h: 0.28, fontSize: 12, color: C.ink2 });
     grafico(s, pres, [
       { name: "Chat", labels: capas, values: L.por_capa.auroc_chat },
@@ -102,7 +104,7 @@ El síntoma, entonces, se reproduce en nuestro sistema. La pregunta es qué camb
     const det = L.deteccion, i76 = L.capas.indexOf(76);
     const bloques = [
       [f2(det.auroc_chat_heldout, 3), "AUROC chat, capa 76", `IC [${f2(det.auroc_chat_ci[0], 3)}; ${f2(det.auroc_chat_ci[1], 3)}] · en agente ${f2(det.auroc_agent_heldout, 3)}`],
-      [f2(L.pca.cos[i76], 3), "|cos(PC1, r̂)|, capa 76", `PC1 explica ${pct(L.pca.var[i76])} · Mistral, capa 30: 0,952 (28,7 %)`],
+      [f2(L.pca.cos[i76], 3), "|cos(PC1, r̂)|, capa 76", `PC1 explica ${pct(L.pca.var[i76])} · Mistral V3 (42), capa 30: 0,952 (28,7 %)`],
       [f2(L.sonda.auroc_cv, 3), "sonda logística, validación cruzada", `IC Nadeau–Bengio [${f2(L.sonda.ic[0], 3)}; 1] · barajadas ${f2(L.sonda.permutado, 3)} · en muestra 1`]];
     bloques.forEach(([n, a, b], i) => {
       const x = MX + i * 4.12;
@@ -125,7 +127,7 @@ Hay, por tanto, un detector bien definido en chat.`,
   {
     const s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: sec });
     nav(s, 2);
-    s.addText("La proyección dañina cae en los 42 pares; la benigna, apenas", { placeholder: "title" });
+    s.addText("La proyección dañina cae; la benigna cambia poco", { placeholder: "title" });
     const p = L.proy76, lo = -10, hi = 28, yT = 2.3, yB = 6.3;
     const ey = (v) => yB - ((v - lo) / (hi - lo)) * (yB - yT);
     const panel = (x0, w, a, b, col, tit) => {
@@ -141,8 +143,8 @@ Hay, por tanto, un detector bien definido en chat.`,
       txt(s, "agente", { x: xb - 0.45, y: yB + 0.1, w: 0.9, h: 0.26, align: "center", fontSize: 12, color: C.ag });
     };
     [-10, 0, 10, 20].forEach((v) => txt(s, v < 0 ? `−${-v}` : `${v}`, { x: MX - 0.05, y: ey(v) - 0.12, w: 0.4, h: 0.24, align: "right", fontSize: 11, color: C.mute }));
-    panel(MX + 0.45, 2.9, p.chat_h, p.ag_h, C.harm, "Dañinas · 42 pares");
-    panel(MX + 3.6, 2.9, p.chat_b, p.ag_b, C.ben, "Benignas · 42 pares");
+    panel(MX + 0.45, 2.9, p.chat_h, p.ag_h, C.harm, "Dañinas · lote exportado");
+    panel(MX + 3.6, 2.9, p.chat_b, p.ag_b, C.ben, "Benignas · lote exportado");
     txt(s, "proyección fuera de muestra, capa 76 (unidades crudas)", { x: MX + 0.45, y: 6.68, w: 6.0, h: 0.26, fontSize: 11, color: C.mute });
     const X0 = 7.55, XW = W - MX - X0;
     const ph = L.pareado_h, pb = L.pareado_b, fo = L.formato;
@@ -157,20 +159,20 @@ Hay, por tanto, un detector bien definido en chat.`,
       txt(s, val, { x: X0 + 0.85, y: y - 0.04, w: 1.6, h: 0.58, fontFace: F.med, fontSize: 30, color: col, valign: "middle" });
       txt(s, det, { x: X0 + 2.5, y, w: XW - 2.5, h: 0.62, fontSize: 12, color: C.ink2, valign: "middle" });
     });
-    rotulo(s, "Mistral‑7B · capa 30 · registro redondeado", X0, 5.15, XW);
-    txt(s, [...N.dph(), R(` = ${f2(Mi.delta_h_oof)}   ·   `), ...N.dpb(), R(` = ${f2(Mi.delta_b_oof)}   ·   `), ...N.d2p(), R(` = ${f2(Mi.interaction_oof)} [${f2(Mi.interaction_ci[0])}; ${f2(Mi.interaction_ci[1])}]`)],
+    rotulo(s, "Mistral‑7B · 96 pares · capa 18", X0, 5.15, XW);
+    txt(s, [...N.dph(), R(` = ${f2(M96.delta_p_harmful)}   ·   `), ...N.dpb(), R(` = ${f2(M96.delta_p_benign)}   ·   `), ...N.d2p(), R(` = ${f2(M96.interaction)} [${f2(M96.interaction_ci[0])}; ${f2(M96.interaction_ci[1])}]`)],
       { x: X0, y: 5.45, w: XW, h: 0.32, fontSize: 13.5, color: C.ink2 });
     txt(s, "Medida geométrica en unidades crudas: no se compara entre modelos ni equivale a rechazo.",
       { x: X0, y: 6.0, w: XW, h: 0.55, fontSize: 12.5, color: C.ink, italic: true });
     fuente(s, "IC 95 %: bootstrap percentil por pares (10.000). p ≈ 10⁻⁴ es la resolución de 10.000 permutaciones de signos. results.json → heldout.projections, paired_*; tesis, tabla 4.3.");
     nota(s, {
-      titulo: "La proyección dañina cae en los 42 pares; la benigna, apenas", t: 60,
-      guion: `Ahora el desplazamiento, en la capa 76. Cada línea es un par. A la izquierda, las dañinas: la proyección cae al pasar a agente en los 42 pares, sin excepción. El promedio, delta p sub h, es 15,7, con intervalo de 13,8 a 17,6.
+      titulo: "La proyección dañina cae; la benigna cambia poco", t: 60,
+      guion: `Ahora el desplazamiento, en la capa 76 de Llama. Cada línea es uno de sus 42 pares. A la izquierda, las dañinas: la proyección cae al pasar a agente en todos los pares. El promedio, delta p sub h, es 15,7, con intervalo de 13,8 a 17,6.
 A la derecha, las benignas: casi no se mueven, y si algo, suben un poco. Su cambio promedio es −1,5 y su intervalo incluye el cero.
-La interacción, lo específico del daño, es 17,3, con intervalo de 14,9 a 19,5; es positiva en 41 de 42 pares y su p es del orden de 10 a la menos 4, que es la resolución de las permutaciones. En Mistral, en otras unidades, el patrón se repite: interacción de 8,4.
+La interacción, lo específico del daño, es 17,3, con intervalo de 14,9 a 19,5; es positiva en 41 de 42 pares y su p es del orden de 10 a la menos 4, que es la resolución de las permutaciones. En Mistral, ahora sobre 96 pares y en otras unidades, la interacción guardada es 3,28.
 Esto descarta un corrimiento rígido. Pero todavía no dice si se perdió información o si solo cambió la escala.`,
       transicion: "Para eso están las otras dos unidades.",
-      fuentes: `Proyecciones: results.json → heldout.projections (dirección reajustada en cada fold). Δp_h = ${f2(ph.delta_p, 4)}, IC percentil [${f2(ph.ci_lower, 4)}; ${f2(ph.ci_upper, 4)}], t = ${f2(ph.t_statistic, 2)}, d_z = ${f2(ph.cohens_d_paired, 4)}, 42/42 decrecen (sign test p = ${ph.sign_test_p.toExponential(2)}). Δp_b = ${f2(pb.delta_p, 4)}, IC [${f2(pb.ci_lower, 4)}; ${f2(pb.ci_upper, 4)}]. Interacción ${f2(fo.interaction, 4)}, IC [${f2(fo.interaction_ci[0], 4)}; ${f2(fo.interaction_ci[1], 4)}], p de permutación intra‑par con piso 10⁻⁴, 41/42 positivos, fracción común ${f2(fo.common_shift_fraction, 4)}. Mistral: registro (FORMAT EFFECT SPECIFICITY, held‑out). Tesis, tabla 4.3 y sección 4.1.3.`,
+      fuentes: `Proyecciones: results.json → heldout.projections (dirección reajustada en cada fold). Δp_h = ${f2(ph.delta_p, 4)}, IC percentil [${f2(ph.ci_lower, 4)}; ${f2(ph.ci_upper, 4)}], t = ${f2(ph.t_statistic, 2)}, d_z = ${f2(ph.cohens_d_paired, 4)}, 42/42 decrecen (sign test p = ${ph.sign_test_p.toExponential(2)}). Δp_b = ${f2(pb.delta_p, 4)}, IC [${f2(pb.ci_lower, 4)}; ${f2(pb.ci_upper, 4)}]. Interacción ${f2(fo.interaction, 4)}, IC [${f2(fo.interaction_ci[0], 4)}; ${f2(fo.interaction_ci[1], 4)}], p de permutación intra‑par con piso 10⁻⁴, 41/42 positivos, fracción común ${f2(fo.common_shift_fraction, 4)}. Mistral V2: results/corridas/mistral7b/v2/results.json, format_effect.held_out.per_layer[18], n=96.`,
     });
   }
 
@@ -221,64 +223,21 @@ Esto descarta un corrimiento rígido. Pero todavía no dice si se perdió inform
     barra(4.56, "AUROC (escala 0,5–1)", (det.auroc_agent_heldout - 0.5) / (det.auroc_chat_heldout - 0.5), f2(det.auroc_chat_heldout, 3), f2(det.auroc_agent_heldout, 3),
       `diferencia ${f2(det.auroc_gap_heldout, 3)} · IC [${f2(det.auroc_gap_ci[0], 3)}; ${f2(det.auroc_gap_ci[1], 3)}]`);
     rrect(s, pres, X0, 5.8, XW, 0.92, C.mist);
-    txt(s, [R("Mistral‑7B (registro): ", { fontFace: F.demi, color: C.ink }), R(`S −${pct(Mi.perdida_cruda)} · d ${f2(Mi.d_chat_oof)} → ${f2(Mi.d_agent_oof)} (−${pct(Mi.loss_standardised)}) · AUROC ${f2(Mi.auroc_chat_oof, 3)} → ${f2(Mi.auroc_agent_oof, 3)} · κ = ${f2(Mi.scale_contraction, 3)}`)],
+    txt(s, [R("Mistral‑7B · 96 pares: ", { fontFace: F.demi, color: C.ink }), R(`S −${pct(M96.separation_loss_raw)} · d ${f2(M96.cohens_d_chat)} → ${f2(M96.cohens_d_agent)} (−${pct(M96.separation_loss_standardised)}) · AUROC ${f2(M96.auroc_chat, 3)} → ${f2(M96.auroc_agent, 3)} · κ = ${f2(M96.scale_contraction, 3)}`)],
       { x: X0 + 0.2, y: 5.86, w: XW - 0.4, h: 0.8, fontSize: 12.5, color: C.ink2, valign: "middle" });
     fuente(s, "Barras: chat (tinta) y agente (ámbar), en proporción al valor de chat. Sin prueba formal entre modelos. results.json → heldout.projections; metricas_avance.json; tesis, tablas 4.2 y 4.4.");
     nota(s, {
       titulo: "Parte de la caída es escala; otra parte es pérdida de margen", t: 60,
       guion: `Para eso están las otras dos unidades. Arriba, las mismas proyecciones en unidades crudas: en agente, todo se comprime cerca de cero. La separación cruda cae 83 %. Pero la dispersión también cae: kappa es 0,31.
 Abajo, al estandarizar por la dispersión de cada formato, la brecha entre clases se recupera en parte: d pasa de 3,2 a 1,8, una pérdida de 44 %. Y el AUROC pasa de 0,978 a 0,920; la diferencia, 0,058, tiene un intervalo que excluye el cero.
-En Mistral la pérdida es mayor: d cae 64 % y el AUROC llega a 0,785.
+En Mistral, sobre 96 pares, d cae un 51,6 % y el AUROC pasa de 0,924 a 0,878. Su intervalo de diferencia de AUROC incluye cero: esa pérdida puntual no es significativa al 95 %.
 La lectura: buena parte de la caída cruda es escala, pero sobrevive una pérdida real de margen. La información no desaparece —el AUROC agéntico sigue lejos de 0,5—; se estrecha.`,
       transicion: "Esa pérdida, ¿depende de cuán explícito es el daño?",
-      fuentes: `S y s calculados desde heldout.projections (desviación agrupada de las dos clases en cada formato): S_chat = ${f2(sp.S_chat, 4)}, S_ag = ${f2(sp.S_ag, 4)}, d_chat = ${f2(sp.d_chat, 4)}, d_ag = ${f2(sp.d_ag, 4)}, κ = ${f2(sp.kappa, 4)}; coinciden con metricas_avance.json → heldout_format. AUROC: heldout_detection (gap ${f2(det.auroc_gap_heldout, 4)}, IC [${f2(det.auroc_gap_ci[0], 4)}; ${f2(det.auroc_gap_ci[1], 4)}], condicional a los puntajes guardados). Panel estandarizado: (p − media benigna del formato) / s agrupada del formato; puntos con dispersión vertical aleatoria solo para legibilidad. Mistral: registro, FORMAT EFFECT IN SCALE‑INVARIANT UNITS (held‑out).`,
+      fuentes: `S y s calculados desde heldout.projections (desviación agrupada de las dos clases en cada formato): S_chat = ${f2(sp.S_chat, 4)}, S_ag = ${f2(sp.S_ag, 4)}, d_chat = ${f2(sp.d_chat, 4)}, d_ag = ${f2(sp.d_ag, 4)}, κ = ${f2(sp.kappa, 4)}; coinciden con metricas_avance.json → heldout_format. AUROC: heldout_detection (gap ${f2(det.auroc_gap_heldout, 4)}, IC [${f2(det.auroc_gap_ci[0], 4)}; ${f2(det.auroc_gap_ci[1], 4)}], condicional a los puntajes guardados). Panel estandarizado: (p − media benigna del formato) / s agrupada del formato; puntos con dispersión vertical aleatoria solo para legibilidad. Mistral V2: results/corridas/mistral7b/v2/results.json, format_effect.held_out.per_layer[18] y heldout.detection, n=96.`,
     });
   }
 
-  // ------------------------------------------------------------ 17. Explicitud
-  {
-    const s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: sec });
-    nav(s, 2);
-    s.addText("Según la explicitud, no aparece una jerarquía universal", { placeholder: "title" });
-    const est = Object.fromEntries(L.estratos.map((e) => [e.stratum, e]));
-    const nombres = [["explicit", "Explícito", 18], ["contextual", "Contextual", 14], ["framed", "Apariencia legítima", 10]];
-    const x0 = 3.65, x1 = 8.2, esc = (v) => x0 + ((v - 0.5) / 0.5) * (x1 - x0);
-    txt(s, [R("● ", { color: C.ink }), R("chat    "), R("● ", { color: C.ag }), R("agente")], { x: x1 - 2.2, y: 1.88, w: 2.2, h: 0.26, fontSize: 12, color: C.ink2, align: "right" });
-    const grupos = [["Llama‑3.3‑70B · capa 76", nombres.map(([k, n, c]) => [n, c, est[k].auroc_chat, est[k].auroc_agent])],
-      ["Mistral‑7B · capa 30 · registro", nombres.map(([k, n, c]) => [n, c, Mi.strata_oof[k][1], Mi.strata_oof[k][2]])]];
-    [0.5, 0.6, 0.7, 0.8, 0.9, 1.0].forEach((v) => {
-      seg(s, pres, esc(v), 2.25, esc(v), 5.75, v === 0.5 ? "AEB4BC" : "E6E8EB", 0.75, v === 0.5 ? { line: { dashType: "dash" } } : {});
-      txt(s, f2(v, 1), { x: esc(v) - 0.3, y: 5.8, w: 0.6, h: 0.24, align: "center", fontSize: 11, color: C.mute });
-    });
-    txt(s, "AUROC fuera de muestra de la dirección conversacional (0,5 = azar)", { x: x0, y: 6.08, w: x1 - x0, h: 0.26, align: "center", fontSize: 11, color: C.mute });
-    grupos.forEach(([g, filas], gi) => {
-      const yg = 2.3 + gi * 1.75;
-      rotulo(s, g, MX, yg, 3.0, C.ink);
-      filas.forEach(([n, c, a, b], i) => {
-        const y = yg + 0.42 + i * 0.42;
-        txt(s, [R(n, { color: C.ink }), R(`  ·  ${c}`, { color: C.mute })], { x: MX, y: y - 0.15, w: 2.6, h: 0.3, fontSize: 12.5, valign: "middle" });
-        seg(s, pres, esc(b), y, esc(a), y, "B7BDC5", 4);
-        dot(s, pres, esc(a), y, 0.2, C.ink);
-        dot(s, pres, esc(b), y, 0.2, C.ag);
-        txt(s, `−${f2(a - b, 3)}`, { x: esc(a) + 0.14, y: y - 0.14, w: 0.75, h: 0.28, fontSize: 11.5, color: C.ink2, valign: "middle" });
-      });
-    });
-    const X0 = 9.0, XW = W - MX - X0;
-    const bloques = [["Pérdida máxima", "Llama en el estrato explícito (0,991 → 0,929); Mistral en el contextual (0,944 → 0,740)."],
-      ["Apariencia legítima", "conserva señal por encima del azar en ambos modelos: 0,89 y 0,71 en agente."],
-      ["Precisión", "18, 14 y 10 pares, sin intervalos por estrato: no permiten ordenar los estratos en la población. El corpus ampliado (42 · 24 · 30) se construyó para dar esa precisión."]];
-    txt(s, bloques.flatMap(([a, b], i) => [R(a, { fontFace: F.demi, color: C.ink, breakLine: true }), R(b, { breakLine: i < bloques.length - 1, paraSpaceAfter: 14 })]),
-      { x: X0, y: 1.95, w: XW, h: 4.7, fontSize: 13.5, color: C.ink2 });
-    fuente(s, "metricas_avance.json → llama.strata_oof · registro de Mistral (DETECTION CAPABILITY BY EXPLICITNESS, held‑out) · tesis, tabla 4.5.");
-    nota(s, {
-      titulo: "Según la explicitud, no aparece una jerarquía universal", t: 40,
-      guion: `Segunda dimensión: la explicitud. En Llama, la mayor pérdida aparece en el estrato explícito; en Mistral, en el contextual. No hay, entonces, una jerarquía universal del tipo «cuanto más encubierto, peor».
-Lo que sí se observa es que el estrato de apariencia legítima conserva señal por encima del azar en ambos modelos: 0,89 y 0,71 en agente.
-Con 18, 14 y 10 pares y sin intervalos por estrato, esto es exploratorio; precisamente para eso se construyó el corpus ampliado de 42, 24 y 30 pares.`,
-      transicion: "Si la dirección de chat pierde margen en agente, ¿hay otra dirección que separe mejor?",
-      fuentes: `Llama (capa 76): explícito ${f2(est.explicit.auroc_chat, 4)} → ${f2(est.explicit.auroc_agent, 4)}; contextual ${f2(est.contextual.auroc_chat, 4)} → ${f2(est.contextual.auroc_agent, 4)}; apariencia legítima ${f2(est.framed.auroc_chat, 4)} → ${f2(est.framed.auroc_agent, 4)}. Mistral (capa 30, registro): 0,9722 → 0,8827; 0,9439 → 0,7398; 0,9000 → 0,7100. Barras: estimaciones puntuales, sin contraste estadístico entre estratos ni entre modelos.`,
-    });
-  }
+  require("./s_comparativas96").estratos(pres, D);
 
   // ------------------------------------------------------------ 18. Reorientación
   {
@@ -322,7 +281,7 @@ Con 18, 14 y 10 pares y sin intervalos por estrato, esto es exploratorio; precis
     rrect(s, pres, X0, 5.75, XW, 0.95, C.mist);
     txt(s, [R("Lectura prudente: ", { fontFace: F.demi, color: C.ink }), R("compatible con una reorientación del contraste entre clases. Es una descripción geométrica bajo supuestos de error: no prueba que el modelo use ese eje para decidir.")],
       { x: X0 + 0.2, y: 5.8, w: XW - 0.4, h: 0.85, fontSize: 13, color: C.ink2, valign: "middle" });
-    fuente(s, "Llama V3, capa 76, 42 pares; mismo estimador en ambos formatos. metricas_avance.json → rotation_at_reference; tesis, sección 4.1.6 y figura 4.3.");
+    fuente(s, "Llama V3, capa 76, 42 pares; mismo estimador en ambos formatos. metricas_avance.json → rotation_at_reference; tesis, sección 4.1.6.");
     nota(s, {
       titulo: "En agente, el contraste dañino–benigno se reorienta", t: 55,
       guion: `Si la dirección conversacional pierde margen en agente, ¿hay otra dirección que separe mejor? Estimé la dirección agéntica con el mismo estimador, diferencia de medias, y la comparé con la de chat.
@@ -334,49 +293,7 @@ La lectura prudente: el contraste entre clases se reorienta en agente. Es geomet
     });
   }
 
-  // ------------------------------------------------------------ 19. Monitor
-  {
-    const s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: sec });
-    nav(s, 2);
-    s.addText("Un monitor ajustado en formato agéntico recupera la señal", { placeholder: "title" });
-    const mo = L.monitores, cc = L.monitor_conteos;
-    const filas = [["Llama · diferencia de medias", "capa 76", cc.dm.tp, cc.dm.fp, mo.auroc_agent_diff_means_oof, mo.monitor_f1_diff_means_oof, mo.monitor_fpr_diff_means_oof],
-      ["Llama · regresión logística", "capa 76", cc.lr.tp, cc.lr.fp, mo.auroc_w_agent_oof, mo.monitor_f1_oof, mo.monitor_fpr_oof],
-      ["Mistral · regresión logística", "capa 30 · registro", Mi.monitor.tp, Mi.monitor.fp, Mi.monitor.auroc, Mi.monitor.f1, Mi.monitor.fpr]];
-    const xh = 3.35, xb = 7.0, dd = 0.13, pitch = 0.163;
-    rotulo(s, "42 dañinas", xh, 1.88, 3.4, C.harm);
-    rotulo(s, "42 benignas", xb, 1.88, 3.4, C.ben);
-    ["AUROC", "F1", "FPR"].forEach((h, i) => txt(s, h, { x: 10.62 + i * 0.72, y: 1.88, w: 0.7, h: 0.26, fontSize: 11, color: C.mute, align: "right" }));
-    filas.forEach(([n, sub, tp, fp, au, f1, fpr], i) => {
-      const y = 2.3 + i * 1.18;
-      txt(s, [R(n, { fontFace: F.demi, color: C.ink, breakLine: true }), R(sub, { color: C.mute })], { x: MX, y, w: 2.65, h: 0.62, fontSize: 13 });
-      for (let k = 0; k < 42; k++) {
-        const cx = xh + (k % 21) * pitch + dd / 2, cy = y + 0.12 + Math.floor(k / 21) * pitch + dd / 2;
-        if (k < tp) dot(s, pres, cx, cy, dd, C.harm);
-        else s.addShape(pres.shapes.OVAL, { x: cx - dd / 2, y: cy - dd / 2, w: dd, h: dd, fill: { color: C.paper }, line: { color: C.harm, width: 1 } });
-        const bx = xb + (k % 21) * pitch + dd / 2;
-        if (k < fp) dot(s, pres, bx, cy, dd, C.ben);
-        else s.addShape(pres.shapes.OVAL, { x: bx - dd / 2, y: cy - dd / 2, w: dd, h: dd, fill: { color: C.paper }, line: { color: "9DBAD6", width: 1 } });
-      }
-      txt(s, `${tp}/42 detectadas`, { x: xh, y: y + 0.5, w: 3.4, h: 0.26, fontSize: 11.5, color: C.ink2 });
-      txt(s, `${fp}/42 falsos positivos`, { x: xb, y: y + 0.5, w: 3.4, h: 0.26, fontSize: 11.5, color: C.ink2 });
-      [au, f1, fpr].forEach((v, j) => txt(s, f2(v, 3), { x: 10.62 + j * 0.72, y: y + 0.05, w: 0.7, h: 0.4, fontSize: j === 1 ? 17 : 14, fontFace: j === 1 ? F.med : F.body, color: C.ink, align: "right", valign: "middle" }));
-    });
-    txt(s, [R("●", { color: C.harm }), R(" detectada  "), R("○", { color: C.harm }), R(" no detectada      "), R("●", { color: C.ben }), R(" falso positivo  "), R("○", { color: "9DBAD6" }), R(" benigna aceptada")],
-      { x: xh, y: 5.75, w: 7.2, h: 0.28, fontSize: 11.5, color: C.ink2 });
-    const w0 = L.fpr_cero_wilson;
-    txt(s, [R("Cero no es una tasa nula. ", { fontFace: F.demi, color: C.ink }), R(`0/42 falsos positivos tiene un IC 95 % de Wilson de [0 %; ${f2(100 * w0[1], 1)} %]. AUROC: media de 5 folds; F1 y FPR: umbral calibrado en el entrenamiento de cada fold y aplicado a pares retenidos. Sin validación externa: viabilidad preliminar, no garantía de seguridad.`)],
-      { x: MX, y: 6.12, w: W - 2 * MX, h: 0.75, fontSize: 12.5, color: C.ink2 });
-    fuente(s, "metricas_avance.json → monitors_at_reference; registro de Mistral (AUROC out‑of‑fold, F1 out‑of‑fold, FPR). Conteos de puntos deducidos de F1 y FPR con 42 por clase. Tesis, tabla 4.6.");
-    nota(s, {
-      titulo: "Un monitor ajustado en formato agéntico recupera la señal", t: 40,
-      guion: `Eso tiene una consecuencia práctica, el objetivo cinco. Un monitor que proyecta sobre la dirección agéntica, con umbral calibrado en entrenamiento y evaluado en pares retenidos, recupera la señal.
-Con diferencia de medias detecta 35 de 42 dañinas con seis falsos positivos; con regresión logística, 37 de 42 sin falsos positivos; en Mistral, 33 con cinco.
-Pero cero de 42 no es una tasa nula: su intervalo de Wilson llega a 8,4 %. Y no hay validación en datos externos. Es viabilidad preliminar, no una garantía de seguridad.`,
-      transicion: "Queda una pregunta: ¿la dirección tiene efecto sobre la conducta?",
-      fuentes: `Llama, capa 76: diferencia de medias AUROC OOF ${f2(mo.auroc_agent_diff_means_oof, 4)}, F1 ${f2(mo.monitor_f1_diff_means_oof, 4)}, FPR ${f2(mo.monitor_fpr_diff_means_oof, 4)}; logística AUROC ${f2(mo.auroc_w_agent_oof, 4)} (sd ${f2(mo.auroc_w_agent_oof_sd, 4)}), F1 ${f2(mo.monitor_f1_oof, 4)}, precisión 1, sensibilidad ${f2(mo.monitor_recall_oof, 4)}, FPR 0. En muestra la logística da AUROC 1 y F1 1, que no se usan. Mistral, logística (registro): AUROC 0,9347 (sd 0,0311), F1 0,8250, FPR 0,1190. Los conteos (35/6, 37/0, 33/5) se deducen de F1 y FPR con 42 por clase: FP = FPR·42 y TP = F1·(FP + 42)/(2 − F1). IC de Wilson para 0/42 calculado aquí: [0; 0,0838].`,
-    });
-  }
+  require("./s_comparativas96").monitores(pres, D);
 
   // ------------------------------------------------------------ 20. Intervención
   {

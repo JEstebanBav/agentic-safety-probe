@@ -22,11 +22,11 @@ MARGEN_PT = 9       # margen del recorte: las ecuaciones pueden desbordar su caj
 EMU_PT = 12700
 
 
-def transparente(im, tinta=(0x16, 0x1A, 0x20)):
+def transparente(im, tinta=(0x26, 0x28, 0x2A)):
     """Fondo blanco -> transparente: la opacidad sale de la luminancia y el color es la tinta."""
     from PIL import Image
     gris = im.convert("L")
-    alfa = gris.point(lambda v: max(0, min(255, round((255 - v) * 255 / (255 - 26)))))
+    alfa = gris.point(lambda v: max(0, min(255, round((248 - v) * 255 / (248 - 40)))))
     out = Image.new("RGBA", im.size, tinta + (0,))
     out.putalpha(alfa)
     return out

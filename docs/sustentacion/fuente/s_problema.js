@@ -104,53 +104,8 @@ No se usan en la diapositiva las cifras de encuestas de Gravitee citadas en la t
     });
   }
 
-  // ------------------------------------------------------------ 3. Caso documentado
-  {
-    const s = pres.addSlide({ masterName: "CONTENIDO", sectionTitle: "I. Problema" });
-    nav(s, 0);
-    s.addText("Un caso documentado: tareas que parecían legítimas, una por una", { placeholder: "title" });
-    rrect(s, pres, MX, 1.82, 7.4, 0.78, C.ink);
-    txt(s, [R("Campaña de espionaje operada con un agente de programación", { fontFace: F.demi, color: C.paper, breakLine: true }),
-      R("Claude Code con herramientas MCP · objetivo agregado: intrusión en organizaciones", { color: "C9CED6", fontSize: 12 })],
-    { x: MX + 0.2, y: 1.82, w: 6.7, h: 0.78, valign: "middle", fontSize: 14 });
-    const tareas = ["Reconocimiento", "Escaneo de vulnerabilidades", "Validación de credenciales", "Extracción de datos", "Movimiento lateral"];
-    const cw = 1.416, gap = 0.08;
-    tareas.forEach((t, i) => {
-      const x = MX + i * (cw + gap);
-      seg(s, pres, MX + 3.7, 2.6, x + cw / 2, 3.05, C.rule, 1);
-      caja(s, pres, x, 3.05, cw, 0.82, t, { size: 12 });
-    });
-    txt(s, "Cada tarea «parecía legítima evaluada de forma aislada».", { x: MX, y: 4.0, w: 7.4, h: 0.4, fontFace: F.head,
-      italic: true, fontSize: 16, color: C.ink, align: "center" });
-    rrect(s, pres, MX, 4.55, 7.4, 0.62, C.agL);
-    txt(s, [R("Encuadre: ", { fontFace: F.demi }), R("los operadores dijeron ser empleados de firmas legítimas de ciberseguridad que hacían pruebas defensivas.")],
-      { x: MX + 0.2, y: 4.55, w: 7.0, h: 0.62, valign: "middle", fontSize: 13 });
-    const cifras = [["80–90 %", "de las operaciones tácticas las ejecutó la IA de forma independiente"],
-      ["≈ 30", "entidades objetivo; la investigación validó un puñado de intrusiones"],
-      ["2025", "detectada a mediados de septiembre; informe público en noviembre"]];
-    cifras.forEach(([n, t], i) => {
-      const y = 1.82 + i * 1.12;
-      txt(s, n, { x: 8.45, y, w: 4.28, h: 0.6, fontFace: F.med, fontSize: 34, color: C.ink });
-      txt(s, t, { x: 8.45, y: y + 0.58, w: 4.28, h: 0.5, fontSize: 13, color: C.ink2 });
-    });
-    rrect(s, pres, MX, 5.4, W - 2 * MX, 1.35, C.mist);
-    rotulo(s, "Dos ingredientes que esta tesis aísla en un experimento controlado", MX + 0.25, 5.52, 8);
-    txt(s, [R("1  ", { fontFace: F.demi, color: C.ag }), R("Capacidad de actuar con herramientas", { fontFace: F.demi }), R("  →  dimensión de formato")],
-      { x: MX + 0.25, y: 5.88, w: 6.2, h: 0.32, fontSize: 14 });
-    txt(s, [R("2  ", { fontFace: F.demi, color: C.harm }), R("Intención dañina con apariencia legítima", { fontFace: F.demi }), R("  →  dimensión de explicitud")],
-      { x: MX + 0.25, y: 6.26, w: 6.2, h: 0.32, fontSize: 14 });
-    txt(s, "Es un sistema cerrado que aquí no se estudia: el caso motiva la pregunta, no la responde.",
-      { x: 7.75, y: 5.86, w: 4.75, h: 0.75, fontSize: 13, color: C.ink2, italic: true });
-    fuente(s, "Anthropic (2025). Disrupting the first reported AI‑orchestrated cyber espionage campaign. Informe completo, noviembre de 2025.");
-    nota(s, {
-      titulo: "Un caso documentado", t: 50,
-      guion: `En noviembre de 2025, Anthropic publicó el análisis de una campaña de espionaje que usó su agente de programación, Claude Code, conectado a herramientas mediante el protocolo MCP. Según el informe, la IA ejecutó entre el 80 y el 90 % de las operaciones tácticas de forma independiente, contra unas treinta entidades.
-Lo que me interesa es cómo se sortearon las salvaguardas. El ataque se descompuso en tareas pequeñas —reconocimiento, validación de credenciales, extracción de datos—, y cada una, dice el informe, parecía legítima evaluada de forma aislada. Además, los operadores se presentaron como empleados de firmas de ciberseguridad que hacían pruebas defensivas.
-Ahí están los dos ingredientes de esta tesis: un modelo que actúa con herramientas y una intención dañina con apariencia legítima. Aclaro que es un modelo cerrado y que no lo estudio: el caso motiva la pregunta, no la responde.`,
-      transicion: "¿Qué sabe la literatura sobre por qué ceden las salvaguardas?",
-      fuentes: `Anthropic, "Disrupting the first reported AI-orchestrated cyber espionage campaign", informe completo, noviembre de 2025 (assets.anthropic.com/m/ec212e6566a0d47/original/Disrupting-the-first-reported-AI-orchestrated-cyber-espionage-campaign.pdf). Citas verificadas en el PDF: "In mid-September 2025, we detected a highly sophisticated cyber espionage operation"; "execute 80-90% of tactical operations independently"; "The operation targeted roughly 30 entities and our investigation validated a handful of successful intrusions"; tareas "each of which appeared legitimate when evaluated in isolation"; "the human operators claimed that they were employees of legitimate cybersecurity firms". Es contextualización externa: no forma parte de los resultados de la tesis ni de su bibliografía original.`,
-    });
-  }
+  // 3. Caso documentado de Hugging Face y OpenAI
+  require("./s_caso_hf")(pres);
 
   // ------------------------------------------------------------ 4. Brecha
   {

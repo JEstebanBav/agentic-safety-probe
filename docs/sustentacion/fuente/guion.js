@@ -9,6 +9,11 @@ function mmss(seg) {
 
 // n: { titulo, t (segundos; 0 en respaldo), guion, transicion, fuentes, respaldo }
 function nota(slide, n) {
+  const numero = registro.length + 1;
+  // Conserva en las notas los tamaños y las versiones de las fuentes usadas.
+  if ((numero >= 12 && numero <= 21) || [23, 25, 26, 28, 29, 30, 31, 35].includes(numero)) {
+    n = { ...n, fuentes: (n.fuentes || "") + "\nTamaño y procedencia: las ejecuciones Mistral V2 y Qwen V2 incluidas en las comparativas tienen 96 pares verificados. Llama V3 tiene 42 pares; su análisis detallado y los ensayos conductuales conservan sus denominadores reales. Las comparaciones no convierten estos tamaños en equivalentes ni atribuyen a 96 un contraste de 42." };
+  }
   const ini = acumulado;
   if (!n.respaldo) acumulado += n.t;
   const cab = n.respaldo

@@ -1,14 +1,15 @@
 """Extrae las cifras de la presentación desde los artefactos del repositorio.
 
-Escribe datos_presentacion.json junto a este archivo. Cada cifra que aparece en
-las diapositivas sale de aquí, y las aserciones comprueban que coinciden con las
-tablas de la tesis (docs/tesis/Tesis_avances_actualizada). No ejecuta modelos.
+Escribe datos_presentacion.json junto a este archivo. Conserva las comprobaciones
+de los análisis de la tesis y añade las exportaciones de 96 pares de Mistral y
+Qwen, con verificación de tamaño y hash de procedencia. No ejecuta modelos.
 
 Uso, desde la raíz del repositorio:
     python docs/sustentacion/fuente/datos.py
 """
 import json
 import math
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -113,7 +114,39 @@ def main():
     q8 = leer(RAIZ / "results/corridas/qwen3_8b/v1/results.json")["auroc_heldout"]
     q32 = leer(RAIZ / "results/corridas/qwen3_32b/v1/results.json")["auroc_heldout"]
 
+    corpus = [json.loads(linea) for linea in (RAIZ / "data/dataset_v2.jsonl").read_text(encoding="utf-8").splitlines() if linea.strip()]
+    ejemplo = {v["variant"]: v for v in corpus if v["pair_id"] == "fraud_06"}
+    assert len(ejemplo) == 4
+    assert ejemplo["chat_harmful"]["prompt"] == ejemplo["agent_harmful"]["prompt"]
+    assert ejemplo["chat_benign"]["prompt"] == ejemplo["agent_benign"]["prompt"]
+
+    evaluacion96 = {}
+    for key, nombre, etiqueta in [("mistral", "corridas/mistral7b/v2", "Mistral-7B"), ("qwen8b", "corridas/qwen3_8b/v2", "Qwen3-8B"), ("qwen32b", "corridas/qwen3_32b/v2", "Qwen3-32B")]:
+        ruta = RAIZ / "results" / nombre / "results.json"
+        completo = leer(ruta)
+        referencia = str(completo["best_layer"])
+        assert all(len(completo["projections"][k]) == 96 for k in
+                   ["chat_harmful", "chat_benign", "agent_full_harmful", "agent_full_benign"])
+        assert completo["heldout"]["n_pairs"] == 96
+        assert all(len(completo["heldout"]["projections"][k]) == 96 for k in
+                   ["chat_harmful", "chat_benign", "agent_full_harmful", "agent_full_benign"])
+        evaluacion96[key] = {
+            "modelo": etiqueta, "n": 96, "capa": int(referencia),
+            "deteccion": completo["heldout"]["detection"],
+            "formato": completo["format_effect"]["held_out"]["per_layer"][referencia],
+            "estratos": completo["format_effect"]["held_out"]["by_stratum"],
+            "monitor": completo["robust"]["per_layer"][referencia],
+            "fuente": ruta.relative_to(RAIZ).as_posix(),
+            "sha256": hashlib.sha256(ruta.read_bytes()).hexdigest(),
+        }
+
     datos = {
+        "cobertura": leer(AQUI / "cobertura_estudio.json"),
+        "ejemplo_didactico": {"pair_id": "fraud_06", "subtlety": "contextual",
+                              "harmful": ejemplo["chat_harmful"]["prompt"],
+                              "benign": ejemplo["chat_benign"]["prompt"],
+                              "fuente": "data/dataset_v2.jsonl"},
+        "evaluacion96": evaluacion96,
         "fuente": {
             "llama": "results/corridas/llama33_70b/v3/results.json (heldout, pca_by_layer, linear_*), "
                      "factorial_results.json",
