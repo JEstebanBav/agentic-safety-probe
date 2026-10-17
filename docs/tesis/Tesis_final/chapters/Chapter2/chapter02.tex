@@ -1,0 +1,86 @@
+\chapter{Contexto y antecedentes}
+\label{chap:contexto-antecedentes}
+
+Este capítulo sitúa el proyecto en el terreno donde ocurre el fenómeno que
+estudia. La primera sección caracteriza ese terreno en tres planos: el
+formato agéntico como escenario técnico de operación, los modelos de pesos
+abiertos como objetos susceptibles de observación interna, y el espacio de
+solicitudes sobre el que se mide la respuesta del modelo. La segunda revisa
+los antecedentes y el estado actual del conocimiento, desde el origen del
+comportamiento de rechazo en el alineamiento hasta los trabajos más
+recientes que han comenzado a examinar la dirección de rechazo fuera del
+formato conversacional. La tercera delimita, a partir de todo lo anterior,
+el vacío preciso que la investigación aborda.
+
+\section{Caracterización del contexto}
+\label{sec:contexto}
+
+Tres planos caracterizan el terreno en el que ocurre el fenómeno estudiado. El primero es el formato agéntico como escenario técnico. La diferencia entre un modelo que conversa y uno que actúa no reside en el modelo, que es el mismo, sino en lo que acompaña a la instrucción dentro de su contexto: en el formato agéntico el modelo recibe además un mensaje de sistema que lo sitúa como agente y un catálogo de herramientas descritas en el formato de llamada a funciones, lo que le habilita una salida adicional, la invocación de una acción que el sistema ejecutará por él. Entre la respuesta y su efecto desaparece el ser humano que en el formato conversacional lee la respuesta y decide si actuar, y la decisión de cumplir o rechazar, tomada una vez al comienzo, gobierna toda la secuencia de acciones posterior. Para este trabajo, lo relevante es que el estímulo agéntico es más largo, incorpora vocabulario técnico ajeno a la petición y sitúa al modelo en otro rol, y cualquiera de esos elementos puede alterar las representaciones sobre las que opera el mecanismo de rechazo.
+
+El segundo plano son los modelos de pesos abiertos como objeto observable. Un estudio de interpretabilidad mecánica requiere acceso a las activaciones internas durante el procesamiento, algo que los sistemas accesibles solo mediante interfaces de programación no ofrecen. Por eso la literatura sobre la dirección de rechazo se ha construido sobre modelos abiertos \parencite{arditi2024}, y por eso este trabajo exige que los modelos estudiados sean abiertos, estén alineados y admitan el uso de herramientas. Esa condición introduce una tensión que el trabajo no resuelve: los sistemas cuyo fallo motiva la investigación son, en su mayoría, cerrados.
+
+El tercer plano es el espacio de solicitudes. Las peticiones que un modelo alineado debe rechazar difieren en el tipo de daño, que el trabajo organiza en siete categorías tomadas de la taxonomía consolidada para la evaluación de agentes \parencite{andriushchenko2024}, y en el grado en que la intención dañina se manifiesta en la superficie del texto, dimensión que este trabajo introduce como constructo propio. La segunda importa porque el riesgo práctico no se concentra donde el daño es evidente: las solicitudes que atraviesan las salvaguardas son aquellas cuya peligrosidad reside en el propósito y no en las palabras.
+
+\section{Antecedentes y referentes}
+\label{sec:antecedentes}
+
+\subsection{Antecedentes}
+
+\subsubsection*{El alineamiento como origen del comportamiento de rechazo}
+
+El comportamiento de un modelo de lenguaje de negarse a cumplir solicitudes dañinas no es una propiedad espontánea, sino el resultado de un proceso de entrenamiento posterior al preentrenamiento, conocido como alineamiento. \textcite{ouyang2022} establecieron que aumentar el tamaño de un modelo no lo hace, por sí solo, mejor en seguir la intención del usuario: los modelos grandes pueden generar contenido no veraz, tóxico o simplemente inútil, esto es, contenido no alineado con el usuario. Para corregir esta desalineación propusieron un procedimiento en dos fases. En la primera, ajustan el modelo mediante aprendizaje supervisado sobre demostraciones escritas por anotadores del comportamiento deseado. En la segunda, recogen ordenamientos humanos de las salidas del modelo, entrenan con ellos un modelo de preferencias y lo utilizan como señal de recompensa para seguir ajustando el modelo mediante aprendizaje por refuerzo, procedimiento que se denomina aprendizaje por refuerzo a partir de retroalimentación humana (RLHF, por sus siglas en inglés). El modelo resultante, denominado InstructGPT, mostró mejoras en veracidad y reducciones en la generación de salidas tóxicas, hasta el punto de que sus salidas fueron preferidas sobre las de un modelo cien veces mayor sin este ajuste. El RLHF constituye así la vía por la cual un modelo aprende a comportarse de manera útil e inocua, y es el origen del comportamiento de rechazo que esta investigación estudia.
+
+Sobre esta base, \textcite{bai2022} propusieron un procedimiento orientado específicamente a la inocuidad, denominado Constitutional AI, que reduce la dependencia de etiquetas humanas para identificar contenido dañino. En su método, la supervisión humana se limita a un conjunto de principios o reglas, y el propio modelo genera autocríticas y revisiones de sus respuestas conforme a dichos principios; posteriormente, un modelo evalúa las preferencias entre respuestas y esa señal, generada por inteligencia artificial, sustituye a la humana en la fase de refuerzo. Más allá del procedimiento, su trabajo aporta una precisión conceptual relevante para esta investigación: el resultado deseado no es un modelo evasivo, sino un asistente inocuo pero no evasivo, capaz de enfrentar las consultas dañinas explicando sus objeciones a ellas. El rechazo, en este sentido, no es un simple silencio ante lo peligroso, sino un comportamiento deliberado producto del alineamiento.
+
+\subsubsection*{Del modelo conversacional al agente y el fallo de las salvaguardas}
+
+El comportamiento de rechazo se estableció y se evaluó, en su mayor parte, sobre modelos que operan en formato conversacional. Sin embargo, el despliegue reciente de estos modelos como agentes, dotados de herramientas que les permiten actuar en el mundo, introdujo un escenario en el que las salvaguardas obtenidas por alineamiento no necesariamente se conservan. \textcite{andriushchenko2024} proporcionaron la primera medición sistemática de este problema mediante el \textit{benchmark} AgentHarm, que evalúa el comportamiento de agentes ante ciento diez tareas explícitamente dañinas, distribuidas en once categorías de daño y ejecutadas mediante el uso de herramientas simuladas. Sus resultados mostraron que modelos de frontera cumplen una fracción considerable de estas tareas sin necesidad de técnicas de evasión, que los ataques de evasión diseñados para el formato conversacional se transfieren con eficacia al contexto agéntico, y que un modelo cuyas defensas han sido comprometidas conserva sus capacidades, ejecutando la tarea dañina con la misma competencia con que ejecutaría una legítima. Este trabajo estableció, a nivel conductual, que la seguridad evaluada en el formato conversacional no se traslada al agéntico, y dejó planteada la pregunta por los mecanismos internos responsables de ese fallo, cuestión que los enfoques puramente conductuales no pueden resolver.
+
+\subsection{Estado actual}
+
+\subsubsection*{La lectura de las representaciones internas mediante clasificadores lineales}
+
+El estudio de los mecanismos internos de un modelo requiere métodos capaces de extraer información interpretable de sus representaciones. El fundamento metodológico de esta aproximación se remonta a \textcite{alain2017}, quienes propusieron el uso de clasificadores lineales, denominados sondas (\textit{probes}), entrenados de manera independiente del modelo y sobre las activaciones de una capa intermedia, con el fin de medir qué tan aptas son dichas activaciones para una tarea de clasificación. Una observación central de su trabajo es que la separabilidad lineal de las características aumenta de forma monótona con la profundidad de la red, es decir, la información se vuelve progresivamente más accesible de manera lineal en las capas más profundas. Aunque su estudio se realizó sobre modelos de visión por computadora, la técnica de la sonda lineal constituye el antecedente metodológico de todo el trabajo posterior que localiza conceptos en las activaciones de un modelo, y es la base sobre la que se apoya la medición de la separabilidad entre clases empleada en esta investigación.
+
+\subsubsection*{La hipótesis de representación lineal y la ingeniería de representaciones}
+
+La razón por la cual una sonda lineal resulta efectiva se formaliza en la hipótesis de representación lineal, según la cual muchos conceptos de alto nivel se codifican como direcciones lineales en el espacio de activaciones de un modelo. \textcite{park2024} desarrollaron una formulación de esta hipótesis y de la geometría del espacio de representaciones que la sustenta, ofreciendo el marco teórico que justifica buscar un concepto, como la peligrosidad de una instrucción, en la forma de una dirección. Sobre esta base, \textcite{zou2023} propusieron el marco de ingeniería de representaciones (\textit{representation engineering}), que sistematiza la lectura y la manipulación de conceptos de alto nivel en las activaciones de una red, y establece procedimientos para extraer direcciones asociadas a comportamientos y para intervenir sobre ellas durante la inferencia. Este marco proporciona el instrumental conceptual y técnico sobre el que se construye el estudio de mecanismos de seguridad específicos, como el rechazo.
+
+\subsubsection*{La dirección de rechazo y su auditabilidad}
+
+La aplicación de este instrumental al comportamiento de rechazo fue realizada por \textcite{arditi2024}, quienes demostraron que el rechazo a solicitudes dañinas no se encuentra distribuido de manera difusa por la red, sino mediado por una única dirección en el espacio de activaciones del flujo residual. Su método, basado en la diferencia de medias entre las activaciones de instrucciones dañinas y benignas, permite extraer dicha dirección, y sus intervenciones establecen su papel causal: la eliminación de la dirección suprime la capacidad de rechazo, mientras que su adición la induce incluso ante solicitudes inofensivas. Este resultado, validado en trece modelos de código abierto de hasta setenta y dos mil millones de parámetros, constituye el fundamento metodológico directo de esta investigación. De manera complementaria, \textcite{templeton2024} mostraron, mediante autoencoders dispersos aplicados a un modelo de producción, que es posible extraer millones de características interpretables de las representaciones internas, entre ellas características asociadas a conceptos de seguridad como el engaño o la generación de código inseguro. Este trabajo evidencia que las representaciones de seguridad no son un caso aislado del rechazo, sino un fenómeno auditable y extendido en las representaciones internas de un modelo.
+
+\subsubsection*{El rechazo en contextos de intervención y su dependencia del contexto}
+
+Un conjunto reciente de trabajos ha comenzado a examinar el comportamiento de la dirección de rechazo más allá del formato conversacional en el que fue caracterizada, y ha revelado que no se trata de un mecanismo estable ni aislado. \textcite{lermen2024} aplicaron la ablación del vector de rechazo a un modelo de gran escala y verificaron que el agente resultante completaba tareas dañinas que, sin la intervención, habría rechazado; su enfoque, no obstante, fue de carácter intervencionista, pues eliminó deliberadamente el mecanismo en lugar de medir si este se debilita de forma natural al cambiar de contexto. Por su parte, \textcite{zhong2026} mostraron que la dirección de rechazo depende de la representación de la persona del modelo: al dirigir el modelo hacia una persona complaciente, la tasa de rechazo se desploma, y la reintroducción de la dirección de rechazo restaura el comportamiento únicamente en las capas tardías, lo que los lleva a concluir que el rechazo se condiciona en la etapa de expresión, río abajo de donde se computa. Tratar el rechazo como una dirección única y aislada, señalan, pierde de vista su dependencia del contexto.
+
+El trabajo más próximo al presente estudio es el de \textcite{pinto2026}, quien realizó el primer análisis sistemático de la transferencia del formato conversacional al agéntico de la dirección de rechazo empleada para dirigir el comportamiento (\textit{steering}). Su hallazgo es que la dirección alcanza las capas tardías con una intensidad cercana a la plena en todos los modelos evaluados, mientras que su acoplamiento con el comportamiento se recalibra según el modelo y el contexto, amplificándose en unos casos y atenuándose en otros. Ahora bien, su estudio se orienta al control del comportamiento mediante la inyección de la dirección, y no al diagnóstico de la capacidad de la dirección para detectar la intención dañina.
+
+\section{Brecha, necesidad u oportunidad identificada}
+\label{sec:brecha}
+
+De este modo, la evidencia disponible deja abierto un punto preciso. Se sabe, en el plano del comportamiento, que las salvaguardas fallan cuando el modelo actúa como agente \parencite{andriushchenko2024}, y se sabe, en el plano mecánico, que el rechazo está mediado por una dirección en el espacio de activaciones caracterizada en el formato conversacional \parencite{arditi2024}. Lo que no se ha determinado, por tanto, no es si esa dirección persiste al transitar al formato agéntico —Pinto la rastreó en el plano del control del comportamiento y la halló casi intacta en las capas tardías—, sino si, empleada como instrumento de diagnóstico, conserva su capacidad para detectar la intención dañina al operar el modelo como agente, y si esa capacidad se mantiene frente a solicitudes de distinto grado de explicitud. Esa es la pregunta que este trabajo aborda.
+
+La presente investigación se distingue de estos trabajos en dos aspectos. En primer lugar, adopta una perspectiva diagnóstica y no intervencionista: mide cómo se transforma la proyección sobre la dirección de rechazo al pasar al formato agéntico, sin modificar el modelo. En segundo lugar, incorpora el grado de explicitud de la intención dañina como dimensión de análisis, aspecto que la literatura previa no ha abordado y que resulta central para evaluar la robustez del mecanismo de rechazo frente a solicitudes cuya peligrosidad no es evidente en la superficie del texto.
+
+La brecha, en suma, tiene dos componentes que el trabajo aborda de manera
+conjunta. El primero es que la dirección de rechazo se ha caracterizado en
+un contexto de operación, el conversacional, distinto de aquel en el que los
+modelos fallan, y no se ha medido qué le ocurre a esa representación al
+transitar entre ambos sin intervenir sobre el modelo. El segundo es que esa
+caracterización se ha construido sobre solicitudes cuyo daño es explícito,
+de modo que se desconoce si la capacidad de detección se conserva cuando la
+intención se presenta de forma encubierta.
+
+Los objetivos específicos formulados en la Sección~\ref{sec:objetivos}
+responden a esta doble brecha en secuencia. El primero construye el
+instrumento que permite aislar el efecto del formato, un conjunto
+contrastivo con texto idéntico entre condiciones y estratificado por grado
+de explicitud, que ningún recurso disponible proporcionaba. El segundo
+establece la línea base conversacional contra la cual medir. El tercero
+cuantifica el desplazamiento entre formatos y su significancia, que es el
+primer componente de la brecha. El cuarto evalúa la estabilidad de la
+detección según el grado de explicitud, que es el segundo. Y el quinto
+explora qué consecuencias prácticas tendría el diagnóstico resultante para
+la construcción de mecanismos de monitoreo, cerrando el vínculo entre el
+hallazgo mecánico y el problema aplicado que lo motiva.

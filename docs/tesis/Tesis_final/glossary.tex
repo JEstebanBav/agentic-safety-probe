@@ -1,0 +1,32 @@
+\chapter*{Glosario de notación}
+\addcontentsline{toc}{chapter}{Glosario de notación}
+
+Se reúnen a continuación la notación y las medidas que aparecen en el capítulo de resultados, de modo que puedan consultarse sin volver sobre la formalización.
+
+\begin{description}[leftmargin=0pt, labelwidth=0pt, labelsep=0pt, style=nextline, itemsep=0.45em]
+
+  \item[Cono de influencia ($\mathcal{C}(i)$)] Conjunto de \textit{tokens} de la secuencia que pueden alterar la representación de la posición $i$. Por la máscara causal es $\{1, \dots, i\}$, de modo que la posición final del estímulo renderizado tiene acceso causal al estímulo completo, incluidos sus delimitadores. Es la razón por la que el estudio mide en esa posición.
+
+  \item[Capa de referencia] Capa de cada modelo en la que el procedimiento maximiza el desplazamiento medido y sobre la que se reportan las cifras principales. En las ejecuciones principales de esta versión es 30 en Mistral V3 y 76 en Llama V3; las ejecuciones históricas se identifican por separado.
+
+  \item[Índice de Jaccard ($J$)] Proporción de términos compartidos entre la rama dañina y la benigna de un par, sobre el total de términos distintos que usan ambas. Mide la simetría léxica del pareado: vale uno si las dos ramas usan el mismo vocabulario y cero si no comparten ninguno.
+
+  \item[Proyección ($p$)] Medida geométrica de cuánto se alinea la representación de una instrucción con la dirección de rechazo. Un valor alto indica mayor alineación con ese eje, no que el modelo reconozca el peligro; su capacidad de separar instrucciones dañinas de benignas se cuantifica aparte, mediante el AUROC.
+
+  \item[Gap de proyección ($\Delta p_{h}$)] Diferencia entre la proyección media de las instrucciones dañinas en formato conversacional y la de esas mismas instrucciones en formato agéntico. Mide en qué medida \emph{disminuye} esa alineación al cambiar de formato, y es el resultado central de este trabajo.
+
+  \item[Interacción o diferencia en diferencias ($\Delta^{2} p$)] Diferencia entre el desplazamiento del brazo dañino y el del benigno. Es la parte del efecto específica del contenido dañino.
+
+  \item[Fracción común ($\varphi$)] Proporción del desplazamiento dañino que el brazo benigno reproduce. Un valor negativo indica que los dos brazos se desplazan en sentidos opuestos.
+
+  \item[AUROC] Probabilidad de que, tomadas al azar una instrucción dañina y una benigna, la dañina proyecte más que la benigna. Un valor de 1 indica separación perfecta y uno de 0{,}5 una separación equivalente al azar.
+
+  \item[Gap de detección ($\Delta$AUROC)] Diferencia entre el AUROC del formato conversacional y el del agéntico. Es la diferencia neta de probabilidades de ordenación correcta; admite cambios en ambos sentidos y no cuenta exclusivamente los aciertos perdidos. Es una cantidad distinta del gap de proyección y responde a otra pregunta: aquel mide intensidad de la respuesta, este mide capacidad de discriminación.
+
+  \item[Contracción de escala ($\kappa$)] Cociente entre la desviación estándar de las proyecciones en formato agéntico y la observada en formato conversacional. Cuantifica qué parte de una pérdida medida en unidades crudas corresponde a un cambio de unidades.
+
+  \item[$\bm{w}_{\mathrm{DM}}$ y $\bm{w}_{\mathrm{LR}}$] Direcciones agénticas estimadas por diferencia de medias y regresión logística, respectivamente. Se reportan por separado. La primera es el contraste entre centroides dentro del formato agéntico. Su coseno con la dirección de rechazo conversacional mide cuánto ha rotado el eje sobre el que el modelo codifica la peligrosidad.
+
+\end{description}
+
+\clearpage

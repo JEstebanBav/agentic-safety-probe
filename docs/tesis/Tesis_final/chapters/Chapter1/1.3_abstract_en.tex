@@ -1,0 +1,11 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This progress report studies how internal representations of harmful instructions change between a conversational format and a format containing an agent system message and simulated tool schemas. An expanded contrastive corpus of 96 harmful--benign pairs was constructed, with four variants per pair and three explicitness levels. Available experiments use the original 42-pair corpus. Llama-3.3-70B V3 and the Mistral-7B V3 execution log support the main results; earlier Qwen runs are retained as exploratory evidence.
+
+The conversational direction is estimated by difference in means from the residual stream at the final token of the rendered stimulus. With five-fold pair-level evaluation, its AUROC decreases from 0.9779 in chat to 0.9195 in the agent format for Llama, and from 0.9478 to 0.7851 for Mistral. Interactions with the benign arm are positive, and reduced separation persists in standardized units, although it is smaller than the raw decrease. PCA aligns with the contrast in deeper layers. For Llama, the agent mean-difference direction has low alignment with the conversational direction and supports an out-of-fold monitor with $F_1=0.8434$; logistic regression is treated as a separate estimator.
+
+The observations support a reduced discriminative margin under the tested conditions. Complementary Llama interventions increase heuristically labelled refusal, but higher doses also induce benign refusal, and human label auditing remains necessary. Generalization to the expanded corpus, external data and agents executing real actions remains open.
+
+\vspace{0.4cm}\noindent
+\textbf{Keywords:} mechanistic interpretability; refusal direction; agentic format; cross-validation; AI safety.

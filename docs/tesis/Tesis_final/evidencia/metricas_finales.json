@@ -1,0 +1,3318 @@
+{
+  "llama": {
+    "modelo": "Llama-3.3-70B",
+    "version": "V4",
+    "fuente": "results/ultimos_resultados/llama3380B_v4",
+    "hf_id": "meta-llama/Llama-3.3-70B-Instruct",
+    "precision": "FP16",
+    "n_pares": 96,
+    "capas_total": 80,
+    "capas_evaluadas": [
+      0,
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32,
+      36,
+      40,
+      44,
+      48,
+      52,
+      56,
+      60,
+      64,
+      68,
+      72,
+      76
+    ],
+    "capa_referencia": 76,
+    "deteccion": {
+      "auroc_chat": 0.9682074652777779,
+      "auroc_agente": 0.8694661458333334,
+      "auroc_chat_ic": [
+        0.947265625,
+        0.9849175347222222
+      ],
+      "auroc_agente_ic": [
+        0.8199869791666667,
+        0.9165581597222222
+      ],
+      "brecha": 0.09874131944444453,
+      "brecha_ic": [
+        0.05913628472222232,
+        0.14019097222222232
+      ],
+      "brecha_p": 0.0,
+      "optimismo_chat": 0.001953124999999778,
+      "optimismo_agente": 0.0017361111111112715,
+      "coseno_entre_folds": 0.9923355087610052
+    },
+    "desplazamiento": {
+      "dp_h": 15.20347776403338,
+      "dp_b": -1.8387504900057088,
+      "interaccion": 17.042228254039088,
+      "interaccion_ic": [
+        15.450547506253201,
+        18.579598310305897
+      ],
+      "interaccion_p": 0.0001,
+      "fraccion_comun": -0.12094275523956834,
+      "pares_interaccion_positiva": 94,
+      "dp_h_ic": [
+        13.799499728842438,
+        16.555486990311397
+      ],
+      "dp_h_dz": 2.2423449283089867,
+      "dp_h_decrecen": 92,
+      "dp_h_signos_p": 8.758241741061071e-23,
+      "dp_b_ic": [
+        -2.844550441851744,
+        -0.7644500427486328
+      ],
+      "benigno_p_bilateral": 0.0009527868670593164,
+      "interaccion_dz": 2.199479580323901
+    },
+    "escala": {
+      "perdida_cruda": 0.8390925104959867,
+      "perdida_estandarizada": 0.4922471684720965,
+      "d_chat": 2.947400026130091,
+      "d_agente": 1.4965507089129706,
+      "kappa": 0.31690121553792006
+    },
+    "estratos": {
+      "contextual": {
+        "n": 24,
+        "auroc_chat": 0.9114583333333333,
+        "auroc_agente": 0.7916666666666666,
+        "perdida_auroc": 0.11979166666666663,
+        "d_chat": 1.9263541292241741,
+        "d_agente": 1.0855609651716167,
+        "perdida_d": 0.436468638500638
+      },
+      "explicit": {
+        "n": 42,
+        "auroc_chat": 0.9914965986394558,
+        "auroc_agente": 0.8990929705215419,
+        "perdida_auroc": 0.09240362811791392,
+        "d_chat": 4.20055408156668,
+        "d_agente": 1.767074836910447,
+        "perdida_d": 0.5793233933911448
+      },
+      "framed": {
+        "n": 30,
+        "auroc_chat": 0.9722222222222221,
+        "auroc_agente": 0.8877777777777779,
+        "perdida_auroc": 0.08444444444444421,
+        "d_chat": 2.90348633973022,
+        "d_agente": 1.5985488887517734,
+        "perdida_d": 0.44943812310124254
+      }
+    },
+    "sonda_lineal": {
+      "auroc": 0.9874505540166204,
+      "sd_folds": 0.014464676068221919,
+      "ic": [
+        0.9724375417386772,
+        1.0
+      ],
+      "permutado": 0.4556875346260387,
+      "dentro_muestra": 1.0,
+      "repeticiones": 10
+    },
+    "lineal_vs_mlp": {
+      "n_paired_folds": 5,
+      "mean_a": 0.9651911357340721,
+      "mean_b": 0.9875277008310249,
+      "difference": -0.02233656509695292,
+      "se_corrected": 0.010668739328830529,
+      "ci_lower": -0.05195773418511564,
+      "ci_upper": 0.007284603991209792,
+      "p_value": 0.10439970335782565
+    },
+    "circularidad": {
+      "dp_ingenuo": 15.485688658165847,
+      "dp_crossfit": 15.20347776403338,
+      "sesgo": 0.2822108941324668,
+      "decrecen": 92,
+      "pares": 96,
+      "signos_p": 8.758241741061071e-23
+    },
+    "monitores": {
+      "medias": {
+        "auroc": 0.9180457063711911,
+        "f1": 0.8449197860962567,
+        "fpr": 0.125
+      },
+      "logistica": {
+        "auroc": 0.9809875346260387,
+        "f1": 0.9152542372881356,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.84375
+      }
+    },
+    "rotacion": {
+      "diff_means": {
+        "cosine_full_sample": 0.22405797096559754,
+        "reliability_chat": 0.9510015776714914,
+        "reliability_agent": 0.9574759970662768,
+        "ceiling": 0.9542332963131257,
+        "cosine_normalised": 0.22804539822861652,
+        "angle_deg_normalised": 76.81797656653136
+      },
+      "logistic": {
+        "cosine_full_sample": 0.06723293636546271,
+        "reliability_chat": 0.32528601526843526,
+        "reliability_agent": 0.3177858589964925,
+        "ceiling": 0.3215140677818404,
+        "cosine_normalised": 0.11255356073568226,
+        "angle_deg_normalised": 83.5374618030391
+      }
+    },
+    "seleccion": {
+      "n_seleccion": 48,
+      "n_inferencia": 48,
+      "capa": 76,
+      "bonferroni": 0.0025,
+      "dp_inferencia": 13.949768749985177,
+      "ic": [
+        11.83962164015528,
+        15.918194161629675
+      ],
+      "decrecen": 46,
+      "pares": 48,
+      "signos_p": 8.363087999896379e-12,
+      "dz": 1.9618429209903652,
+      "interaccion_inferencia": 15.366741654582656,
+      "interaccion_inferencia_ic": [
+        13.097720156733281,
+        17.51721796340451
+      ],
+      "estabilidad_frecuencia": {
+        "76": 1.0
+      },
+      "estabilidad_frac_decrecen_media": 0.9714583333333333
+    },
+    "pca": {
+      "0": {
+        "coseno": 0.30492568016052246,
+        "varianza_pc1": 0.19774335622787476,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.15568792918491545
+      },
+      "4": {
+        "coseno": 0.423961341381073,
+        "varianza_pc1": 0.2286657989025116,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.14005027265592634
+      },
+      "8": {
+        "coseno": 0.12305314838886261,
+        "varianza_pc1": 0.09536752104759216,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.40751295179119373
+      },
+      "12": {
+        "coseno": 0.033385612070560455,
+        "varianza_pc1": 0.129763662815094,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.502946848940621
+      },
+      "16": {
+        "coseno": 0.11961771547794342,
+        "varianza_pc1": 0.13255241513252258,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.6386935493790535
+      },
+      "20": {
+        "coseno": 0.9805783033370972,
+        "varianza_pc1": 0.15182754397392273,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7269248794307922
+      },
+      "24": {
+        "coseno": 0.9915074706077576,
+        "varianza_pc1": 0.26345574855804443,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7220275731054173
+      },
+      "28": {
+        "coseno": 0.9926592707633972,
+        "varianza_pc1": 0.3349003195762634,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7020476753180701
+      },
+      "32": {
+        "coseno": 0.9952563047409058,
+        "varianza_pc1": 0.3572556972503662,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7015104929873577
+      },
+      "36": {
+        "coseno": 0.9949390292167664,
+        "varianza_pc1": 0.34482499957084656,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6902294718118436
+      },
+      "40": {
+        "coseno": 0.9941624402999878,
+        "varianza_pc1": 0.3024879992008209,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.692964367664793
+      },
+      "44": {
+        "coseno": 0.9945111274719238,
+        "varianza_pc1": 0.280392587184906,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7011251079102967
+      },
+      "48": {
+        "coseno": 0.9942924976348877,
+        "varianza_pc1": 0.26774081587791443,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7010376650183856
+      },
+      "52": {
+        "coseno": 0.9941503405570984,
+        "varianza_pc1": 0.2527862787246704,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7018247493796642
+      },
+      "56": {
+        "coseno": 0.9937840104103088,
+        "varianza_pc1": 0.23476973176002502,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7032404361998682
+      },
+      "60": {
+        "coseno": 0.9932533502578735,
+        "varianza_pc1": 0.2191585898399353,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7057440422490373
+      },
+      "64": {
+        "coseno": 0.9927279353141785,
+        "varianza_pc1": 0.2069835066795349,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7037138307561289
+      },
+      "68": {
+        "coseno": 0.9923781156539917,
+        "varianza_pc1": 0.1994219571352005,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7020176682951934
+      },
+      "72": {
+        "coseno": 0.9917936325073242,
+        "varianza_pc1": 0.19078698754310608,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.7009723540624896
+      },
+      "76": {
+        "coseno": 0.9903572797775269,
+        "varianza_pc1": 0.18685220181941986,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6965237180037428
+      }
+    },
+    "factorial_referencia": {
+      "harmful": {
+        "system": {
+          "delta": 4.021464464565117,
+          "ic": [
+            3.4616744540786994,
+            4.545800951542332
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 15.435561904373268,
+          "ic": [
+            14.060251775030823,
+            16.796469145904602
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 15.485688844695686,
+          "ic": [
+            14.09687172966272,
+            16.848342031645977
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -3.97133755373458,
+          "ic": [
+            -4.491731524514035,
+            -3.4126759012229746
+          ],
+          "p": 0.0002
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 5.869961823647221,
+          "ic": [
+            5.141763353378822,
+            6.598436283770328
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 17.443113103198506,
+          "ic": [
+            15.87357889576815,
+            19.016286332175756
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 17.59012410355111,
+          "ic": [
+            16.003820238883296,
+            19.178622122559073
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -5.722950826088589,
+          "ic": [
+            -6.440108997126421,
+            -4.999300199995439
+          ],
+          "p": 0.0002
+        }
+      }
+    },
+    "por_capa": {
+      "0": {
+        "dp_h": -0.020561338242054233,
+        "dp_b": -0.02409241867645091,
+        "interaccion": 0.0035310804343966773,
+        "auroc_chat": 0.6529947916666666,
+        "auroc_agente": 0.6055772569444444,
+        "coseno_medias": 0.866080210155285,
+        "coseno_logistica": 0.6412760101451598,
+        "factorial_sistema": 0.0006590047366141034,
+        "factorial_herramientas": 0.004298953397665173,
+        "factorial_total": 0.004366240939513471
+      },
+      "4": {
+        "dp_h": -0.018408053653228496,
+        "dp_b": -0.029437636082284797,
+        "interaccion": 0.0110295824290563,
+        "auroc_chat": 0.697265625,
+        "auroc_agente": 0.6758897569444444,
+        "coseno_medias": 0.8673565391161694,
+        "coseno_logistica": 0.7608244447705484,
+        "factorial_sistema": 0.003750929337305326,
+        "factorial_herramientas": 0.012706277503942449,
+        "factorial_total": 0.012893311553246654
+      },
+      "8": {
+        "dp_h": 0.007949930491307234,
+        "dp_b": -0.050717123496346155,
+        "interaccion": 0.058667053987653386,
+        "auroc_chat": 0.8387586805555555,
+        "auroc_agente": 0.7721354166666666,
+        "coseno_medias": 0.7570921870001612,
+        "coseno_logistica": 0.6391292879007875,
+        "factorial_sistema": 0.0041552702799284216,
+        "factorial_herramientas": 0.06529705939950266,
+        "factorial_total": 0.06580275074520614
+      },
+      "12": {
+        "dp_h": 0.11524587033774274,
+        "dp_b": -0.06612113959970668,
+        "interaccion": 0.18136700993744942,
+        "auroc_chat": 0.902560763888889,
+        "auroc_agente": 0.8070746527777778,
+        "coseno_medias": 0.6634178009103786,
+        "coseno_logistica": 0.5193111727015254,
+        "factorial_sistema": 0.019961869198596105,
+        "factorial_herramientas": 0.19746823403208208,
+        "factorial_total": 0.1995634261984378
+      },
+      "16": {
+        "dp_h": 0.5471217384141497,
+        "dp_b": -0.13042649180232757,
+        "interaccion": 0.6775482302164773,
+        "auroc_chat": 0.9761284722222222,
+        "auroc_agente": 0.8935546875000001,
+        "coseno_medias": 0.7365767690184866,
+        "coseno_logistica": 0.45260825627864176,
+        "factorial_sistema": 0.20185828938459355,
+        "factorial_herramientas": 0.686241743969731,
+        "factorial_total": 0.697597006491075
+      },
+      "20": {
+        "dp_h": 1.310674667897122,
+        "dp_b": -0.23443822786325919,
+        "interaccion": 1.545112895760381,
+        "auroc_chat": 0.9806857638888888,
+        "auroc_agente": 0.9479166666666667,
+        "coseno_medias": 0.5799392668885297,
+        "coseno_logistica": 0.34166263814823383,
+        "factorial_sistema": 0.6068604352573553,
+        "factorial_herramientas": 1.567277576463918,
+        "factorial_total": 1.5738435573875904
+      },
+      "24": {
+        "dp_h": 2.646712994948652,
+        "dp_b": -0.3522670405717186,
+        "interaccion": 2.9989800355203706,
+        "auroc_chat": 0.9721137152777778,
+        "auroc_agente": 0.938259548611111,
+        "coseno_medias": 0.40834282490086987,
+        "coseno_logistica": 0.21341528472625482,
+        "factorial_sistema": 0.7429151791147888,
+        "factorial_herramientas": 3.0289793455352383,
+        "factorial_total": 3.0304969403271875
+      },
+      "28": {
+        "dp_h": 3.1529356009113543,
+        "dp_b": -0.6963108520634593,
+        "interaccion": 3.8492464529748136,
+        "auroc_chat": 0.966796875,
+        "auroc_agente": 0.9018012152777778,
+        "coseno_medias": 0.4430549162897004,
+        "coseno_logistica": 0.1261751247571649,
+        "factorial_sistema": 1.1652403594926,
+        "factorial_herramientas": 3.821967573836446,
+        "factorial_total": 3.8896085048715276
+      },
+      "32": {
+        "dp_h": 3.039109817769079,
+        "dp_b": -1.1851162886287652,
+        "interaccion": 4.224226106397844,
+        "auroc_chat": 0.9662543402777777,
+        "auroc_agente": 0.8662109375,
+        "coseno_medias": 0.4125701591609858,
+        "coseno_logistica": 0.102677098170345,
+        "factorial_sistema": 1.3546255674834051,
+        "factorial_herramientas": 4.198840328802666,
+        "factorial_total": 4.266146341338754
+      },
+      "36": {
+        "dp_h": 3.1265999905034874,
+        "dp_b": -1.4583578577292828,
+        "interaccion": 4.58495784823277,
+        "auroc_chat": 0.9658203125,
+        "auroc_agente": 0.8595920138888888,
+        "coseno_medias": 0.42552965545300747,
+        "coseno_logistica": 0.09657805554886303,
+        "factorial_sistema": 1.628545867279172,
+        "factorial_herramientas": 4.595995725442966,
+        "factorial_total": 4.6360384828100605
+      },
+      "40": {
+        "dp_h": 3.1564407158285124,
+        "dp_b": -1.7566883255239898,
+        "interaccion": 4.913129041352502,
+        "auroc_chat": 0.9657118055555556,
+        "auroc_agente": 0.8873697916666666,
+        "coseno_medias": 0.405663529477374,
+        "coseno_logistica": 0.1133233097284943,
+        "factorial_sistema": 1.726744572011133,
+        "factorial_herramientas": 4.939643833786249,
+        "factorial_total": 4.9797914667675895
+      },
+      "44": {
+        "dp_h": 3.7780392442050563,
+        "dp_b": -2.023054915004128,
+        "interaccion": 5.8010941592091845,
+        "auroc_chat": 0.9686414930555556,
+        "auroc_agente": 0.8891059027777777,
+        "coseno_medias": 0.3902407203992653,
+        "coseno_logistica": 0.09676770549385538,
+        "factorial_sistema": 1.9781724829226732,
+        "factorial_herramientas": 5.843406999173264,
+        "factorial_total": 5.891081878915429
+      },
+      "48": {
+        "dp_h": 4.705902630940259,
+        "dp_b": -2.0306081445081463,
+        "interaccion": 6.736510775448405,
+        "auroc_chat": 0.9680989583333334,
+        "auroc_agente": 0.8841145833333333,
+        "coseno_medias": 0.35880704833779464,
+        "coseno_logistica": 0.08557602434018774,
+        "factorial_sistema": 2.2323979698121548,
+        "factorial_herramientas": 6.806970942455033,
+        "factorial_total": 6.853897251809636
+      },
+      "52": {
+        "dp_h": 5.728161282952697,
+        "dp_b": -2.065810147590789,
+        "interaccion": 7.793971430543486,
+        "auroc_chat": 0.967990451388889,
+        "auroc_agente": 0.8780381944444445,
+        "coseno_medias": 0.3183777808850254,
+        "coseno_logistica": 0.07960605855731827,
+        "factorial_sistema": 2.4146137464170656,
+        "factorial_herramientas": 7.900683979193369,
+        "factorial_total": 7.944511917730173
+      },
+      "56": {
+        "dp_h": 6.581745145197355,
+        "dp_b": -2.3026181304236037,
+        "interaccion": 8.88436327562096,
+        "auroc_chat": 0.9682074652777777,
+        "auroc_agente": 0.8670789930555556,
+        "coseno_medias": 0.283585020434446,
+        "coseno_logistica": 0.07894604664099332,
+        "factorial_sistema": 2.8581903781741858,
+        "factorial_herramientas": 9.031049117911607,
+        "factorial_total": 9.075234599954758
+      },
+      "60": {
+        "dp_h": 7.449232927728439,
+        "dp_b": -2.4252277248412737,
+        "interaccion": 9.874460652569713,
+        "auroc_chat": 0.9684244791666667,
+        "auroc_agente": 0.8688151041666666,
+        "coseno_medias": 0.2591729309543657,
+        "coseno_logistica": 0.07244884325262566,
+        "factorial_sistema": 3.1440783080955343,
+        "factorial_herramientas": 10.078648192963254,
+        "factorial_total": 10.11020809613789
+      },
+      "64": {
+        "dp_h": 8.506678533372222,
+        "dp_b": -2.359121155947515,
+        "interaccion": 10.865799689319736,
+        "auroc_chat": 0.9670138888888888,
+        "auroc_agente": 0.8628472222222223,
+        "coseno_medias": 0.24895291287335547,
+        "coseno_logistica": 0.06284880171870555,
+        "factorial_sistema": 3.519578456878662,
+        "factorial_herramientas": 11.120809106932331,
+        "factorial_total": 11.152250105204683
+      },
+      "68": {
+        "dp_h": 9.889862758934713,
+        "dp_b": -2.185226281523404,
+        "interaccion": 12.075089040458117,
+        "auroc_chat": 0.9667968750000001,
+        "auroc_agente": 0.8656684027777777,
+        "coseno_medias": 0.2311929025984448,
+        "coseno_logistica": 0.048642433433347634,
+        "factorial_sistema": 4.031983558088541,
+        "factorial_herramientas": 12.314454779028893,
+        "factorial_total": 12.412934601617357
+      },
+      "72": {
+        "dp_h": 11.182976128858563,
+        "dp_b": -2.3001913453202003,
+        "interaccion": 13.483167474178764,
+        "auroc_chat": 0.9671223958333334,
+        "auroc_agente": 0.8614366319444445,
+        "coseno_medias": 0.21664745549445372,
+        "coseno_logistica": 0.044656821572462944,
+        "factorial_sistema": 4.488357267652949,
+        "factorial_herramientas": 13.789238086280724,
+        "factorial_total": 13.892716732807457
+      },
+      "76": {
+        "dp_h": 15.20347776403338,
+        "dp_b": -1.8387504900057088,
+        "interaccion": 17.042228254039088,
+        "auroc_chat": 0.9682074652777779,
+        "auroc_agente": 0.8694661458333334,
+        "coseno_medias": 0.22405797096559754,
+        "coseno_logistica": 0.06723293636546271,
+        "factorial_sistema": 5.869961823647221,
+        "factorial_herramientas": 17.443113103198506,
+        "factorial_total": 17.59012410355111
+      }
+    },
+    "archivos_sha256": {
+      "agent_direction_results.json": "71d9caa7e9968348d8df5ea90d5b6436446d17d189bf2dcd3a9eb7de2feaebbd",
+      "causal_results.json": "80cb4f4a9bf7acd99b4186ffb9fb4c3120cc8a6a30373e7ffe42828401d7b30c",
+      "factorial_results.json": "85de30ed1f7e69cb453577d37ac3a61510a912a363f54e3189d34c1500e9e895",
+      "format_effect_results.json": "10a4585929861be275581c7d2e8acc2bc21890ab7df52c2fea79b82f801b1dfa",
+      "results.json": "e4b5e2777f6673edf58c20715b5292468cdc1effdbe45fa37531bd9276d5d0cb",
+      "robust_results.json": "6848daf6639a37a224f112a716e50fd92c491111a05cab55738d200daa46bfd6",
+      "stratified_results.json": "2dde93aa13b438611438388f4d9e43bae914febfc9d7b93bc6eabf0f2616717b"
+    },
+    "conducta": {
+      "rechazo": {
+        "chat_harmful": [
+          82,
+          96,
+          0.7699818497355329,
+          0.9110979421986138
+        ],
+        "agent_harmful": [
+          43,
+          96,
+          0.3523575930459819,
+          0.5474836140225261
+        ],
+        "chat_benign": [
+          8,
+          96,
+          0.04283062415096722,
+          0.15589903239709585
+        ],
+        "agent_benign": [
+          2,
+          96,
+          0.005731969852430421,
+          0.07280713517784211
+        ]
+      },
+      "degeneradas": {
+        "chat_harmful": 0,
+        "agent_harmful": 0,
+        "chat_benign": 0,
+        "agent_benign": 0
+      },
+      "llamadas_herramienta": {
+        "chat_harmful": [
+          0,
+          96
+        ],
+        "agent_harmful": [
+          51,
+          96
+        ],
+        "chat_benign": [
+          0,
+          96
+        ],
+        "agent_benign": [
+          93,
+          96
+        ]
+      },
+      "brecha_danino": {
+        "n_pairs": 96,
+        "refuse_chat_comply_agent": 40,
+        "comply_chat_refuse_agent": 1,
+        "refuse_both": 42,
+        "comply_both": 13,
+        "mcnemar_p": 3.8198777474462986e-11
+      },
+      "brecha_benigno": {
+        "n_pairs": 96,
+        "refuse_chat_comply_agent": 8,
+        "comply_chat_refuse_agent": 2,
+        "refuse_both": 0,
+        "comply_both": 86,
+        "mcnemar_p": 0.109375
+      },
+      "proyeccion_vs_rechazo": {
+        "chat_harmful": {
+          "n_refuse": 82,
+          "n_comply": 14,
+          "mean_projection_refuse": 20.369850740200135,
+          "mean_projection_comply": 3.2592287872518813,
+          "auroc_projection_predicts_refusal": 0.9721254355400697
+        },
+        "agent_harmful": {
+          "n_refuse": 43,
+          "n_comply": 53,
+          "mean_projection_refuse": 5.0367642336113505,
+          "mean_projection_comply": 0.24086231555578844,
+          "auroc_projection_predicts_refusal": 0.9710399297937692
+        },
+        "pooled_harmful": {
+          "n_refuse": 125,
+          "n_comply": 67,
+          "mean_projection_refuse": 15.095268981933593,
+          "mean_projection_comply": 0.8715657574027332,
+          "auroc_projection_predicts_refusal": 0.9659701492537314
+        },
+        "projection_drop_flipped_vs_held": {
+          "n_flipped": 40,
+          "n_held": 42,
+          "mean_drop_flipped": 16.758034791052342,
+          "mean_drop_held": 18.13002456369854,
+          "mannwhitney_p": 0.4836798015623883
+        }
+      }
+    },
+    "causal": {
+      "76": {
+        "unidad": 15.485687255859375,
+        "dosis": {
+          "0.5": {
+            "alpha": 7.7428436279296875,
+            "desplazamiento": 7.7426703561027095,
+            "restaura": [
+              7,
+              53,
+              0.06547853284463252,
+              0.24840255308904924,
+              0
+            ],
+            "control": [
+              0,
+              53,
+              0.0,
+              0.06758198857654187,
+              0
+            ],
+            "benigno": [
+              0,
+              94,
+              0.0,
+              0.03926207629154474,
+              0
+            ],
+            "mcnemar_p": 0.015625
+          },
+          "1": {
+            "alpha": 15.485687255859375,
+            "desplazamiento": 15.485344823801293,
+            "restaura": [
+              21,
+              53,
+              0.27589406738001676,
+              0.5305852132679447,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              6,
+              94,
+              0.029579735297574024,
+              0.13232973550994373,
+              0
+            ],
+            "mcnemar_p": 3.814697265625e-06
+          },
+          "2": {
+            "alpha": 30.97137451171875,
+            "desplazamiento": 30.97070324196006,
+            "restaura": [
+              36,
+              53,
+              0.545185201490326,
+              0.7890778592086491,
+              6
+            ],
+            "control": [
+              1,
+              53,
+              0.0033384533882637665,
+              0.09942912052501235,
+              0
+            ],
+            "benigno": [
+              49,
+              94,
+              0.42145414630705824,
+              0.6194283185315994,
+              9
+            ],
+            "mcnemar_p": 5.820766091346741e-11
+          },
+          "4": {
+            "alpha": 61.9427490234375,
+            "desplazamiento": 61.94146977730517,
+            "restaura": [
+              0,
+              53,
+              0.0,
+              0.06758198857654187,
+              49
+            ],
+            "control": [
+              1,
+              53,
+              0.0033384533882637665,
+              0.09942912052501235,
+              4
+            ],
+            "benigno": [
+              1,
+              94,
+              0.0018803957480879353,
+              0.05782291296278563,
+              93
+            ],
+            "mcnemar_p": 1.0
+          }
+        }
+      },
+      "56": {
+        "unidad": 6.656813144683838,
+        "dosis": {
+          "0.5": {
+            "alpha": 3.328406572341919,
+            "desplazamiento": 3.3284498493907586,
+            "restaura": [
+              8,
+              53,
+              0.07852417850846262,
+              0.27054249276195336,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              0,
+              94,
+              0.0,
+              0.03926207629154474,
+              0
+            ],
+            "mcnemar_p": 0.03125
+          },
+          "1": {
+            "alpha": 6.656813144683838,
+            "desplazamiento": 6.6569500662526995,
+            "restaura": [
+              25,
+              53,
+              0.3438224347819615,
+              0.603399187212937,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              7,
+              94,
+              0.03653858086656638,
+              0.14581212236028018,
+              0
+            ],
+            "mcnemar_p": 2.384185791015625e-07
+          },
+          "2": {
+            "alpha": 13.313626289367676,
+            "desplazamiento": 13.313932641075468,
+            "restaura": [
+              51,
+              53,
+              0.8724571280258164,
+              0.9895897127241731,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              91,
+              94,
+              0.9103268539187764,
+              0.9890873725316923,
+              0
+            ],
+            "mcnemar_p": 3.552713678800501e-15
+          },
+          "4": {
+            "alpha": 26.62725257873535,
+            "desplazamiento": 26.627828964225525,
+            "restaura": [
+              53,
+              53,
+              0.932418011423458,
+              0.9999999999999999,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              75,
+              94,
+              0.7057493276333955,
+              0.8666051801078118,
+              19
+            ],
+            "mcnemar_p": 8.881784197001252e-16
+          }
+        }
+      },
+      "28": {
+        "unidad": 3.1701340675354004,
+        "dosis": {
+          "0.5": {
+            "alpha": 1.5850670337677002,
+            "desplazamiento": 1.5850523028452441,
+            "restaura": [
+              3,
+              53,
+              0.019436661484935766,
+              0.15370208310180888,
+              0
+            ],
+            "control": [
+              0,
+              53,
+              0.0,
+              0.06758198857654187,
+              0
+            ],
+            "benigno": [
+              0,
+              94,
+              0.0,
+              0.03926207629154474,
+              0
+            ],
+            "mcnemar_p": 0.25
+          },
+          "1": {
+            "alpha": 3.1701340675354004,
+            "desplazamiento": 3.1701509012085087,
+            "restaura": [
+              3,
+              53,
+              0.019436661484935766,
+              0.15370208310180888,
+              0
+            ],
+            "control": [
+              1,
+              53,
+              0.0033384533882637665,
+              0.09942912052501235,
+              0
+            ],
+            "benigno": [
+              1,
+              94,
+              0.0018803957480879353,
+              0.05782291296278563,
+              0
+            ],
+            "mcnemar_p": 0.5
+          },
+          "2": {
+            "alpha": 6.340268135070801,
+            "desplazamiento": 6.340299719206567,
+            "restaura": [
+              13,
+              53,
+              0.14932902108056811,
+              0.3756655768735192,
+              0
+            ],
+            "control": [
+              2,
+              53,
+              0.010410287275826845,
+              0.12754287197418354,
+              0
+            ],
+            "benigno": [
+              2,
+              94,
+              0.005854336239172753,
+              0.07429020489102965,
+              0
+            ],
+            "mcnemar_p": 0.00341796875
+          },
+          "4": {
+            "alpha": 12.680536270141602,
+            "desplazamiento": 12.680587071714536,
+            "restaura": [
+              45,
+              53,
+              0.7294575072380466,
+              0.9214758214915374,
+              0
+            ],
+            "control": [
+              24,
+              53,
+              0.3265757915292224,
+              0.5854602451289419,
+              0
+            ],
+            "benigno": [
+              53,
+              94,
+              0.4630290566620046,
+              0.6596183378539684,
+              0
+            ],
+            "mcnemar_p": 9.5367431640625e-07
+          }
+        }
+      }
+    }
+  },
+  "mistral": {
+    "modelo": "Mistral-7B",
+    "version": "V4",
+    "fuente": "results/ultimos_resultados/mistral7b_v4",
+    "hf_id": "mistralai/Mistral-7B-Instruct-v0.3",
+    "precision": "FP16",
+    "n_pares": 96,
+    "capas_total": 32,
+    "capas_evaluadas": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28,
+      30
+    ],
+    "capa_referencia": 30,
+    "deteccion": {
+      "auroc_chat": 0.9230685763888888,
+      "auroc_agente": 0.7740885416666667,
+      "auroc_chat_ic": [
+        0.887912326388889,
+        0.9548638237847222
+      ],
+      "auroc_agente_ic": [
+        0.7238498263888891,
+        0.824978298611111
+      ],
+      "brecha": 0.1489800347222221,
+      "brecha_ic": [
+        0.09711371527777779,
+        0.20052083333333326
+      ],
+      "brecha_p": 0.0,
+      "optimismo_chat": 0.0018446180555555802,
+      "optimismo_agente": 0.0171440972222221,
+      "coseno_entre_folds": 0.9949864036304333
+    },
+    "desplazamiento": {
+      "dp_h": 7.7519823205318685,
+      "dp_b": -0.479759773776906,
+      "interaccion": 8.231742094308775,
+      "interaccion_ic": [
+        7.212863839551809,
+        9.222133106594772
+      ],
+      "interaccion_p": 0.0001,
+      "fraccion_comun": -0.06188865685441725,
+      "pares_interaccion_positiva": 93,
+      "dp_h_ic": [
+        6.805669145159425,
+        8.68262954259881
+      ],
+      "dp_h_dz": 1.6420416035409908,
+      "dp_h_decrecen": 87,
+      "dp_h_signos_p": 3.640258907444359e-17,
+      "dp_b_ic": [
+        -1.0820282469948177,
+        0.1577823001763782
+      ],
+      "benigno_p_bilateral": 0.13132843124672544,
+      "interaccion_dz": 1.6373776751847684
+    },
+    "escala": {
+      "perdida_cruda": 0.859565597805168,
+      "perdida_estandarizada": 0.6161344914845441,
+      "d_chat": 2.230122094711503,
+      "d_agente": 0.8560669519379848,
+      "kappa": 0.3658427211601836
+    },
+    "estratos": {
+      "contextual": {
+        "n": 24,
+        "auroc_chat": 0.8819444444444444,
+        "auroc_agente": 0.673611111111111,
+        "perdida_auroc": 0.20833333333333337,
+        "d_chat": 1.6660357140560929,
+        "d_agente": 0.6230374041521286,
+        "perdida_d": 0.6260359853659464
+      },
+      "explicit": {
+        "n": 42,
+        "auroc_chat": 0.9784580498866213,
+        "auroc_agente": 0.8707482993197279,
+        "perdida_auroc": 0.10770975056689347,
+        "d_chat": 3.3641013304564957,
+        "d_agente": 1.096509188544241,
+        "perdida_d": 0.6740558381469892
+      },
+      "framed": {
+        "n": 30,
+        "auroc_chat": 0.9155555555555556,
+        "auroc_agente": 0.7077777777777778,
+        "perdida_auroc": 0.20777777777777773,
+        "d_chat": 1.9655316805997685,
+        "d_agente": 0.7225929589171519,
+        "perdida_d": 0.6323676865403371
+      }
+    },
+    "sonda_lineal": {
+      "auroc": 0.9734148199445984,
+      "sd_folds": 0.019384099924235645,
+      "ic": [
+        0.9532958951386177,
+        0.9935337447505792
+      ],
+      "permutado": 0.5058145429362881,
+      "dentro_muestra": 1.0,
+      "repeticiones": 10
+    },
+    "lineal_vs_mlp": {
+      "n_paired_folds": 5,
+      "mean_a": 0.9416509695290859,
+      "mean_b": 0.9762036011080332,
+      "difference": -0.03455263157894737,
+      "se_corrected": 0.017215931790442087,
+      "ci_lower": -0.08235172112993938,
+      "ci_upper": 0.01324645797204465,
+      "p_value": 0.11519053645350462
+    },
+    "circularidad": {
+      "dp_ingenuo": 7.829007301903888,
+      "dp_crossfit": 7.751982320531867,
+      "sesgo": 0.07702498137202163,
+      "decrecen": 87,
+      "pares": 96,
+      "signos_p": 3.640258907444359e-17
+    },
+    "monitores": {
+      "medias": {
+        "auroc": 0.8018213296398893,
+        "f1": 0.7042253521126761,
+        "fpr": 0.4375
+      },
+      "logistica": {
+        "auroc": 0.9313005540166206,
+        "f1": 0.8241758241758241,
+        "fpr": 0.11458333333333333,
+        "precision": 0.872093023255814,
+        "recall": 0.78125
+      }
+    },
+    "rotacion": {
+      "diff_means": {
+        "cosine_full_sample": 0.4451720887956162,
+        "reliability_chat": 0.9718766032433606,
+        "reliability_agent": 0.9535950149233545,
+        "ceiling": 0.9626924140001891,
+        "cosine_normalised": 0.44985460846470016,
+        "angle_deg_normalised": 63.26564383610724
+      },
+      "logistic": {
+        "cosine_full_sample": 0.15897660809028008,
+        "reliability_chat": 0.30251989169947047,
+        "reliability_agent": 0.33362807662306293,
+        "ceiling": 0.31769345225848084,
+        "cosine_normalised": 0.3690809133539548,
+        "angle_deg_normalised": 68.34105400301428
+      }
+    },
+    "seleccion": {
+      "n_seleccion": 48,
+      "n_inferencia": 48,
+      "capa": 30,
+      "bonferroni": 0.003125,
+      "dp_inferencia": 7.442020204694128,
+      "ic": [
+        6.180767653987551,
+        8.655261813648835
+      ],
+      "decrecen": 44,
+      "pares": 48,
+      "signos_p": 1.5138326148189662e-09,
+      "dz": 1.6889984654526027,
+      "interaccion_inferencia": 7.669152634921386,
+      "interaccion_inferencia_ic": [
+        6.166682468201161,
+        9.063573179791469
+      ],
+      "estabilidad_frecuencia": {
+        "30": 1.0
+      },
+      "estabilidad_frac_decrecen_media": 0.9033333333333334
+    },
+    "pca": {
+      "0": {
+        "coseno": 0.8096915483474731,
+        "varianza_pc1": 0.5299645662307739,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.03515388646227842
+      },
+      "2": {
+        "coseno": 0.17071080207824707,
+        "varianza_pc1": 0.08740928024053574,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.3110133343166783
+      },
+      "4": {
+        "coseno": 0.4801924228668213,
+        "varianza_pc1": 0.08252594619989395,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.2887716664292167
+      },
+      "6": {
+        "coseno": 0.1679227650165558,
+        "varianza_pc1": 0.0776134505867958,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.3507834880788963
+      },
+      "8": {
+        "coseno": 0.026927178725600243,
+        "varianza_pc1": 0.11031034588813782,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.4611025933744133
+      },
+      "10": {
+        "coseno": 0.026962947100400925,
+        "varianza_pc1": 0.11981760710477829,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.509448797019687
+      },
+      "12": {
+        "coseno": 0.4834517240524292,
+        "varianza_pc1": 0.1452823132276535,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.5065760043205675
+      },
+      "14": {
+        "coseno": 0.920319676399231,
+        "varianza_pc1": 0.21354065835475922,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.54679401865956
+      },
+      "16": {
+        "coseno": 0.9459520578384399,
+        "varianza_pc1": 0.24382372200489044,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5823139832945469
+      },
+      "18": {
+        "coseno": 0.9723802208900452,
+        "varianza_pc1": 0.29199671745300293,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5904257519649875
+      },
+      "20": {
+        "coseno": 0.9768162369728088,
+        "varianza_pc1": 0.3196064829826355,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.586254679452142
+      },
+      "22": {
+        "coseno": 0.9783892035484314,
+        "varianza_pc1": 0.3216972053050995,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5856201135925874
+      },
+      "24": {
+        "coseno": 0.9761698246002197,
+        "varianza_pc1": 0.32912716269493103,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5761137879663576
+      },
+      "26": {
+        "coseno": 0.970818042755127,
+        "varianza_pc1": 0.3112388253211975,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5728688684722654
+      },
+      "28": {
+        "coseno": 0.9668838381767273,
+        "varianza_pc1": 0.3055993318557739,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5692815942331166
+      },
+      "30": {
+        "coseno": 0.9511474967002869,
+        "varianza_pc1": 0.27964866161346436,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5659472986976998
+      }
+    },
+    "factorial_referencia": {
+      "harmful": {
+        "system": {
+          "delta": 6.097372384741902,
+          "ic": [
+            5.408271300202856,
+            6.798003087410082
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 6.120358440404138,
+          "ic": [
+            5.2663069885456935,
+            7.026587134211635
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 7.829007199344536,
+          "ic": [
+            6.897374781042648,
+            8.766778469318524
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -4.388723550985257,
+          "ic": [
+            -5.341234592410426,
+            -3.4554253152882066
+          ],
+          "p": 0.0002
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 4.697965178638697,
+          "ic": [
+            3.819145183451474,
+            5.60297250530372
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 5.7415430676192045,
+          "ic": [
+            4.766886508278549,
+            6.757035039442901
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 8.395861357450485,
+          "ic": [
+            7.414649135867754,
+            9.40134143391624
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -2.0436468596259747,
+          "ic": [
+            -3.1849762170885993,
+            -0.9231485879048708
+          ],
+          "p": 0.0002
+        }
+      }
+    },
+    "por_capa": {
+      "0": {
+        "dp_h": -0.049237822709333634,
+        "dp_b": -0.05495621966396666,
+        "interaccion": 0.005718396954633026,
+        "auroc_chat": 0.5977647569444444,
+        "auroc_agente": 0.5150824652777778,
+        "coseno_medias": 0.8721976904352642,
+        "coseno_logistica": 0.6772276822365308,
+        "factorial_sistema": 0.002293662323306004,
+        "factorial_herramientas": 0.006277784239500761,
+        "factorial_total": 0.006370181683450937
+      },
+      "2": {
+        "dp_h": -0.016948103571445553,
+        "dp_b": -0.023258841523765433,
+        "interaccion": 0.0063107379523198795,
+        "auroc_chat": 0.7466362847222222,
+        "auroc_agente": 0.7332899305555557,
+        "coseno_medias": 0.8353950664685346,
+        "coseno_logistica": 0.6937969615370402,
+        "factorial_sistema": 0.004013287980342284,
+        "factorial_herramientas": 0.00783759547630325,
+        "factorial_total": 0.009191432502120733
+      },
+      "4": {
+        "dp_h": -0.016713591301991505,
+        "dp_b": -0.036593824865635595,
+        "interaccion": 0.01988023356364409,
+        "auroc_chat": 0.7248263888888891,
+        "auroc_agente": 0.7000868055555555,
+        "coseno_medias": 0.8032457578827717,
+        "coseno_logistica": 0.6923287086160426,
+        "factorial_sistema": 0.011638894386123866,
+        "factorial_herramientas": 0.023634568050814167,
+        "factorial_total": 0.02592225600286232
+      },
+      "6": {
+        "dp_h": 0.08527918067421236,
+        "dp_b": 0.04635889928262435,
+        "interaccion": 0.03892028139158801,
+        "auroc_chat": 0.7944878472222223,
+        "auroc_agente": 0.7534722222222222,
+        "coseno_medias": 0.7599454700910583,
+        "coseno_logistica": 0.6096830986459696,
+        "factorial_sistema": 0.022373600455466654,
+        "factorial_herramientas": 0.04183659446425736,
+        "factorial_total": 0.048580258036963635
+      },
+      "8": {
+        "dp_h": -0.004065890673167444,
+        "dp_b": -0.09884796825227553,
+        "interaccion": 0.09478207757910809,
+        "auroc_chat": 0.8696831597222222,
+        "auroc_agente": 0.8569878472222222,
+        "coseno_medias": 0.7711809781790868,
+        "coseno_logistica": 0.6137450203774029,
+        "factorial_sistema": 0.05593126663006842,
+        "factorial_herramientas": 0.08475925216528897,
+        "factorial_total": 0.10624162408445652
+      },
+      "10": {
+        "dp_h": -0.05562125223306231,
+        "dp_b": -0.19220089508962457,
+        "interaccion": 0.13657964285656227,
+        "auroc_chat": 0.9134114583333333,
+        "auroc_agente": 0.8876953125,
+        "coseno_medias": 0.7325470026028087,
+        "coseno_logistica": 0.5232894301416611,
+        "factorial_sistema": 0.09831201552879065,
+        "factorial_herramientas": 0.1031901572132483,
+        "factorial_total": 0.150384345499333
+      },
+      "12": {
+        "dp_h": 0.18137816979508345,
+        "dp_b": -0.19812510718530127,
+        "interaccion": 0.3795032769803847,
+        "auroc_chat": 0.9403211805555556,
+        "auroc_agente": 0.8875868055555555,
+        "coseno_medias": 0.7199876143276265,
+        "coseno_logistica": 0.4463154125441743,
+        "factorial_sistema": 0.2527632833613704,
+        "factorial_herramientas": 0.28498699228900176,
+        "factorial_total": 0.3960360129907106
+      },
+      "14": {
+        "dp_h": 0.961798419106338,
+        "dp_b": 0.04423713346600955,
+        "interaccion": 0.9175612856403285,
+        "auroc_chat": 0.9450954861111112,
+        "auroc_agente": 0.8587239583333335,
+        "coseno_medias": 0.6889528534975538,
+        "coseno_logistica": 0.3771952529123058,
+        "factorial_sistema": 0.6019041228573769,
+        "factorial_herramientas": 0.654236368291701,
+        "factorial_total": 0.9358980569134777
+      },
+      "16": {
+        "dp_h": 1.8573017989733014,
+        "dp_b": 0.13094005422783994,
+        "interaccion": 1.7263617447454616,
+        "auroc_chat": 0.939670138888889,
+        "auroc_agente": 0.8636067708333334,
+        "coseno_medias": 0.6745849301379759,
+        "coseno_logistica": 0.28045736102198204,
+        "factorial_sistema": 1.0772847055147092,
+        "factorial_herramientas": 1.1664880756288767,
+        "factorial_total": 1.7600882851208248
+      },
+      "18": {
+        "dp_h": 2.7617091208138405,
+        "dp_b": -0.030462192568362623,
+        "interaccion": 2.792171313382203,
+        "auroc_chat": 0.9376085069444444,
+        "auroc_agente": 0.8294270833333333,
+        "coseno_medias": 0.5963865024479363,
+        "coseno_logistica": 0.2398052750185174,
+        "factorial_sistema": 1.7764051674554744,
+        "factorial_herramientas": 1.827376327322175,
+        "factorial_total": 2.837094630114734
+      },
+      "20": {
+        "dp_h": 3.86227993633223,
+        "dp_b": 0.21692391883798826,
+        "interaccion": 3.6453560174942417,
+        "auroc_chat": 0.9338107638888888,
+        "auroc_agente": 0.8104383680555556,
+        "coseno_medias": 0.5896704952261886,
+        "coseno_logistica": 0.17422400644258357,
+        "factorial_sistema": 2.189196651491026,
+        "factorial_herramientas": 2.2737877825275064,
+        "factorial_total": 3.70222856849432
+      },
+      "22": {
+        "dp_h": 4.277092363254263,
+        "dp_b": 0.08594014161386386,
+        "interaccion": 4.191152221640399,
+        "auroc_chat": 0.9322916666666667,
+        "auroc_agente": 0.7993706597222221,
+        "coseno_medias": 0.5580695518120942,
+        "coseno_logistica": 0.16128298792000556,
+        "factorial_sistema": 2.390974146934847,
+        "factorial_herramientas": 2.6868940802911916,
+        "factorial_total": 4.255768350946407
+      },
+      "24": {
+        "dp_h": 5.031536455383002,
+        "dp_b": 0.027851134228273604,
+        "interaccion": 5.0036853211547285,
+        "auroc_chat": 0.9290364583333334,
+        "auroc_agente": 0.7994791666666666,
+        "coseno_medias": 0.5428439247778352,
+        "coseno_logistica": 0.14857554534369238,
+        "factorial_sistema": 2.9211457489679256,
+        "factorial_herramientas": 3.2450763067851467,
+        "factorial_total": 5.079536321262519
+      },
+      "26": {
+        "dp_h": 5.528790575376742,
+        "dp_b": -0.10611758001028866,
+        "interaccion": 5.634908155387031,
+        "auroc_chat": 0.9263237847222223,
+        "auroc_agente": 0.780490451388889,
+        "coseno_medias": 0.5120439647583075,
+        "coseno_logistica": 0.14308826949807224,
+        "factorial_sistema": 3.258619103580713,
+        "factorial_herramientas": 3.6694926706453166,
+        "factorial_total": 5.729501828551292
+      },
+      "28": {
+        "dp_h": 7.052459113610213,
+        "dp_b": 0.14145341500494701,
+        "interaccion": 6.9110056986052655,
+        "auroc_chat": 0.9259982638888887,
+        "auroc_agente": 0.7659505208333334,
+        "coseno_medias": 0.47863747870720763,
+        "coseno_logistica": 0.1332018583795067,
+        "factorial_sistema": 4.051831637819608,
+        "factorial_herramientas": 4.5905838304509725,
+        "factorial_total": 7.031946601967016
+      },
+      "30": {
+        "dp_h": 7.7519823205318685,
+        "dp_b": -0.479759773776906,
+        "interaccion": 8.231742094308775,
+        "auroc_chat": 0.9230685763888888,
+        "auroc_agente": 0.7740885416666667,
+        "coseno_medias": 0.4451720887956162,
+        "coseno_logistica": 0.15897660809028008,
+        "factorial_sistema": 4.697965178638697,
+        "factorial_herramientas": 5.7415430676192045,
+        "factorial_total": 8.395861357450485
+      }
+    },
+    "archivos_sha256": {
+      "agent_direction_results.json": "39939f3715025291a4af3f446f4adf58c3168fa6d37907d93ce2401f483a72e3",
+      "causal_results.json": "5b2357ab8c85cb8d733d383e299e4cffc006cb6d0e16e3cf54e601fa894097db",
+      "factorial_results.json": "fc02e0e3b62aa967ae0313403c853598d5eb8caa8723897cbb96f98a862ad782",
+      "format_effect_results.json": "37d94e09595ffe99745254e6603c68f56f5323ba294b2d9c678aa9801f2c211b",
+      "results.json": "89ff653d1322d85376ac6fc9e7d4c56843b1ab251c04d09fb78552a4db4c2e1e",
+      "robust_results.json": "6d8878f303f933b0a49c25d35d88f1e158b5fd79bb900a81ae35c441850b988b",
+      "stratified_results.json": "483cae74dd52d58e39f4290f840e0b9c4c93e1007d29c6d6cc0ca2d796c08bf2"
+    },
+    "conducta": {
+      "rechazo": {
+        "chat_harmful": [
+          47,
+          96,
+          0.3919286123125563,
+          0.5880396291011453
+        ],
+        "agent_harmful": [
+          9,
+          96,
+          0.050108108212146014,
+          0.1686533069222155
+        ],
+        "chat_benign": [
+          2,
+          96,
+          0.005731969852430421,
+          0.07280713517784211
+        ],
+        "agent_benign": [
+          0,
+          96,
+          3.469446951953614e-18,
+          0.038475587857675686
+        ]
+      },
+      "degeneradas": {
+        "chat_harmful": 0,
+        "agent_harmful": 0,
+        "chat_benign": 0,
+        "agent_benign": 0
+      },
+      "llamadas_herramienta": {
+        "chat_harmful": [
+          0,
+          96
+        ],
+        "agent_harmful": [
+          71,
+          96
+        ],
+        "chat_benign": [
+          0,
+          96
+        ],
+        "agent_benign": [
+          88,
+          96
+        ]
+      },
+      "brecha_danino": {
+        "n_pairs": 96,
+        "refuse_chat_comply_agent": 42,
+        "comply_chat_refuse_agent": 4,
+        "refuse_both": 5,
+        "comply_both": 45,
+        "mcnemar_p": 5.100190492157708e-09
+      },
+      "brecha_benigno": {
+        "n_pairs": 96,
+        "refuse_chat_comply_agent": 2,
+        "comply_chat_refuse_agent": 0,
+        "refuse_both": 0,
+        "comply_both": 94,
+        "mcnemar_p": 0.5
+      },
+      "proyeccion_vs_rechazo": {
+        "chat_harmful": {
+          "n_refuse": 47,
+          "n_comply": 49,
+          "mean_projection_refuse": 9.283611419353079,
+          "mean_projection_comply": 2.6230900950577793,
+          "auroc_projection_predicts_refusal": 0.8844984802431611
+        },
+        "agent_harmful": {
+          "n_refuse": 9,
+          "n_comply": 87,
+          "mean_projection_refuse": 3.328969611061944,
+          "mean_projection_comply": -2.4905151103077263,
+          "auroc_projection_predicts_refusal": 0.9757343550446999
+        },
+        "pooled_harmful": {
+          "n_refuse": 56,
+          "n_comply": 136,
+          "mean_projection_refuse": 8.326615414449147,
+          "mean_projection_comply": -0.6481132348451544,
+          "auroc_projection_predicts_refusal": 0.9342174369747899
+        },
+        "projection_drop_flipped_vs_held": {
+          "n_flipped": 42,
+          "n_held": 5,
+          "mean_drop_flipped": 11.30217147760448,
+          "mean_drop_held": 5.452174282073974,
+          "mannwhitney_p": 1.5645993745514002e-05
+        }
+      }
+    },
+    "causal": {
+      "30": {
+        "unidad": 7.829007148742676,
+        "dosis": {
+          "0.5": {
+            "alpha": 3.914503574371338,
+            "desplazamiento": 3.914536277710021,
+            "restaura": [
+              2,
+              87,
+              0.006327085105926007,
+              0.0799931801396141,
+              0
+            ],
+            "control": [
+              0,
+              87,
+              0.0,
+              0.04228750694412034,
+              0
+            ],
+            "benigno": [
+              1,
+              96,
+              0.0018411702168162486,
+              0.056666176227157854,
+              0
+            ],
+            "mcnemar_p": 0.5
+          },
+          "1": {
+            "alpha": 7.829007148742676,
+            "desplazamiento": 7.829105123877525,
+            "restaura": [
+              6,
+              87,
+              0.031988839442576765,
+              0.14239694240580283,
+              0
+            ],
+            "control": [
+              1,
+              87,
+              0.0020319077375923027,
+              0.06227197835723791,
+              0
+            ],
+            "benigno": [
+              1,
+              96,
+              0.0018411702168162486,
+              0.056666176227157854,
+              0
+            ],
+            "mcnemar_p": 0.0625
+          },
+          "2": {
+            "alpha": 15.658014297485352,
+            "desplazamiento": 15.658221512176524,
+            "restaura": [
+              22,
+              87,
+              0.17333211159075584,
+              0.3533157366689819,
+              0
+            ],
+            "control": [
+              4,
+              87,
+              0.018022688467086906,
+              0.11233033507987294,
+              0
+            ],
+            "benigno": [
+              1,
+              96,
+              0.0018411702168162486,
+              0.056666176227157854,
+              0
+            ],
+            "mcnemar_p": 7.62939453125e-06
+          },
+          "4": {
+            "alpha": 31.316028594970703,
+            "desplazamiento": 31.316364840700707,
+            "restaura": [
+              18,
+              87,
+              0.13507359604160085,
+              0.30350873561529723,
+              11
+            ],
+            "control": [
+              6,
+              87,
+              0.031988839442576765,
+              0.14239694240580283,
+              0
+            ],
+            "benigno": [
+              6,
+              96,
+              0.028956674311051346,
+              0.12970946506441489,
+              4
+            ],
+            "mcnemar_p": 0.0018310546875
+          }
+        }
+      }
+    }
+  },
+  "qwen8b": {
+    "modelo": "Qwen3-8B",
+    "version": "V3",
+    "fuente": "results/ultimos_resultados/qwen_8B_v3",
+    "hf_id": "Qwen/Qwen3-8B",
+    "precision": "FP16",
+    "n_pares": 96,
+    "capas_total": 36,
+    "capas_evaluadas": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28,
+      30,
+      32,
+      34
+    ],
+    "capa_referencia": 32,
+    "deteccion": {
+      "auroc_chat": 0.919921875,
+      "auroc_agente": 0.7692057291666666,
+      "auroc_chat_ic": [
+        0.884765625,
+        0.9532362196180555
+      ],
+      "auroc_agente_ic": [
+        0.7174479166666667,
+        0.8220513237847223
+      ],
+      "brecha": 0.15071614583333337,
+      "brecha_ic": [
+        0.10698784722222221,
+        0.1968315972222221
+      ],
+      "brecha_p": 0.0,
+      "optimismo_chat": 0.006293402777777679,
+      "optimismo_agente": 0.02213541666666663,
+      "coseno_entre_folds": 0.9934853221589378
+    },
+    "desplazamiento": {
+      "dp_h": 176.39772792147642,
+      "dp_b": -1.458519182872334,
+      "interaccion": 177.85624710434874,
+      "interaccion_ic": [
+        159.57317210407084,
+        196.0515798636759
+      ],
+      "interaccion_p": 0.0001,
+      "fraccion_comun": -0.008268355834614802,
+      "pares_interaccion_positiva": 95,
+      "dp_h_ic": [
+        159.71966395883422,
+        192.2953154986799
+      ],
+      "dp_h_dz": 2.1740086341053297,
+      "dp_h_decrecen": 92,
+      "dp_h_signos_p": 8.758241741061071e-23,
+      "dp_b_ic": [
+        -18.29797550258518,
+        15.671787483993858
+      ],
+      "benigno_p_bilateral": 0.8663266654413182,
+      "interaccion_dz": 1.9276408672452205
+    },
+    "escala": {
+      "perdida_cruda": 0.8603667203861293,
+      "perdida_estandarizada": 0.5023546731660719,
+      "d_chat": 2.1794601174299424,
+      "d_agente": 1.0845981424599351,
+      "kappa": 0.28058794503754775
+    },
+    "estratos": {
+      "contextual": {
+        "n": 24,
+        "auroc_chat": 0.9097222222222222,
+        "auroc_agente": 0.7586805555555555,
+        "perdida_auroc": 0.15104166666666674,
+        "d_chat": 1.9517633835819281,
+        "d_agente": 0.9525976590190455,
+        "perdida_d": 0.5119297415699986
+      },
+      "explicit": {
+        "n": 42,
+        "auroc_chat": 0.9824263038548753,
+        "auroc_agente": 0.8531746031746033,
+        "perdida_auroc": 0.12925170068027203,
+        "d_chat": 3.340249783018553,
+        "d_agente": 1.545995553184051,
+        "perdida_d": 0.5371616934027763
+      },
+      "framed": {
+        "n": 30,
+        "auroc_chat": 0.8744444444444445,
+        "auroc_agente": 0.7311111111111112,
+        "perdida_auroc": 0.1433333333333333,
+        "d_chat": 1.7369906765785241,
+        "d_agente": 0.8752863521357065,
+        "perdida_d": 0.4960903567658629
+      }
+    },
+    "sonda_lineal": {
+      "auroc": 0.9582710526315789,
+      "sd_folds": 0.029641361992149805,
+      "ic": [
+        0.9275060268941028,
+        0.9890360783690549
+      ],
+      "permutado": 0.4650318559556787,
+      "dentro_muestra": 1.0,
+      "repeticiones": 10
+    },
+    "lineal_vs_mlp": {
+      "n_paired_folds": 5,
+      "mean_a": 0.9445969529085871,
+      "mean_b": 0.9409487534626038,
+      "difference": 0.003648199445983402,
+      "se_corrected": 0.02148571964312494,
+      "ci_lower": -0.05600572168882292,
+      "ci_upper": 0.06330212058078973,
+      "p_value": 0.8734118020996258
+    },
+    "circularidad": {
+      "dp_ingenuo": 179.29966209616887,
+      "dp_crossfit": 176.3977279214764,
+      "sesgo": 2.901934174692485,
+      "decrecen": 92,
+      "pares": 96,
+      "signos_p": 8.758241741061071e-23
+    },
+    "monitores": {
+      "medias": {
+        "auroc": 0.8851952908587257,
+        "f1": 0.7868852459016394,
+        "fpr": 0.15625
+      },
+      "logistica": {
+        "auroc": 0.9368005540166205,
+        "f1": 0.839779005524862,
+        "fpr": 0.09375,
+        "precision": 0.8941176470588236,
+        "recall": 0.7916666666666666
+      }
+    },
+    "rotacion": {
+      "diff_means": {
+        "cosine_full_sample": 0.23490427094792515,
+        "reliability_chat": 0.961900632795892,
+        "reliability_agent": 0.9394609331382361,
+        "ceiling": 0.9506145728278567,
+        "cosine_normalised": 0.23952126476536711,
+        "angle_deg_normalised": 76.1417132464439
+      },
+      "logistic": {
+        "cosine_full_sample": 0.09229963174415098,
+        "reliability_chat": 0.23959135067911963,
+        "reliability_agent": 0.30451050352680636,
+        "ceiling": 0.27010753939119575,
+        "cosine_normalised": 0.16366494880002738,
+        "angle_deg_normalised": 80.58031258869893
+      }
+    },
+    "seleccion": {
+      "n_seleccion": 48,
+      "n_inferencia": 48,
+      "capa": 32,
+      "bonferroni": 0.002777777777777778,
+      "dp_inferencia": 172.56565064919096,
+      "ic": [
+        151.21231728206004,
+        192.18426190018758
+      ],
+      "decrecen": 46,
+      "pares": 48,
+      "signos_p": 8.363087999896379e-12,
+      "dz": 2.35725770344674,
+      "interaccion_inferencia": 172.84890602229413,
+      "interaccion_inferencia_ic": [
+        145.14743675037232,
+        199.47120213628543
+      ],
+      "estabilidad_frecuencia": {
+        "32": 1.0
+      },
+      "estabilidad_frac_decrecen_media": 0.9572916666666665
+    },
+    "pca": {
+      "0": {
+        "coseno": 0.2107158601284027,
+        "varianza_pc1": 0.19758272171020508,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.13445794467481198
+      },
+      "2": {
+        "coseno": 0.356065034866333,
+        "varianza_pc1": 0.08942452818155289,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.1733112615540597
+      },
+      "4": {
+        "coseno": 0.04825153201818466,
+        "varianza_pc1": 0.14587219059467316,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.29040421231267466
+      },
+      "6": {
+        "coseno": 0.08414880931377411,
+        "varianza_pc1": 0.14041531085968018,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.20598686237624403
+      },
+      "8": {
+        "coseno": 0.11555082350969315,
+        "varianza_pc1": 0.13033117353916168,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.25919155226053403
+      },
+      "10": {
+        "coseno": 0.229829803109169,
+        "varianza_pc1": 0.1365116685628891,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.338934620605484
+      },
+      "12": {
+        "coseno": 0.19241294264793396,
+        "varianza_pc1": 0.13060417771339417,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.42837977958643125
+      },
+      "14": {
+        "coseno": 0.9328655004501343,
+        "varianza_pc1": 0.14327532052993774,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.4270543084402646
+      },
+      "16": {
+        "coseno": 0.9808362126350403,
+        "varianza_pc1": 0.26478856801986694,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.4707348384026858
+      },
+      "18": {
+        "coseno": 0.9853650331497192,
+        "varianza_pc1": 0.2995714843273163,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5719760815547223
+      },
+      "20": {
+        "coseno": 0.9867461919784546,
+        "varianza_pc1": 0.3032758831977844,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6083460766977011
+      },
+      "22": {
+        "coseno": 0.9775359630584717,
+        "varianza_pc1": 0.308195024728775,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.58174004050639
+      },
+      "24": {
+        "coseno": 0.970423698425293,
+        "varianza_pc1": 0.2907804250717163,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5634638284984609
+      },
+      "26": {
+        "coseno": 0.9737906455993652,
+        "varianza_pc1": 0.2884557843208313,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5706194030096501
+      },
+      "28": {
+        "coseno": 0.9709502458572388,
+        "varianza_pc1": 0.2619808316230774,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5708941072509826
+      },
+      "30": {
+        "coseno": 0.9687290191650391,
+        "varianza_pc1": 0.28795212507247925,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5506908514576255
+      },
+      "32": {
+        "coseno": 0.9682420492172241,
+        "varianza_pc1": 0.2637968957424164,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5602871742047971
+      },
+      "34": {
+        "coseno": 0.9765044450759888,
+        "varianza_pc1": 0.2604182958602905,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5604678850814823
+      }
+    },
+    "factorial_referencia": {
+      "harmful": {
+        "system": {
+          "delta": 70.79089843233426,
+          "ic": [
+            59.77553831239542,
+            81.42731179483235
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 181.49990183115005,
+          "ic": [
+            165.13907778660456,
+            197.23034654532867
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 179.29966129859287,
+          "ic": [
+            162.88695042828718,
+            195.21230289513866
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -72.99113917350769,
+          "ic": [
+            -83.29519799351692,
+            -62.12742587129276
+          ],
+          "p": 0.0002
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 106.09185296297073,
+          "ic": [
+            91.03015036334595,
+            121.32031277914841
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 176.27979914347333,
+          "ic": [
+            158.22513408660888,
+            194.52648905316988
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 182.52054357528687,
+          "ic": [
+            164.279043563207,
+            201.21994985739389
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -99.85110918680829,
+          "ic": [
+            -115.17643474539122,
+            -85.06720952788989
+          ],
+          "p": 0.0002
+        }
+      }
+    },
+    "por_capa": {
+      "0": {
+        "dp_h": -0.23843855788059778,
+        "dp_b": -0.2745891235432589,
+        "interaccion": 0.03615056566266109,
+        "auroc_chat": 0.5575086805555555,
+        "auroc_agente": 0.5379774305555555,
+        "coseno_medias": 0.8262864593008774,
+        "coseno_logistica": 0.6364499475219361,
+        "factorial_sistema": 0.013468543067574501,
+        "factorial_herramientas": 0.043300359199444444,
+        "factorial_total": 0.04427417057255906
+      },
+      "2": {
+        "dp_h": 0.08004512018956862,
+        "dp_b": 0.010596585508228729,
+        "interaccion": 0.0694485346813399,
+        "auroc_chat": 0.5465494791666667,
+        "auroc_agente": 0.5329861111111112,
+        "coseno_medias": 0.6880128391079758,
+        "coseno_logistica": 0.5579447293822539,
+        "factorial_sistema": 0.028614426497370005,
+        "factorial_herramientas": 0.10334707819856703,
+        "factorial_total": 0.10507555197303495
+      },
+      "4": {
+        "dp_h": 0.2300054633469185,
+        "dp_b": 0.06319694904661811,
+        "interaccion": 0.16680851430030036,
+        "auroc_chat": 0.6372612847222223,
+        "auroc_agente": 0.6022135416666666,
+        "coseno_medias": 0.6714620116330183,
+        "coseno_logistica": 0.513374393780898,
+        "factorial_sistema": 0.05255902682741481,
+        "factorial_herramientas": 0.24500646317998567,
+        "factorial_total": 0.24018053337931633
+      },
+      "6": {
+        "dp_h": 0.9083901801800455,
+        "dp_b": 0.6259189981949181,
+        "interaccion": 0.28247118198512733,
+        "auroc_chat": 0.5843098958333333,
+        "auroc_agente": 0.5631510416666666,
+        "coseno_medias": 0.6662945295842708,
+        "coseno_logistica": 0.4714367877817087,
+        "factorial_sistema": 0.10463741918404901,
+        "factorial_herramientas": 0.38600056370099384,
+        "factorial_total": 0.37835962076981855
+      },
+      "8": {
+        "dp_h": 0.8733593576188982,
+        "dp_b": 0.16173854814981012,
+        "interaccion": 0.711620809469088,
+        "auroc_chat": 0.7029079861111112,
+        "auroc_agente": 0.6221788194444444,
+        "coseno_medias": 0.6237837116255451,
+        "coseno_logistica": 0.47375138043979537,
+        "factorial_sistema": 0.292859108497699,
+        "factorial_herramientas": 0.8383939682195585,
+        "factorial_total": 0.8368117138743401
+      },
+      "10": {
+        "dp_h": 1.6439056317736356,
+        "dp_b": -0.29142957049169077,
+        "interaccion": 1.9353352022653263,
+        "auroc_chat": 0.8011067708333334,
+        "auroc_agente": 0.652126736111111,
+        "coseno_medias": 0.5649232671350183,
+        "coseno_logistica": 0.3878101864242356,
+        "factorial_sistema": 1.067357080678145,
+        "factorial_herramientas": 2.0664660843710103,
+        "factorial_total": 2.0767633207142353
+      },
+      "12": {
+        "dp_h": 3.5226128059737456,
+        "dp_b": 0.35019829545150555,
+        "interaccion": 3.17241451052224,
+        "auroc_chat": 0.8645833333333333,
+        "auroc_agente": 0.8089192708333334,
+        "coseno_medias": 0.6558542547258902,
+        "coseno_logistica": 0.4268390664981272,
+        "factorial_sistema": 1.46023499344786,
+        "factorial_herramientas": 3.2931489013135433,
+        "factorial_total": 3.337445316836238
+      },
+      "14": {
+        "dp_h": 2.9260792752054527,
+        "dp_b": -2.3608892991349024,
+        "interaccion": 5.286968574340355,
+        "auroc_chat": 0.8894314236111112,
+        "auroc_agente": 0.8624131944444444,
+        "coseno_medias": 0.6572121620049812,
+        "coseno_logistica": 0.3709787627649208,
+        "factorial_sistema": 2.7067767903208733,
+        "factorial_herramientas": 5.332186184823513,
+        "factorial_total": 5.433022127797207
+      },
+      "16": {
+        "dp_h": 10.051440933825162,
+        "dp_b": -1.841743146985148,
+        "interaccion": 11.893184080810311,
+        "auroc_chat": 0.9039713541666666,
+        "auroc_agente": 0.889865451388889,
+        "coseno_medias": 0.5865342918261496,
+        "coseno_logistica": 0.2718284078118983,
+        "factorial_sistema": 5.551439773291349,
+        "factorial_herramientas": 11.74191997324427,
+        "factorial_total": 12.051393162459135
+      },
+      "18": {
+        "dp_h": 18.43953688110203,
+        "dp_b": 0.9838130756866602,
+        "interaccion": 17.455723805415367,
+        "auroc_chat": 0.9281684027777778,
+        "auroc_agente": 0.9148220486111112,
+        "coseno_medias": 0.576289358671497,
+        "coseno_logistica": 0.19551656985659518,
+        "factorial_sistema": 6.423379547894001,
+        "factorial_herramientas": 16.889538312330842,
+        "factorial_total": 17.689613479500014
+      },
+      "20": {
+        "dp_h": 29.39608580028963,
+        "dp_b": 6.512406316255323,
+        "interaccion": 22.883679484034307,
+        "auroc_chat": 0.9402126736111112,
+        "auroc_agente": 0.8946397569444444,
+        "coseno_medias": 0.5205955013974722,
+        "coseno_logistica": 0.15532767183617058,
+        "factorial_sistema": 3.7556493785232314,
+        "factorial_herramientas": 21.42286885716021,
+        "factorial_total": 23.322704714412488
+      },
+      "22": {
+        "dp_h": 38.28356981709903,
+        "dp_b": 10.322796889038598,
+        "interaccion": 27.96077292806043,
+        "auroc_chat": 0.933810763888889,
+        "auroc_agente": 0.8819444444444444,
+        "coseno_medias": 0.49628206155416155,
+        "coseno_logistica": 0.12283689591864574,
+        "factorial_sistema": 5.48316633204619,
+        "factorial_herramientas": 26.19678130249182,
+        "factorial_total": 28.536299164096512
+      },
+      "24": {
+        "dp_h": 50.74417416689792,
+        "dp_b": 10.548193795835681,
+        "interaccion": 40.19598037106224,
+        "auroc_chat": 0.9277343749999999,
+        "auroc_agente": 0.8652343750000001,
+        "coseno_medias": 0.41039125849982233,
+        "coseno_logistica": 0.06907045970188021,
+        "factorial_sistema": 10.591160530845324,
+        "factorial_herramientas": 38.680892507235214,
+        "factorial_total": 41.063504556814834
+      },
+      "26": {
+        "dp_h": 75.48611985988315,
+        "dp_b": 12.939307583792939,
+        "interaccion": 62.54681227609021,
+        "auroc_chat": 0.9251302083333334,
+        "auroc_agente": 0.8481987847222222,
+        "coseno_medias": 0.3512742314797576,
+        "coseno_logistica": 0.06070047659585394,
+        "factorial_sistema": 22.33133212228616,
+        "factorial_herramientas": 61.420032143592834,
+        "factorial_total": 63.87185072898865
+      },
+      "28": {
+        "dp_h": 103.83289419313805,
+        "dp_b": 24.310629215117284,
+        "interaccion": 79.52226497802076,
+        "auroc_chat": 0.9229600694444445,
+        "auroc_agente": 0.8299696180555556,
+        "coseno_medias": 0.319382214773138,
+        "coseno_logistica": 0.06865750049304052,
+        "factorial_sistema": 29.13926493128141,
+        "factorial_herramientas": 78.10181287924449,
+        "factorial_total": 81.49574967225392
+      },
+      "30": {
+        "dp_h": 145.24877709558643,
+        "dp_b": 24.073457832346406,
+        "interaccion": 121.17531926324003,
+        "auroc_chat": 0.9178602430555555,
+        "auroc_agente": 0.7976345486111112,
+        "coseno_medias": 0.3094171516199979,
+        "coseno_logistica": 0.031170433651390606,
+        "factorial_sistema": 66.46283791462581,
+        "factorial_herramientas": 118.11307295163472,
+        "factorial_total": 124.05687093734743
+      },
+      "32": {
+        "dp_h": 176.39772792147642,
+        "dp_b": -1.458519182872334,
+        "interaccion": 177.85624710434874,
+        "auroc_chat": 0.919921875,
+        "auroc_agente": 0.7692057291666666,
+        "coseno_medias": 0.23490427094792515,
+        "coseno_logistica": 0.09229963174415098,
+        "factorial_sistema": 106.09185296297073,
+        "factorial_herramientas": 176.27979914347333,
+        "factorial_total": 182.52054357528687
+      },
+      "34": {
+        "dp_h": 162.96572654928593,
+        "dp_b": -98.8164809116887,
+        "interaccion": 261.78220746097463,
+        "auroc_chat": 0.919162326388889,
+        "auroc_agente": 0.7263454861111112,
+        "coseno_medias": 0.25227222773305674,
+        "coseno_logistica": 0.10279782439178844,
+        "factorial_sistema": 174.64189247290295,
+        "factorial_herramientas": 261.8201110760371,
+        "factorial_total": 268.52119926611584
+      }
+    },
+    "archivos_sha256": {
+      "agent_direction_results.json": "9df6a3dcf052c8f6f36abec98f375d8e437c0d7112bfa1a536ca11cb1c6eff67",
+      "factorial_results.json": "c04c2637309821aff68a06de353bbd1e21ddcc8382a69a66135e71cbce427041",
+      "format_effect_results.json": "796b7c1bf9dff521e084e1d0d66f902e2a8cd5f66121899f8dc9dcd437e0d999",
+      "results.json": "1615b6b5134911838ed4eb74ed9a2755630b73f4741d5b1e6e764b63ffd3a9b0",
+      "robust_results.json": "eb275d5a9d2ebb8617f5a152dfd74df92f020fd1fec37ed6802e1720ddffbcf9",
+      "stratified_results.json": "e910057987871b63521c29454ba6a82e155924250896e182e85de48b9006c9e6"
+    }
+  },
+  "qwen32b": {
+    "modelo": "Qwen3-32B",
+    "version": "V3",
+    "fuente": "results/ultimos_resultados/qwen32B_v3",
+    "hf_id": "Qwen/Qwen3-32B",
+    "precision": "FP16",
+    "n_pares": 96,
+    "capas_total": 64,
+    "capas_evaluadas": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28,
+      30,
+      32,
+      34,
+      36,
+      38,
+      40,
+      42,
+      44,
+      46,
+      48,
+      50,
+      52,
+      54,
+      56,
+      58,
+      60,
+      62
+    ],
+    "capa_referencia": 62,
+    "deteccion": {
+      "auroc_chat": 0.9483506944444444,
+      "auroc_agente": 0.8690321180555556,
+      "auroc_chat_ic": [
+        0.917209201388889,
+        0.9746093749999999
+      ],
+      "auroc_agente_ic": [
+        0.8238905164930556,
+        0.9112413194444445
+      ],
+      "brecha": 0.07931857638888884,
+      "brecha_ic": [
+        0.03776041666666674,
+        0.12315538194444431
+      ],
+      "brecha_p": 0.0002,
+      "optimismo_chat": 0.004014756944444531,
+      "optimismo_agente": 0.00629340277777779,
+      "coseno_entre_folds": 0.9884408064394377
+    },
+    "desplazamiento": {
+      "dp_h": 397.39301534269015,
+      "dp_b": -5.737967204205784,
+      "interaccion": 403.13098254689595,
+      "interaccion_ic": [
+        365.35750362544496,
+        439.94380423614246
+      ],
+      "interaccion_p": 0.0001,
+      "fraccion_comun": -0.014439023794259879,
+      "pares_interaccion_positiva": 93,
+      "dp_h_ic": [
+        362.6339855514573,
+        429.74484019527046
+      ],
+      "dp_h_dz": 2.36256283222219,
+      "dp_h_decrecen": 93,
+      "dp_h_signos_p": 3.7243574839549574e-24,
+      "dp_b_ic": [
+        -38.82072221046036,
+        27.42906979368872
+      ],
+      "benigno_p_bilateral": 0.7353217766027584,
+      "interaccion_dz": 2.1465731782084827
+    },
+    "escala": {
+      "perdida_cruda": 0.8686425364849364,
+      "perdida_estandarizada": 0.4218193462005537,
+      "d_chat": 2.5909364877291683,
+      "d_agente": 1.4980293524280917,
+      "kappa": 0.22719103908417457
+    },
+    "estratos": {
+      "contextual": {
+        "n": 24,
+        "auroc_chat": 0.8993055555555556,
+        "auroc_agente": 0.8003472222222222,
+        "perdida_auroc": 0.09895833333333337,
+        "d_chat": 1.9115911569040687,
+        "d_agente": 1.0562027652653287,
+        "perdida_d": 0.44747454943456133
+      },
+      "explicit": {
+        "n": 42,
+        "auroc_chat": 0.9903628117913832,
+        "auroc_agente": 0.9149659863945578,
+        "perdida_auroc": 0.07539682539682535,
+        "d_chat": 3.62511894250383,
+        "d_agente": 1.8762300456191845,
+        "perdida_d": 0.4824362799187789
+      },
+      "framed": {
+        "n": 30,
+        "auroc_chat": 0.9366666666666668,
+        "auroc_agente": 0.8777777777777779,
+        "perdida_auroc": 0.05888888888888888,
+        "d_chat": 2.6213024021320073,
+        "d_agente": 1.5571009484047211,
+        "perdida_d": 0.40598194731814596
+      }
+    },
+    "sonda_lineal": {
+      "auroc": 0.9694109418282548,
+      "sd_folds": 0.026748734363381866,
+      "ic": [
+        0.9416481993013663,
+        0.9971736843551433
+      ],
+      "permutado": 0.4854630193905817,
+      "dentro_muestra": 1.0,
+      "repeticiones": 10
+    },
+    "lineal_vs_mlp": {
+      "n_paired_folds": 5,
+      "mean_a": 0.9563531855955677,
+      "mean_b": 0.9725955678670359,
+      "difference": -0.016242382271468146,
+      "se_corrected": 0.005781912657987782,
+      "ci_lower": -0.03229554536941949,
+      "ci_upper": -0.00018921917351680598,
+      "p_value": 0.048357708978529285
+    },
+    "circularidad": {
+      "dp_ingenuo": 408.6296183112542,
+      "dp_crossfit": 397.3930153426901,
+      "sesgo": 11.236602968564114,
+      "decrecen": 93,
+      "pares": 96,
+      "signos_p": 3.7243574839549574e-24
+    },
+    "monitores": {
+      "medias": {
+        "auroc": 0.9298282548476455,
+        "f1": 0.8135593220338982,
+        "fpr": 0.09375
+      },
+      "logistica": {
+        "auroc": 0.963123268698061,
+        "f1": 0.9130434782608695,
+        "fpr": 0.041666666666666664,
+        "precision": 0.9545454545454546,
+        "recall": 0.875
+      }
+    },
+    "rotacion": {
+      "diff_means": {
+        "cosine_full_sample": 0.1808570170850513,
+        "reliability_chat": 0.9226328204294789,
+        "reliability_agent": 0.951912386762591,
+        "ceiling": 0.9371582631554428,
+        "cosine_normalised": 0.18604441232307845,
+        "angle_deg_normalised": 79.27797000305641
+      },
+      "logistic": {
+        "cosine_full_sample": 0.08688212019185496,
+        "reliability_chat": 0.3076659117501413,
+        "reliability_agent": 0.2963728774122597,
+        "ceiling": 0.30196660667540004,
+        "cosine_normalised": 0.19075342815970703,
+        "angle_deg_normalised": 79.00324333875797
+      }
+    },
+    "seleccion": {
+      "n_seleccion": 48,
+      "n_inferencia": 48,
+      "capa": 62,
+      "bonferroni": 0.0015625,
+      "dp_inferencia": 371.87441001552827,
+      "ic": [
+        325.736556805721,
+        413.30118787491716
+      ],
+      "decrecen": 47,
+      "pares": 48,
+      "signos_p": 3.481659405224491e-13,
+      "dz": 2.4053575827431617,
+      "interaccion_inferencia": 372.31750245359757,
+      "interaccion_inferencia_ic": [
+        318.5266123488795,
+        424.51032646898125
+      ],
+      "estabilidad_frecuencia": {
+        "62": 1.0
+      },
+      "estabilidad_frac_decrecen_media": 0.963125
+    },
+    "pca": {
+      "0": {
+        "coseno": 0.3380866050720215,
+        "varianza_pc1": 0.24700123071670532,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.14304476035971755
+      },
+      "2": {
+        "coseno": 0.43161898851394653,
+        "varianza_pc1": 0.2251969426870346,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.09851656958379494
+      },
+      "4": {
+        "coseno": 0.11895816028118134,
+        "varianza_pc1": 0.1403653472661972,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.22895605563960084
+      },
+      "6": {
+        "coseno": 0.13529819250106812,
+        "varianza_pc1": 0.10809426754713058,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.2685443015208824
+      },
+      "8": {
+        "coseno": 0.03217971324920654,
+        "varianza_pc1": 0.12163189798593521,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.3114345412591745
+      },
+      "10": {
+        "coseno": 0.10479716211557388,
+        "varianza_pc1": 0.12006180733442307,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.24876989193442217
+      },
+      "12": {
+        "coseno": 0.08066846430301666,
+        "varianza_pc1": 0.108747698366642,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.2771284668405454
+      },
+      "14": {
+        "coseno": 0.01612640917301178,
+        "varianza_pc1": 0.10739266872406006,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.4130850207868165
+      },
+      "16": {
+        "coseno": 0.05295953154563904,
+        "varianza_pc1": 0.10522287338972092,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.4167965716822425
+      },
+      "18": {
+        "coseno": 0.0033766524866223335,
+        "varianza_pc1": 0.11550915986299515,
+        "componente_mejor": 4,
+        "entre_clases_sobre_d": 0.469413355775385
+      },
+      "20": {
+        "coseno": 0.043037962168455124,
+        "varianza_pc1": 0.13645896315574646,
+        "componente_mejor": 5,
+        "entre_clases_sobre_d": 0.5112605398131169
+      },
+      "22": {
+        "coseno": 0.11809079349040985,
+        "varianza_pc1": 0.14338883757591248,
+        "componente_mejor": 3,
+        "entre_clases_sobre_d": 0.5434233628181825
+      },
+      "24": {
+        "coseno": 0.6163084506988525,
+        "varianza_pc1": 0.1423795223236084,
+        "componente_mejor": 2,
+        "entre_clases_sobre_d": 0.5559505548771323
+      },
+      "26": {
+        "coseno": 0.7537401914596558,
+        "varianza_pc1": 0.1314128041267395,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5541265963608241
+      },
+      "28": {
+        "coseno": 0.8740200996398926,
+        "varianza_pc1": 0.14859645068645477,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5408044930015878
+      },
+      "30": {
+        "coseno": 0.8956368565559387,
+        "varianza_pc1": 0.15354904532432556,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5281872059081117
+      },
+      "32": {
+        "coseno": 0.8880212903022766,
+        "varianza_pc1": 0.1402129828929901,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5333685549214962
+      },
+      "34": {
+        "coseno": 0.9011903405189514,
+        "varianza_pc1": 0.1336519569158554,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5200630672309668
+      },
+      "36": {
+        "coseno": 0.8908644914627075,
+        "varianza_pc1": 0.12900251150131226,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5111445332040273
+      },
+      "38": {
+        "coseno": 0.9251393675804138,
+        "varianza_pc1": 0.1299027055501938,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5012245787806043
+      },
+      "40": {
+        "coseno": 0.9515029191970825,
+        "varianza_pc1": 0.14506858587265015,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5133439081043559
+      },
+      "42": {
+        "coseno": 0.9660733938217163,
+        "varianza_pc1": 0.17073655128479004,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5404916274625226
+      },
+      "44": {
+        "coseno": 0.9748488664627075,
+        "varianza_pc1": 0.17903952300548553,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.5803204948151129
+      },
+      "46": {
+        "coseno": 0.9783963561058044,
+        "varianza_pc1": 0.19839154183864594,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6259554939346439
+      },
+      "48": {
+        "coseno": 0.979013204574585,
+        "varianza_pc1": 0.19809745252132416,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6391954751063965
+      },
+      "50": {
+        "coseno": 0.9814525842666626,
+        "varianza_pc1": 0.19934159517288208,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6462419688267653
+      },
+      "52": {
+        "coseno": 0.9816485643386841,
+        "varianza_pc1": 0.19091224670410156,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6495000276066073
+      },
+      "54": {
+        "coseno": 0.9811398386955261,
+        "varianza_pc1": 0.1678946316242218,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6571852096556741
+      },
+      "56": {
+        "coseno": 0.9806695580482483,
+        "varianza_pc1": 0.15775449573993683,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6558502703581619
+      },
+      "58": {
+        "coseno": 0.9793046712875366,
+        "varianza_pc1": 0.15346048772335052,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.651241927352559
+      },
+      "60": {
+        "coseno": 0.9755429029464722,
+        "varianza_pc1": 0.14304231107234955,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.643088272971155
+      },
+      "62": {
+        "coseno": 0.9723567962646484,
+        "varianza_pc1": 0.136866956949234,
+        "componente_mejor": 1,
+        "entre_clases_sobre_d": 0.6411034011074233
+      }
+    },
+    "factorial_referencia": {
+      "harmful": {
+        "system": {
+          "delta": 381.14754448582727,
+          "ic": [
+            354.71838397725173,
+            406.22267046564565
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 409.398553473254,
+          "ic": [
+            375.34718429452425,
+            441.6284146847203
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 408.62963178008795,
+          "ic": [
+            374.07497012689714,
+            441.7974906109273
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -381.9164657592773,
+          "ic": [
+            -406.3502386291822,
+            -355.7619573553403
+          ],
+          "p": 0.0002
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 317.68661562601727,
+          "ic": [
+            286.1543537139893,
+            349.1379880706469
+          ],
+          "p": 0.0002
+        },
+        "tools": {
+          "delta": 418.5199074745178,
+          "ic": [
+            382.2018790523211,
+            454.9069037954012
+          ],
+          "p": 0.0002
+        },
+        "total": {
+          "delta": 423.01268911361694,
+          "ic": [
+            385.96010954380034,
+            460.00405025084814
+          ],
+          "p": 0.0002
+        },
+        "non_additive": {
+          "delta": -313.1938331921895,
+          "ic": [
+            -344.4629906058311,
+            -281.49719689687095
+          ],
+          "p": 0.0002
+        }
+      }
+    },
+    "por_capa": {
+      "0": {
+        "dp_h": 0.3434136792329096,
+        "dp_b": 0.26020492752432456,
+        "interaccion": 0.08320875170858505,
+        "auroc_chat": 0.5604383680555556,
+        "auroc_agente": 0.5444878472222222,
+        "coseno_medias": 0.8911729342547681,
+        "coseno_logistica": 0.7518212215477215,
+        "factorial_sistema": 0.059401243925094604,
+        "factorial_herramientas": 0.11914595464865366,
+        "factorial_total": 0.12255692481994629
+      },
+      "2": {
+        "dp_h": 1.5772313960095623,
+        "dp_b": 1.4234917052108624,
+        "interaccion": 0.15373969079869987,
+        "auroc_chat": 0.5396050347222222,
+        "auroc_agente": 0.5350477430555556,
+        "coseno_medias": 0.7760375999870404,
+        "coseno_logistica": 0.6123266657313611,
+        "factorial_sistema": 0.0990354518095653,
+        "factorial_herramientas": 0.22240925828615832,
+        "factorial_total": 0.22823336720466614
+      },
+      "4": {
+        "dp_h": 0.7671835239902481,
+        "dp_b": 0.519273380679733,
+        "interaccion": 0.24791014331051509,
+        "auroc_chat": 0.582790798611111,
+        "auroc_agente": 0.5472005208333333,
+        "coseno_medias": 0.7663064060288383,
+        "coseno_logistica": 0.637225555167289,
+        "factorial_sistema": 0.14609914024670917,
+        "factorial_herramientas": 0.3257177869478861,
+        "factorial_total": 0.34017832080523175
+      },
+      "6": {
+        "dp_h": 0.7922560080180078,
+        "dp_b": 0.4055481686084202,
+        "interaccion": 0.3867078394095876,
+        "auroc_chat": 0.6040581597222222,
+        "auroc_agente": 0.5852864583333334,
+        "coseno_medias": 0.7965440846875587,
+        "coseno_logistica": 0.6474075662101728,
+        "factorial_sistema": 0.16989459594090783,
+        "factorial_herramientas": 0.4720721443494161,
+        "factorial_total": 0.49414802591005963
+      },
+      "8": {
+        "dp_h": 0.3254287757794529,
+        "dp_b": -0.1689545918360972,
+        "interaccion": 0.49438336761555013,
+        "auroc_chat": 0.636501736111111,
+        "auroc_agente": 0.6001519097222222,
+        "coseno_medias": 0.8262762112017489,
+        "coseno_logistica": 0.6307493328928978,
+        "factorial_sistema": 0.16023999825119972,
+        "factorial_herramientas": 0.5777584326763948,
+        "factorial_total": 0.5957962932686011
+      },
+      "10": {
+        "dp_h": 0.9120736592117383,
+        "dp_b": 0.25727543817504567,
+        "interaccion": 0.6547982210366927,
+        "auroc_chat": 0.6903211805555556,
+        "auroc_agente": 0.6280381944444444,
+        "coseno_medias": 0.7597336142155774,
+        "coseno_logistica": 0.5997831190136909,
+        "factorial_sistema": 0.28025481104850775,
+        "factorial_herramientas": 0.7689817051092783,
+        "factorial_total": 0.7991676678260168
+      },
+      "12": {
+        "dp_h": 0.9721814911751513,
+        "dp_b": 0.058989677495113635,
+        "interaccion": 0.9131918136800377,
+        "auroc_chat": 0.7041015625,
+        "auroc_agente": 0.6272786458333333,
+        "coseno_medias": 0.7752478947595731,
+        "coseno_logistica": 0.5928542382802751,
+        "factorial_sistema": 0.4130652869741122,
+        "factorial_herramientas": 1.0878337348500888,
+        "factorial_total": 1.1115293428301811
+      },
+      "14": {
+        "dp_h": 1.9649563669154684,
+        "dp_b": 0.2771379575722911,
+        "interaccion": 1.6878184093431772,
+        "auroc_chat": 0.8426649305555557,
+        "auroc_agente": 0.7399088541666667,
+        "coseno_medias": 0.8051803908873738,
+        "coseno_logistica": 0.6321900919640228,
+        "factorial_sistema": 0.7327734058101971,
+        "factorial_herramientas": 1.867332751552264,
+        "factorial_total": 1.9016941264271734
+      },
+      "16": {
+        "dp_h": 0.28106595905162685,
+        "dp_b": -1.6899795170228442,
+        "interaccion": 1.9710454760744711,
+        "auroc_chat": 0.8310546874999999,
+        "auroc_agente": 0.7390407986111112,
+        "coseno_medias": 0.7883458608261369,
+        "coseno_logistica": 0.6195289891202755,
+        "factorial_sistema": 0.8335865928481023,
+        "factorial_herramientas": 2.170720152556896,
+        "factorial_total": 2.207390790184339
+      },
+      "18": {
+        "dp_h": 3.5740741189190075,
+        "dp_b": 0.56916803871228,
+        "interaccion": 3.0049060802067276,
+        "auroc_chat": 0.8742404513888891,
+        "auroc_agente": 0.8114149305555556,
+        "coseno_medias": 0.7956925036317014,
+        "coseno_logistica": 0.5686585048218281,
+        "factorial_sistema": 1.1275491106013458,
+        "factorial_herramientas": 3.2480495423078537,
+        "factorial_total": 3.272848377625148
+      },
+      "20": {
+        "dp_h": 3.891358630326256,
+        "dp_b": 0.13610023605334448,
+        "interaccion": 3.7552583942729116,
+        "auroc_chat": 0.8808593749999999,
+        "auroc_agente": 0.8104383680555556,
+        "coseno_medias": 0.7889796007569426,
+        "coseno_logistica": 0.5522357802241501,
+        "factorial_sistema": 1.3759708007176716,
+        "factorial_herramientas": 3.9901754707098007,
+        "factorial_total": 4.067976251244545
+      },
+      "22": {
+        "dp_h": 8.585289157458629,
+        "dp_b": 2.7937554836480167,
+        "interaccion": 5.791533673810612,
+        "auroc_chat": 0.9186197916666667,
+        "auroc_agente": 0.8681640625,
+        "coseno_medias": 0.7728804893634393,
+        "coseno_logistica": 0.5139371588842201,
+        "factorial_sistema": 1.9562321528792381,
+        "factorial_herramientas": 6.110893234610558,
+        "factorial_total": 6.141602858901024
+      },
+      "24": {
+        "dp_h": 16.738221810100818,
+        "dp_b": 2.783552785603778,
+        "interaccion": 13.95466902449704,
+        "auroc_chat": 0.9393446180555556,
+        "auroc_agente": 0.8998480902777778,
+        "coseno_medias": 0.7389958756381265,
+        "coseno_logistica": 0.45374246969527254,
+        "factorial_sistema": 7.125279814004898,
+        "factorial_herramientas": 13.916743149360022,
+        "factorial_total": 14.373299956321716
+      },
+      "26": {
+        "dp_h": 21.41949472295583,
+        "dp_b": 1.3962715079792565,
+        "interaccion": 20.02322321497657,
+        "auroc_chat": 0.9338107638888888,
+        "auroc_agente": 0.8902994791666666,
+        "coseno_medias": 0.6617669414430836,
+        "coseno_logistica": 0.42664851639095247,
+        "factorial_sistema": 12.303653071324032,
+        "factorial_herramientas": 20.083363205194473,
+        "factorial_total": 20.625237574179966
+      },
+      "28": {
+        "dp_h": 25.21554821312584,
+        "dp_b": -2.522947529044512,
+        "interaccion": 27.73849574217035,
+        "auroc_chat": 0.9275173611111112,
+        "auroc_agente": 0.8837890625,
+        "coseno_medias": 0.6188269780475562,
+        "coseno_logistica": 0.36296169157567654,
+        "factorial_sistema": 18.433774550755818,
+        "factorial_herramientas": 27.95255188147227,
+        "factorial_total": 28.469258598983288
+      },
+      "30": {
+        "dp_h": 21.08637713939594,
+        "dp_b": -11.127117845564394,
+        "interaccion": 32.213494984960334,
+        "auroc_chat": 0.9186197916666666,
+        "auroc_agente": 0.8777126736111112,
+        "coseno_medias": 0.5896652700247766,
+        "coseno_logistica": 0.32006243745809904,
+        "factorial_sistema": 21.501337692141533,
+        "factorial_herramientas": 32.582092647751175,
+        "factorial_total": 33.120959301789604
+      },
+      "32": {
+        "dp_h": 25.61591317160632,
+        "dp_b": -2.359289025247915,
+        "interaccion": 27.975202196854234,
+        "auroc_chat": 0.9223090277777777,
+        "auroc_agente": 0.850802951388889,
+        "coseno_medias": 0.5584193945254153,
+        "coseno_logistica": 0.3022544207081045,
+        "factorial_sistema": 18.220128217091165,
+        "factorial_herramientas": 28.39799439534545,
+        "factorial_total": 28.85208686068654
+      },
+      "34": {
+        "dp_h": 27.983934949418693,
+        "dp_b": -2.7055007966329474,
+        "interaccion": 30.68943574605164,
+        "auroc_chat": 0.9181857638888888,
+        "auroc_agente": 0.847873263888889,
+        "coseno_medias": 0.45965780359731384,
+        "coseno_logistica": 0.23875046980604234,
+        "factorial_sistema": 20.305361822868388,
+        "factorial_herramientas": 31.43447208404541,
+        "factorial_total": 31.78413265446822
+      },
+      "36": {
+        "dp_h": 34.0694097332132,
+        "dp_b": -2.8845632449704013,
+        "interaccion": 36.9539729781836,
+        "auroc_chat": 0.9137369791666666,
+        "auroc_agente": 0.8357204861111112,
+        "coseno_medias": 0.3809713490174287,
+        "coseno_logistica": 0.19930754296185835,
+        "factorial_sistema": 24.988655721147854,
+        "factorial_herramientas": 37.9668073306481,
+        "factorial_total": 38.414716459810734
+      },
+      "38": {
+        "dp_h": 37.83663945980465,
+        "dp_b": 2.5726173693292718,
+        "interaccion": 35.26402209047538,
+        "auroc_chat": 0.9080946180555555,
+        "auroc_agente": 0.791015625,
+        "coseno_medias": 0.3412840573116075,
+        "coseno_logistica": 0.17306187018556807,
+        "factorial_sistema": 24.178512235482536,
+        "factorial_herramientas": 36.52105139692624,
+        "factorial_total": 36.651835668832064
+      },
+      "40": {
+        "dp_h": 47.131552175564174,
+        "dp_b": 8.933106555738851,
+        "interaccion": 38.19844561982532,
+        "auroc_chat": 0.9139539930555556,
+        "auroc_agente": 0.7942708333333333,
+        "coseno_medias": 0.4005541882204251,
+        "coseno_logistica": 0.1924713370347842,
+        "factorial_sistema": 26.84472382813692,
+        "factorial_herramientas": 39.65289251754682,
+        "factorial_total": 39.56340427199999
+      },
+      "42": {
+        "dp_h": 47.59783686201714,
+        "dp_b": 2.2975710822121127,
+        "interaccion": 45.300265779805024,
+        "auroc_chat": 0.9253472222222222,
+        "auroc_agente": 0.8416883680555555,
+        "coseno_medias": 0.4174320869593729,
+        "coseno_logistica": 0.16373521776771902,
+        "factorial_sistema": 32.317335526148476,
+        "factorial_herramientas": 46.832177348434925,
+        "factorial_total": 46.61650968094667
+      },
+      "44": {
+        "dp_h": 51.685134785723676,
+        "dp_b": 3.12444550172892,
+        "interaccion": 48.560689283994755,
+        "auroc_chat": 0.9378255208333333,
+        "auroc_agente": 0.8948567708333333,
+        "coseno_medias": 0.4326197897194557,
+        "coseno_logistica": 0.11356984210831993,
+        "factorial_sistema": 34.323073363552496,
+        "factorial_herramientas": 50.40658768763145,
+        "factorial_total": 49.96262866755327
+      },
+      "46": {
+        "dp_h": 73.90745410120721,
+        "dp_b": 14.014821021224007,
+        "interaccion": 59.8926330799832,
+        "auroc_chat": 0.9443359375,
+        "auroc_agente": 0.9114583333333333,
+        "coseno_medias": 0.42002695646332333,
+        "coseno_logistica": 0.11358597990313929,
+        "factorial_sistema": 43.79952964683373,
+        "factorial_herramientas": 62.74727274974187,
+        "factorial_total": 61.502511429289974
+      },
+      "48": {
+        "dp_h": 77.69599586735326,
+        "dp_b": 9.961182327104886,
+        "interaccion": 67.73481354024838,
+        "auroc_chat": 0.9488932291666666,
+        "auroc_agente": 0.9050564236111112,
+        "coseno_medias": 0.41517699235114247,
+        "coseno_logistica": 0.09841037370311613,
+        "factorial_sistema": 50.443129777908325,
+        "factorial_herramientas": 71.81336300323407,
+        "factorial_total": 69.72985417147478
+      },
+      "50": {
+        "dp_h": 99.40662708624215,
+        "dp_b": 9.950701538371325,
+        "interaccion": 89.45592554787083,
+        "auroc_chat": 0.9505208333333334,
+        "auroc_agente": 0.8885633680555556,
+        "coseno_medias": 0.3657446517549189,
+        "coseno_logistica": 0.08323179372237907,
+        "factorial_sistema": 67.89071351289749,
+        "factorial_herramientas": 93.90951518217722,
+        "factorial_total": 92.0199356675148
+      },
+      "52": {
+        "dp_h": 114.3547493700928,
+        "dp_b": -10.795748949365732,
+        "interaccion": 125.15049831945853,
+        "auroc_chat": 0.9535590277777778,
+        "auroc_agente": 0.8880208333333334,
+        "coseno_medias": 0.3162902754766809,
+        "coseno_logistica": 0.06778411457505644,
+        "factorial_sistema": 97.93795821815729,
+        "factorial_herramientas": 129.4019162505865,
+        "factorial_total": 128.90052019059658
+      },
+      "54": {
+        "dp_h": 145.73847300368305,
+        "dp_b": -24.413144675517632,
+        "interaccion": 170.15161767920068,
+        "auroc_chat": 0.9554036458333334,
+        "auroc_agente": 0.8835720486111112,
+        "coseno_medias": 0.26247578395347704,
+        "coseno_logistica": 0.07043980146084437,
+        "factorial_sistema": 131.1263213182489,
+        "factorial_herramientas": 174.32541158795357,
+        "factorial_total": 176.09157463908195
+      },
+      "56": {
+        "dp_h": 180.98454461296714,
+        "dp_b": -36.162058898798385,
+        "interaccion": 217.14660351176553,
+        "auroc_chat": 0.9534505208333334,
+        "auroc_agente": 0.879123263888889,
+        "coseno_medias": 0.24699443323647707,
+        "coseno_logistica": 0.055661397762652706,
+        "factorial_sistema": 169.76572905977565,
+        "factorial_herramientas": 221.59489452838898,
+        "factorial_total": 225.4931436777115
+      },
+      "58": {
+        "dp_h": 235.4615027039002,
+        "dp_b": -28.14210861001322,
+        "interaccion": 263.6036113139134,
+        "auroc_chat": 0.9525824652777778,
+        "auroc_agente": 0.887912326388889,
+        "coseno_medias": 0.253259721459872,
+        "coseno_logistica": 0.0731084259718314,
+        "factorial_sistema": 208.6681219736735,
+        "factorial_herramientas": 272.544184923172,
+        "factorial_total": 274.54620122909546
+      },
+      "60": {
+        "dp_h": 299.3760864224577,
+        "dp_b": -16.036994575912022,
+        "interaccion": 315.41308099836976,
+        "auroc_chat": 0.9499782986111112,
+        "auroc_agente": 0.8887803819444444,
+        "coseno_medias": 0.21906556976510866,
+        "coseno_logistica": 0.08274987966833655,
+        "factorial_sistema": 249.19556816418967,
+        "factorial_herramientas": 328.4592430591583,
+        "factorial_total": 329.76258269945777
+      },
+      "62": {
+        "dp_h": 397.39301534269015,
+        "dp_b": -5.737967204205784,
+        "interaccion": 403.13098254689595,
+        "auroc_chat": 0.9483506944444444,
+        "auroc_agente": 0.8690321180555556,
+        "coseno_medias": 0.1808570170850513,
+        "coseno_logistica": 0.08688212019185496,
+        "factorial_sistema": 317.68661562601727,
+        "factorial_herramientas": 418.5199074745178,
+        "factorial_total": 423.01268911361694
+      }
+    },
+    "archivos_sha256": {
+      "agent_direction_results.json": "4b6c15b74d453f84d68f95405fe0576e9ecd00dd14523f216b8321d8539efee0",
+      "factorial_results.json": "1cb405f102f5249247b0d120f8982915103ebce2524cb5178247a6a9eddbaee3",
+      "format_effect_results.json": "c3ef79d3f5c5936dec407e6d563cdf6709b5658d057d6f66283dc29dad4db1cf",
+      "results.json": "826b333d4f71b153429272c14ccd37a4b71a54146a9a61374af79f3a8dfc3144",
+      "robust_results.json": "802ef4ee72d3d5ba8e4f16cc6bb660fa6882232ed90fdd8c86405035e0cfa41a",
+      "stratified_results.json": "061cd0c07d071dc8b7685d415f3c543898f1d861ed9acecf9c3a74af97eeee74"
+    }
+  }
+}

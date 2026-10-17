@@ -1,0 +1,19 @@
+\chapter{Conclusiones y recomendaciones del avance}
+\label{chap:conclusiones}
+\section{Conclusiones}
+
+Se construyó y verificó un corpus contrastivo ampliado de 96 pares, con cuatro variantes por par y control de identidad de texto y simetría del andamiaje. Ese es un resultado de construcción de datos. Las conclusiones experimentales de esta versión se refieren a las ejecuciones disponibles de 42 pares y no se extrapolan como si provinieran del corpus ampliado.
+
+En Llama V3 y Mistral V3, la dirección conversacional conserva capacidad discriminativa en formato agéntico, aunque con menor margen: el AUROC fuera de muestra pasa de $0{,}9779$ a $0{,}9195$ en Llama y de $0{,}9478$ a $0{,}7851$ en Mistral. La interacción con el control benigno y la pérdida estandarizada muestran que el resultado no se reduce a una traslación idéntica de ambas clases ni a un mero cambio de escala.
+
+La validación geométrica muestra alineación elevada entre PC1 y la diferencia de medias en capas profundas, y Llama presenta baja alineación entre los contrastes de ambos formatos. La interpretación debe mantener separados diferencia de medias y regresión logística e incorporar la fiabilidad de sus direcciones. Estas observaciones caracterizan representaciones; no identifican por sí solas la causa general del fallo del rechazo.
+
+La disponibilidad de monitores fuera de fold acredita una viabilidad preliminar de recuperar señal agéntica. El ensayo de intervención en Llama aporta evidencia exploratoria de que añadir activación puede aumentar el rechazo, con un costo creciente en solicitudes benignas. La calibración, la validación humana y la transferencia siguen abiertas. Las corridas históricas de Qwen no justifican afirmar un patrón uniforme en todas las familias.
+
+\section{Aportes del trabajo hasta este corte}
+
+El trabajo aporta un corpus ampliado auditable, un pipeline de extracción y análisis con controles de circularidad y pareado, resultados geométricos trazables para Llama y un registro de réplica en Mistral, además de ensayos conductuales conservados para auditoría. La separación entre unidades crudas, separación estandarizada y AUROC evita interpretar un cambio de escala como pérdida total de seguridad. La separación de selección e inferencia hace explícito qué pares sustentan cada contraste.
+
+\section{Recomendaciones}
+
+Se recomienda consolidar los artefactos completos de Mistral, ejecutar el corpus de 96 pares en los modelos con configuración común, documentar versiones y hashes y reservar datos para validación externa. Es necesario completar doble anotación de explicitud y revisión independiente de las generaciones, comparar formalmente estimadores sobre las mismas particiones y evaluar umbrales en condiciones distintas de aquellas que los ajustan. La extensión a trayectorias, autonomía y herramientas ejecutadas requiere un diseño adicional y no se considera validada por este avance.

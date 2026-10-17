@@ -1,0 +1,151 @@
+\documentclass[12pt,twoside]{report}
+
+% =============================================================
+% CONFIGURACIÓN GENERAL
+% =============================================================
+
+\usepackage{etoolbox}
+\input{config}
+
+% Codificación e idioma
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noquoting,es-lcroman,es-tabla]{babel}
+\usepackage{csquotes}
+\spanishplainpercent
+
+% Página y tipografía
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{newtxtext,newtxmath}
+\usepackage{setspace}
+\doublespacing
+\setlength{\parindent}{1.27cm}
+\setlength{\parskip}{0pt}
+\usepackage{ragged2e}
+\justifying
+\clubpenalty=10000
+\widowpenalty=10000
+
+% Matemáticas, tablas y figuras
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{graphicx}
+\graphicspath{{images/}{figures/}}
+\usepackage{booktabs,longtable,adjustbox,multirow}
+\usepackage{caption,subcaption}
+\usepackage{float}
+\usepackage[section]{placeins}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,},group-separator={.}}
+\usepackage{enumitem}
+
+% Tablas y figuras a espacio sencillo
+\AtBeginEnvironment{table}{\singlespacing}
+\AtBeginEnvironment{figure}{\singlespacing}
+
+% Diagramas
+\usepackage{tikz}
+\usetikzlibrary{fit,positioning,arrows.meta,calc,babel}
+
+% Títulos de capítulos y secciones
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering\huge}
+  {\chaptername\ \thechapter}
+  {0.5em}
+  {}
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+% Encabezados y pies de página
+\usepackage{fancyhdr}
+\setlength{\headheight}{16pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RO,LE]{\ThesisShortTitle}
+\fancyfoot[LE,RO]{\thepage}
+\fancyfoot[LO,RE]{Capítulo \thechapter}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Bibliografía APA 7 con Biber
+\usepackage[
+  style=apa,
+  backend=biber,
+  natbib=true
+]{biblatex}
+\DeclareLanguageMapping{spanish}{spanish-apa}
+\DeclareDelimFormat{nameyeardelim}{\addcomma\space}
+\addbibresource{references.bib}
+
+% Enlaces
+\usepackage[hidelinks]{hyperref}
+
+% Para compilar un solo capítulo en Overleaf, descomente una línea:
+% \includeonly{chapters/Chapter3/chapter03}
+% \includeonly{chapters/Chapter4/chapter04}
+
+\begin{document}
+
+% =============================================================
+% PRELIMINARES
+% =============================================================
+
+\pagestyle{plain}
+\pagenumbering{roman}
+
+\input{chapters/Chapter1/1.1_title}
+\input{chapters/Chapter1/1.3_abstract}
+\input{chapters/Chapter1/1.3_abstract_en}
+\input{abbreviations}
+
+\begin{spacing}{1.5}
+  \tableofcontents
+\end{spacing}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Índice de figuras}
+\listoffigures
+
+\clearpage
+\addcontentsline{toc}{chapter}{Índice de tablas}
+\listoftables
+
+% =============================================================
+% CUERPO DEL DOCUMENTO
+% =============================================================
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\include{chapters/Chapter1/1.5_chapter01-introduction}  % 1. Introducción
+\include{chapters/Chapter2/chapter02}                   % 2. Contexto y antecedentes
+\include{chapters/Chapter3/chapter03}                   % 3. Diseño y métodos
+\include{chapters/Chapter4/chapter04}                   % 4. Resultados y evaluación
+\include{chapters/Chapter5/chapter05}                   % 5. Discusión
+\include{chapters/Chapter6/chapter06}                 % 6. Conclusiones y recomendaciones
+
+% =============================================================
+% GLOSARIO Y ANEXOS
+% =============================================================
+
+\clearpage
+\pagestyle{plain}
+
+\input{glossary}
+\appendix
+\include{chapters/Appendix/anexos}
+
+% =============================================================
+% REFERENCIAS
+% =============================================================
+
+\clearpage
+\chapter*{Referencias}
+\addcontentsline{toc}{chapter}{Referencias}
+\printbibliography[heading=none]
+
+\end{document}
