@@ -1,4 +1,4 @@
-// Respaldo para preguntas del jurado (R1–R12). No forman parte de los 20 minutos.
+// Respaldo para preguntas del jurado (R1–R13). No forman parte de los 20 minutos.
 const B = require("./base");
 const { W, MX, C, F, R, txt, m, mx, N, eq, rect, rrect, seg, etiquetaRespaldo, fuente, rotulo } = B;
 const { nota } = require("./guion");
@@ -22,19 +22,19 @@ module.exports = function (pres, D) {
   {
     const s = nueva("Modelos, ejecuciones y configuración");
     const filas = [["Modelo", "L", "d", "H", "H_kv", "d_ff", "Capas leídas", "Referencia", "Soporte"].map(cab),
-      ["Mistral‑7B‑Instruct‑v0.3", "32", "4.096", "32", "8", "14.336", "16", "30", "registro de ejecución"],
-      ["Qwen3‑8B", "36", "4.096", "32", "8", "12.288", "18", "32", "JSON histórico"],
-      ["Qwen3‑32B", "64", "5.120", "64", "8", "25.600", "32", "46", "JSON histórico"],
-      ["Llama‑3.3‑70B‑Instruct", "80", "8.192", "64", "8", "28.672", "20", "76", "JSON y activaciones"]];
+      ["Mistral‑7B‑Instruct‑v0.3", "32", "4.096", "32", "8", "14.336", "16", "18", "96 pares · JSON"],
+      ["Qwen3‑8B", "36", "4.096", "32", "8", "12.288", "18", "22", "96 pares · JSON"],
+      ["Qwen3‑32B", "64", "5.120", "64", "8", "25.600", "32", "46", "96 pares · JSON"],
+      ["Llama‑3.3‑70B‑Instruct", "80", "8.192", "64", "8", "28.672", "20", "76", "42 pares · JSON y activaciones"]];
     s.addTable(filas, Object.assign({}, TBL, { x: MX, y: 1.9, w: W - 2 * MX, colW: [2.9, 0.6, 0.85, 0.6, 0.7, 0.95, 1.25, 1.1, 3.18] }));
     rotulo(s, "Corrida principal · Llama V3", MX, 3.75, 6);
-    txt(s, "meta‑llama/Llama‑3.3‑70B‑Instruct en FP16, semilla 42 · 5 folds por pares · sonda lineal con 10 repeticiones y MLP con 1 · 10 controles con etiquetas permutadas · 10.000 permutaciones y remuestreos · 200 particiones de selección · capas 0, 4, …, 76 · intervención en las capas 56, 52 y 28 con dosis 0,5; 1; 2 y 4 y hasta 64 tokens nuevos · 42 pares (dataset_path = null: corpus original).",
+    txt(s, "meta‑llama/Llama‑3.3‑70B‑Instruct en FP16, semilla 42 · 5 folds por pares · sonda lineal con 10 repeticiones y MLP con 1 · 10 controles con etiquetas permutadas · 10.000 permutaciones y remuestreos · 200 particiones de selección · capas 0, 4, …, 76 · intervención en las capas 56, 52 y 28 con dosis 0,5; 1; 2 y 4 y hasta 64 tokens nuevos. Configuración de la exportación estadística archivada.",
       { x: MX, y: 4.05, w: W - 2 * MX, h: 1.1, fontSize: 13.5, color: C.ink2 });
-    txt(s, "Los 42 pares son los mismos en los cuatro modelos. Mistral V3 declara FP16, 16 capas y 42 pares; su JSON y sus activaciones no están en el repositorio local. Qwen conserva una configuración exportada menos completa.",
+    txt(s, "Tamaños verificados: 96 pares en Mistral V2 y ambos Qwen V2; 42 en Llama V3. Mistral V3 se conserva aparte como ensayo complementario de 42 pares para conducta, PCA y selección. No se mezclan denominadores ni versiones.",
       { x: MX, y: 5.3, w: W - 2 * MX, h: 0.8, fontSize: 13, color: C.mute });
     fuente(s, "Tesis, tablas 3.4 y 4.1 y anexo A.2 · metricas_avance.json → llama.config.");
     nota(s, { titulo: "R1 · Modelos, ejecuciones y configuración", respaldo: true, t: 0,
-      guion: "Si preguntan por qué estos modelos: son abiertos, alineados y con soporte de herramientas; cubren tres recetas de entrenamiento y escalas de 7 a 70 mil millones de parámetros. La comparación entre modelos no aísla el tamaño: cambian arquitectura, entrenamiento y plantilla. Si preguntan por qué no los 96 pares: el corpus ampliado está construido y validado, pero las ejecuciones disponibles son las del corpus original; replicarlo es el siguiente paso." });
+      guion: "La tabla recoge tamaños verificados directamente en los archivos: Mistral y ambos Qwen con 96 pares, Llama con 42. Los modelos son abiertos, alineados y con soporte de herramientas; cubren tres recetas de entrenamiento y escalas de 7 a 70 mil millones de parámetros. La comparación no aísla el tamaño: cambian arquitectura, entrenamiento, plantilla y versión del pipeline. Mistral V3, con 42 pares, es un ensayo adicional que se identifica por separado." });
   }
 
   // R2 · Perfil por capas del desplazamiento
@@ -155,26 +155,7 @@ module.exports = function (pres, D) {
       guion: "Si preguntan si la caída de proyección causa el cambio de conducta: dentro de cada formato la proyección predice bien el rechazo etiquetado, con AUROC de 0,93 a 0,95 en Llama. Pero los pares que dejan de rechazar no pierden más proyección que los que siguen rechazando (p = 0,71). En Mistral sí la pierden (p = 0,004), con solo 3 pares que siguen rechazando. Conclusión: la proyección es informativa, pero no explica sola la decisión; por eso no afirmo causalidad desde la geometría." });
   }
 
-  // R7 · Qwen y control de versiones
-  {
-    const s = nueva("Evidencia histórica de Qwen y control de versiones");
-    const q = D.qwen;
-    const filas = [["Ejecución", "Capa", "AUROC chat", "AUROC agente", "Lectura"].map(cab),
-      ["Qwen3‑8B (histórico)", `${q["8b"].capa}`, f2(q["8b"].auroc_chat, 4), f2(q["8b"].auroc_agent, 4), "sin línea base discriminativa en esa capa"],
-      ["Qwen3‑32B (histórico)", `${q["32b"].capa}`, f2(q["32b"].auroc_chat, 4), f2(q["32b"].auroc_agent, 4), "pérdida pequeña; configuración incompleta"]];
-    s.addTable(filas, Object.assign({}, TBL, { x: MX, y: 1.9, w: W - 2 * MX, colW: [2.9, 0.9, 1.6, 1.7, 5.03], fontSize: 13 }));
-    txt(s, "Usan 42 pares, pero su configuración exportada no acredita todos los controles actuales. Se conservan como antecedentes: no sostienen una réplica uniforme entre familias ni una ley de escala.",
-      { x: MX, y: 3.4, w: W - 2 * MX, h: 0.8, fontSize: 13.5, color: C.ink2 });
-    rotulo(s, "Control de versiones de los resultados de Llama", MX, 4.45, 8);
-    const v = [["Versión anterior de la tesis", "capa 56, Δp ≈ 5,74; coseno agéntico atribuido 0,051"],
-      ["Versión vigente (V3)", "capa 76, Δp fuera de muestra 15,72; coseno de medias 0,213"],
-      ["Correcciones de código entre ambas", "copia GPU → CPU de activaciones ahora bloqueante; eliminación del token BOS duplicado"]];
-    v.forEach(([a, b], k) => txt(s, [R(a + ": ", { fontFace: F.demi, color: C.ink }), R(b)], { x: MX, y: 4.8 + k * 0.45, w: W - 2 * MX, h: 0.4, fontSize: 13.5, color: C.ink2 }));
-    txt(s, "Las diferencias entre versiones no se interpretan como fluctuación estadística sin verificar la implementación.", { x: MX, y: 6.2, w: W - 2 * MX, h: 0.4, fontSize: 13, color: C.mute });
-    fuente(s, "results/corridas/qwen3_8b/v1/results.json y results/corridas/qwen3_32b/v1/results.json → auroc_heldout · tesis, sección 4.4 y anexo A.3 · historial del repositorio (PR #3 y #4).");
-    nota(s, { titulo: "R7 · Qwen y control de versiones", respaldo: true, t: 0,
-      guion: "Si preguntan por Qwen: las corridas son anteriores al pipeline corregido. En Qwen3‑8B, capa 32, la dirección no separa ni en chat (0,52), así que no hay línea base que degradar; en Qwen3‑32B la pérdida es pequeña. No las uso para sostener un patrón entre familias. Si preguntan por qué cambiaron las cifras respecto a la versión anterior: V3 corrige una copia asíncrona de activaciones y un token BOS duplicado; por eso no mezclo cifras de versiones distintas." });
-  }
+  require("./s_comparativas96").respaldo(nueva("Comparaci\u00f3n sobre 96 pares en tres modelos"), pres, D);
 
   // R8 · Factorial exploratorio
   {
@@ -195,7 +176,7 @@ module.exports = function (pres, D) {
       { x: MX, y: 5.85, w: W - 2 * MX, h: 0.8, fontSize: 13.5, color: C.ink2 });
     fuente(s, "results/corridas/llama33_70b/v3/factorial_results.json → by_layer['76']; results.json → prompt_tokens. Intervalos: bootstrap percentil por pares.");
     nota(s, { titulo: "R8 · Exploratorio: ¿sistema o herramientas?", respaldo: true, t: 0,
-      guion: "Usar solo si preguntan cuál componente del formato produce el efecto. La respuesta del documento es: el diseño principal no lo separa. Aclarar que la corrida V3 tiene, además, una variante factorial no analizada en la tesis: con la dirección de muestra completa, añadir solo los esquemas de herramientas reproduce casi toda la caída (16,20 de 16,28), y el mensaje de sistema solo produce 4,32. Pero los esquemas también alargan el estímulo en unos 478 tokens, así que herramientas y longitud están confundidas; por eso el documento lo deja como trabajo pendiente con control de longitud.",
+      guion: "Usar solo si preguntan cuál componente del formato produce el efecto. La respuesta del documento es: el diseño principal no lo separa. Aclarar que la corrida V3 tiene, además, una variante factorial no analizada en la tesis: con la dirección de muestra completa, añadir solo los esquemas de herramientas reproduce casi toda la caída (16,20 de 16,28), y el mensaje de sistema solo produce 4,32. Pero los esquemas también alargan la entrada en unos 478 tokens, así que herramientas y longitud están confundidas; por eso el documento lo deja como trabajo pendiente con control de longitud.",
       fuentes: "factorial_results.json → by_layer['76'].harmful y .interaction (total, tools, system, non_additive). Estas cifras no aparecen en el documento de tesis; están en los archivos de la corrida V3 (run_factorial_analysis en run_experiment.py). Decidir antes de la sustentación si se muestra esta diapositiva." });
   }
 
@@ -219,7 +200,7 @@ module.exports = function (pres, D) {
     const s = nueva("Notación");
     const sm = (...p) => ({ text: mx({ fontSize: 14, color: C.ink }, ...p) });
     const filas = [["Símbolo", "Significado"].map(cab),
-      [sm(m.b("x"), m.supi("(l)"), m.u(" ∈ ℝ"), m.supi("d")), "flujo residual de la última posición del estímulo en la capa l"],
+      [sm(m.b("x"), m.supi("(l)"), m.u(" ∈ ℝ"), m.supi("d")), "flujo residual del último token de la entrada completa en la capa l"],
       [sm(m.hat("r"), m.supi("(l)")), "dirección de rechazo: diferencia normalizada de centroides dañino y benigno en chat"],
       [sm(m.i("p"), m.u(" = "), m.b("x"), m.u(" · "), m.hat("r")), "proyección: alineación geométrica con la dirección (no es un rechazo observado)"],
       [sm(m.u("Δ"), m.i("p"), m.sub("h"), m.u(",  Δ"), m.i("p"), m.sub("b")), "desplazamiento chat − agente de la proyección, por brazo, promediado dentro del par"],
@@ -239,16 +220,23 @@ module.exports = function (pres, D) {
     const s = nueva("Referencias");
     const refs = [
       "Andriushchenko, M., Souly, A., Dziemian, M., et al. (2024). AgentHarm: A benchmark for measuring harmfulness of LLM agents. arXiv:2410.09024; ICLR 2025.",
-      "Anthropic. (2025). Disrupting the first reported AI‑orchestrated cyber espionage campaign [informe completo, noviembre]. *",
       "Arditi, A., Obeso, O., Syed, A., Paleka, D., Panickssery, N., Gurnee, W. y Nanda, N. (2024). Refusal in language models is mediated by a single direction. NeurIPS 2024.",
       "Bengio, Y. (pres.) et al. (2026). International AI Safety Report 2026 [resumen ejecutivo, 3 de febrero]. *",
       "Gartner. (2025, 26 de agosto). Gartner predicts 40% of enterprise apps will feature task‑specific AI agents by 2026, up from less than 5% in 2025 [comunicado de prensa]. *",
+      "Hugging Face. (2026, 27 de julio). Anatomy of a Frontier Lab Agent Intrusion: A Technical Timeline of the July 2026 Incident [informe técnico]. *",
       "Lermen, S., Dziemian, M. y Pimpale, G. (2024). Applying refusal‑vector ablation to Llama 3.1 70B agents. arXiv:2410.10871.",
       "Nadeau, C. y Bengio, Y. (2003). Inference for the generalization error. Machine Learning, 52(3), 239–281.",
+      "OpenAI. (2026, 26 de agosto). The Hugging Face incident and the road ahead [informe del incidente]. *",
       "Pinto, L. (2026). Present but rescaled: Chat‑to‑agent transfer of additive activation steering. arXiv:2607.09156.",
       "Zhong, V. y Li, Q. (2026). Refusal lives downstream of persona in chat models. ICML 2026 Mechanistic Interpretability Workshop. arXiv:2606.26161.",
     ];
-    txt(s, refs.map((t, i) => R(t, { breakLine: i < refs.length - 1, paraSpaceAfter: 8, indentLevel: 0 })), { x: MX, y: 1.9, w: W - 2 * MX, h: 4.6, fontSize: 12.5, color: C.ink2 });
+    const enlaces = { "Hugging Face.": "https://huggingface.co/blog/agent-intrusion-technical-timeline",
+      "OpenAI.": "https://openai.com/index/hugging-face-incident-and-the-road-ahead/" };
+    txt(s, refs.map((t, i) => {
+      const url = Object.entries(enlaces).find(([inicio]) => t.startsWith(inicio));
+      return R(t, { breakLine: i < refs.length - 1, paraSpaceAfter: 8, indentLevel: 0, color: C.ink2,
+        ...(url ? { hyperlink: { url: url[1] } } : {}) });
+    }), { x: MX, y: 1.9, w: W - 2 * MX, h: 4.6, fontSize: 12.5, color: C.ink2 });
     txt(s, "* Contextualización externa añadida para la presentación; no forma parte de la bibliografía del documento. El resto de referencias de la tesis está en references.bib.",
       { x: MX, y: 6.45, w: W - 2 * MX, h: 0.45, fontSize: 11.5, color: C.mute });
     nota(s, { titulo: "R11 · Referencias", respaldo: true, t: 0, guion: "Lista de las fuentes citadas en las diapositivas. Las marcadas con asterisco se verificaron para la presentación en sus fuentes primarias (octubre de 2026)." });
@@ -263,14 +251,17 @@ module.exports = function (pres, D) {
       ["14", "AUROC por capa; PCA; sonda logística", "results.json → heldout.per_layer, pca_by_layer, linear_aurocs*"],
       ["15", "desplazamientos, interacción e intervalos", "results.json → heldout.paired_harmful, paired_benign; metricas → heldout_format"],
       ["16", "AUROC y su diferencia, con IC", "metricas_avance.json → llama.heldout_detection"],
-      ["17", "AUROC por estrato", "metricas → llama.strata_oof; registro de Mistral"],
-      ["18 · 19", "cosenos y fiabilidad; monitores", "metricas → rotation_at_reference, monitors_at_reference"],
+      ["17", "AUROC por estrato · 96 pares", "results/*_v2/results.json → format_effect.held_out.by_stratum"],
+      ["18 · 19", "cosenos y fiabilidad; monitores 42 / 96", "metricas → rotation_at_reference, monitors_at_reference; *_v2 → robust"],
       ["20", "respuesta a la dosis, capa 56", "metricas → intervention_layer56"],
-      ["Mistral", "todas sus cifras (redondeadas)", "results/corridas/mistral7b/v3/run.log"],
-      ["6 · 7", "corpus 96/384; 42 ejecutados; tokens", "data/dataset_v2_report.json; data/dataset_full.jsonl; results.json → prompt_tokens"]];
+      ["Mistral V2 / V3", "evaluación 96 / ensayos complementarios 42", "results/corridas/mistral7b/v2/results.json / registro V3"],
+      ["6 · 7", "corpus 96/384; cobertura por modelo; tokens", "dataset_v2_report.json; cobertura_estudio.json; results.json → prompt_tokens"]];
     s.addTable(filas, Object.assign({}, TBL, { x: MX, y: 1.9, w: W - 2 * MX, colW: [1.35, 4.4, 6.38], fontSize: 12 }));
-    txt(s, "SHA‑256 de las fuentes: evidencia/manifiesto_fuentes.json (p. ej., results.json 046cd1db…, registro de Mistral 5db8d72e…). Las cifras de la presentación se extraen con docs/sustentacion/fuente/datos.py, que verifica con aserciones su coincidencia con las tablas de la tesis.",
+    txt(s, "Las fuentes originales se registran en evidencia/manifiesto_fuentes.json. Las tres exportaciones de 96 pares tienen su SHA‑256 en datos_presentacion.json → evaluacion96. datos.py extrae las cifras y verifica sus tamaños; estas comparativas amplían los resultados del documento de tesis.",
       { x: MX, y: 6.05, w: W - 2 * MX, h: 0.8, fontSize: 12, color: C.mute });
-    nota(s, { titulo: "R12 · Trazabilidad de las cifras", respaldo: true, t: 0, guion: "Si preguntan de dónde sale una cifra: cada diapositiva tiene la fuente al pie y en las notas; esta tabla resume el archivo y la clave. Los resultados de Mistral provienen de un registro con valores impresos y redondeados; no se reconstruyó un JSON ausente." });
+    nota(s, { titulo: "R12 · Trazabilidad de las cifras", respaldo: true, t: 0, guion: "Cada figura identifica archivo, clave y tamaño. Mistral y Qwen V2 usan resultados JSON de 96 pares, incorporados desde la carpeta entregada por el autor y con su hash registrado en evaluacion96. Llama V3 conserva 42 pares. El registro adicional de Mistral V3 se utiliza únicamente donde se indica ese ensayo complementario." });
   }
+
+  // R13 · Autorización y validez del etiquetado.
+  require("./s_autorizacion")(nueva("Qué sabemos de la autorización y qué solo declara el texto"), pres);
 };

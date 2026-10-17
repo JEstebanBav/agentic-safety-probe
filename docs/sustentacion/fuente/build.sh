@@ -3,7 +3,7 @@
 # Requiere Windows con PowerPoint (COM) y Microsoft Edge; no ejecuta modelos.
 set -euo pipefail
 cd "$(dirname "$0")"
-PY=${PY:-/c/Users/esteb/miniconda3/python.exe}
+PY=${PY:-python}
 export NODE_PATH="$PWD/node_modules"
 $PY datos.py
 node construir.js

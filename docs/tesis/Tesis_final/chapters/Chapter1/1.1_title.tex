@@ -1,0 +1,46 @@
+\begin{titlepage}
+\newgeometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\definecolor{band}{HTML}{0B3D2E}
+\definecolor{bandlight}{HTML}{4F7F5E}
+
+\begin{flushright}
+    \includegraphics[width=0.47\textwidth]{\UniversityLogo}
+\end{flushright}
+
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[band] (current page.north west) rectangle ([xshift=1cm]current page.south west);
+  \fill[bandlight] ([xshift=1cm]current page.north west) rectangle ([xshift=1.25cm]current page.south west);
+\end{tikzpicture}
+
+\vspace*{0.4cm}
+
+\begin{center}
+    {\bfseries\Huge \ThesisTitle\par}
+
+    \ifdefempty{\ThesisSubtitle}{}{%
+      \vspace{0.5cm}
+      {\Large \ThesisSubtitle\par}
+    }
+
+    \vfill
+
+    {\Large\textbf{\ThesisAuthors}\par}
+    \vspace{0.8cm}
+    {\normalsize
+      \ThesisProgram\\
+      \ThesisDepartment\\
+      \ThesisUniversity
+    }
+
+    \vspace{1.2cm}
+
+    \begin{tabular}{@{}ll@{}}
+      \textbf{Modalidad de grado:} & \TipoProyecto \\
+      \textbf{Tutor(es):} & \ThesisAdvisors \\
+      \textbf{Lugar y fecha:} & \ThesisCity, \ThesisYear
+    \end{tabular}
+\end{center}
+
+\restoregeometry
+\end{titlepage}

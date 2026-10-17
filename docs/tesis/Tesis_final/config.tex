@@ -1,0 +1,72 @@
+% =============================================================
+% DATOS GENERALES DEL TRABAJO DE GRADO
+% Edite este archivo para personalizar la portada, el encabezado
+% y la modalidad del proyecto.
+% =============================================================
+
+% -------------------------------------------------------------
+% Información general
+% -------------------------------------------------------------
+
+\newcommand{\ThesisTitle}{Transformación de la dirección de rechazo en modelos de lenguaje agénticos}
+
+% Subtítulo (deje el argumento vacío si no se usa)
+\newcommand{\ThesisSubtitle}{Un análisis desde la interpretabilidad mecánica. Avances de investigación}
+
+\newcommand{\ThesisShortTitle}{Dirección de rechazo en modelos agénticos}
+\newcommand{\ThesisAuthors}{Juan Esteban Espitia Leiva}
+
+\newcommand{\ThesisProgram}{Pregrado en Ciencia de Datos}
+\newcommand{\ThesisDepartment}{Departamento de Matemáticas}
+\newcommand{\ThesisUniversity}{Universidad Externado de Colombia}
+
+\newcommand{\ThesisAdvisors}{Julián Fernando Sánchez}
+\newcommand{\ThesisCity}{Bogotá, Colombia}
+\newcommand{\ThesisYear}{2026}
+
+% Archivo del logo institucional dentro de images/.
+\newcommand{\UniversityLogo}{logo-externado-matematicas.png}
+
+
+% =============================================================
+% MODALIDAD DEL PROYECTO
+% =============================================================
+
+% Seleccione UNA de las siguientes modalidades:
+%
+% investigacion   = Investigación
+% innovacion      = Innovación
+% emprendimiento = Emprendimiento
+%
+% Solo debe modificar el valor de la siguiente línea.
+
+\newcommand{\ModalidadProyecto}{investigacion}
+
+
+% -------------------------------------------------------------
+% Nombre de la modalidad para portada y otros elementos
+% -------------------------------------------------------------
+
+\ifdefstring{\ModalidadProyecto}{investigacion}{
+  \newcommand{\TipoProyecto}{Investigación}
+}{
+  \ifdefstring{\ModalidadProyecto}{innovacion}{
+    \newcommand{\TipoProyecto}{Innovación}
+  }{
+    \ifdefstring{\ModalidadProyecto}{emprendimiento}{
+      \newcommand{\TipoProyecto}{Emprendimiento}
+    }{
+      \newcommand{\TipoProyecto}{Modalidad no válida}
+    }
+  }
+}
+
+
+% -------------------------------------------------------------
+% Compatibilidad con versiones anteriores de la plantilla
+% -------------------------------------------------------------
+
+% Mantiene funcionando archivos que todavía utilicen
+% el comando \ProjectType.
+
+\newcommand{\ProjectType}{\TipoProyecto}

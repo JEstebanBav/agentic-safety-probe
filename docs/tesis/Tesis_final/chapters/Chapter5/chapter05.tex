@@ -1,0 +1,35 @@
+\chapter{Discusión}
+\label{chap:discusion}
+\section{Síntesis de los avances}
+
+El avance principal es haber convertido una comparación de proyecciones en un diagnóstico con controles explícitos. El contenido se conserva entre formatos, el brazo benigno distingue cambios comunes de contrastes específicos del daño y la evaluación por pares retenidos evita confundir separación de entrenamiento con generalización. La integración de PCA y la separación de selección e inferencia permiten responder a las observaciones sobre validación geométrica y reutilización de la muestra.
+
+Los resultados de Llama V3 y el registro de Mistral V3 sostienen una reducción del margen discriminativo sobre la dirección conversacional. En ambos, la interacción sigue siendo positiva fuera de muestra y el AUROC agéntico se mantiene por encima del azar. Por tanto, los datos disponibles describen una degradación de margen, con intensidad dependiente del modelo, y no una desaparición completa de información discriminativa.
+
+\section{Interpretación del cambio de representación}
+
+La contracción de escala explica parte de la gran caída de separación cruda. La pérdida persiste en unidades estandarizadas y en AUROC, por lo que no se agota en un cambio de unidades. Sin embargo, restar el control benigno tampoco convierte automáticamente el resto en una medida de rechazo: la etiqueta dañino--benigno, la proyección y la decisión conductual son tres objetos distintos.
+
+La baja alineación entre direcciones comparables en Llama es compatible con una reorientación del contraste entre clases. La fiabilidad alta de las direcciones de medias vuelve esa descripción más interpretable que un coseno obtenido de sondas poco reproducibles. Un monitor agéntico logra recuperar parte de la señal, pero su existencia no prueba que el modelo use ese eje para decidir. El comportamiento puede depender de otras direcciones, capas y transformaciones posteriores.
+
+La comparación entre modelos tampoco aísla el número de parámetros. Cambian arquitectura, entrenamiento, plantilla y distribución de proyecciones. Las diferencias puntuales entre Llama y Mistral no permiten concluir que aumentar tamaño preserve la seguridad. Las ejecuciones históricas de Qwen refuerzan la necesidad de revisar cada configuración y de no seleccionar solo resultados favorables.
+
+\section{Lo que aporta la intervención}
+
+El ensayo complementario de Llama permite ir más allá de asociar dos cantidades: añadir activación en una dirección cambia la fracción de respuestas etiquetadas como rechazo respecto de un control aleatorio. Su interpretación se limita a esa manipulación y a los subconjuntos ensayados. No demuestra necesidad del mecanismo ni que la rotación sea el mediador del efecto del formato. El rechazo masivo de benignos a dosis altas descarta interpretar cualquier incremento de rechazo como una mejora selectiva de seguridad.
+
+La heurística de etiquetado hace auditables los cálculos, pero puede confundir una negativa superficial, un rechazo seguido de información o una respuesta que aparenta usar herramientas. La lectura humana independiente de las generaciones es necesaria antes de elevar estos resultados a una conclusión conductual firme. En Mistral la evidencia causal local es incompleta.
+
+\section{Limitaciones y alcance de validez}
+
+La primera limitación es muestral: el corpus construido tiene 96 pares, mientras las ejecuciones analizadas usan 42 y el estrato más pequeño solo diez. Las cuatro variantes, las capas y los 200 splits no son nuevas unidades independientes. La anotación de explicitud no dispone todavía de una segunda clasificación independiente para estimar acuerdo.
+
+La segunda es el alcance del formato. Se describe capacidad de usar herramientas mediante un mensaje y esquemas simulados; no se observa una tarea autónoma ejecutada durante varios pasos. El contraste principal cambia sistema y herramientas conjuntamente. La interacción con el brazo benigno no descarta por completo efectos de longitud, delimitadores o interacciones entre esos componentes y el contenido.
+
+La tercera es la inferencia. El cross-fitting controla reutilización de cada par, pero induce dependencia por entrenamiento compartido. Los intervalos de los puntajes guardados no incorporan toda la incertidumbre de volver a ajustar el pipeline. La inferencia sobre mitades disjuntas reduce el sesgo de selección, pero evalúa solo 21 pares. Los ángulos ajustados por fiabilidad son estimaciones bajo supuestos, no constantes conocidas.
+
+La cuarta es de reproducibilidad. La copia de activaciones y la duplicación de tokens especiales exigieron correcciones. Las cifras de versiones distintas deben permanecer identificadas; no se atribuye su diferencia a fluctuación de muestreo sin comprobar la implementación. Llama V3 ofrece activaciones y resultados estructurados; Mistral V3 solo está disponible como registro redondeado. Los monitores carecen de evaluación externa y sus umbrales pueden no transferirse a otro corpus o despliegue.
+
+\section{Implicaciones para el avance siguiente}
+
+El siguiente paso informativo es repetir el protocolo corregido sobre los 96 pares construidos, con la misma versión de código, configuración exportada y conservación de activaciones y generaciones. Debe fijarse un protocolo de comparación entre modelos y estimadores, reservar evaluación independiente de umbrales e incorporar una segunda anotación. En paralelo, el análisis factorial puede separar mensaje de sistema y herramientas, con controles de longitud y de plantilla. Solo después corresponde valorar una defensa operacional.

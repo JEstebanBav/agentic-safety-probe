@@ -1,0 +1,11 @@
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+Este avance estudia cómo cambia la representación interna de instrucciones dañinas al pasar de un formato conversacional a otro con mensaje de sistema y herramientas simuladas. Se construyó un corpus contrastivo de 96 pares dañino--benigno, con cuatro variantes por par y tres niveles de explicitud. Las ejecuciones disponibles corresponden al corpus original de 42 pares: Llama-3.3-70B V3 y el registro de Mistral-7B V3 sustentan los resultados principales; Qwen se conserva como evidencia exploratoria previa.
+
+La dirección conversacional se estima por diferencia de medias sobre el flujo residual del último token del estímulo renderizado. Con cinco folds por pares, su AUROC pasa de $0{,}9779$ en chat a $0{,}9195$ en agente para Llama y de $0{,}9478$ a $0{,}7851$ para Mistral. Las interacciones con el brazo benigno son positivas y la pérdida persiste en unidades estandarizadas, aunque es menor que la caída cruda. PCA se alinea con el contraste en capas profundas. En Llama, la dirección agéntica de medias presenta baja alineación con la conversacional y permite un monitor con $F_1$ fuera de fold de $0{,}8434$; la logística constituye un estimador distinto.
+
+Las observaciones sostienen una pérdida de margen discriminativo en las condiciones ensayadas. Las intervenciones complementarias de Llama aumentan el rechazo etiquetado, pero dosis altas también inducen rechazo de benignos y el etiquetado requiere auditoría humana. La generalización al corpus ampliado, a datos externos y a agentes que ejecuten acciones permanece pendiente.
+
+\vspace{0.4cm}\noindent
+\textbf{Palabras clave:} interpretabilidad mecánica; dirección de rechazo; formato agéntico; validación cruzada; seguridad en inteligencia artificial.

@@ -1,0 +1,371 @@
+\chapter{Diseño y métodos del proyecto}
+\label{chap:diseno-metodos}
+
+Este capítulo describe cómo se estructuró la investigación y con qué
+procedimientos se abordó la pregunta planteada. La primera sección expone el
+enfoque, el tipo de estudio y el objeto sobre el que recae el análisis. La
+segunda detalla la construcción del conjunto de datos contrastivo, que es el
+instrumento del que depende todo lo demás. La tercera formaliza los objetos
+matemáticos del método y el procedimiento que los aplica. La cuarta define
+los criterios y controles con los que se evalúa la validez de los
+resultados, incluyendo el tratamiento del problema de circularidad que
+introduce estimar y evaluar una dirección sobre la misma muestra. La quinta
+recoge las consideraciones éticas asociadas al manejo de un conjunto de
+instrucciones dañinas.
+
+\section{Enfoque y diseño}
+\label{sec:enfoque-diseno}
+
+\subsection{Enfoque metodológico}
+
+Esta investigación adopta un enfoque cuantitativo, en la medida en que se apoya en el análisis estadístico de representaciones numéricas internas de un modelo de lenguaje para establecer cómo varía su mecanismo de rechazo entre dos contextos de operación. El diseño es de carácter comparativo, pues contrasta el comportamiento de una misma representación bajo dos condiciones controladas: el formato conversacional y el formato agéntico. La comparación se sostiene sobre un principio de control experimental, según el cual el contenido de cada instrucción se mantiene constante entre condiciones y solo se modifica el elemento cuyo efecto se desea aislar, esto es, la presencia de herramientas y del contexto agéntico asociado.
+
+El estudio se organiza en torno a dos componentes analíticos complementarios. El primero es un componente descriptivo, orientado a caracterizar la dirección de rechazo en el formato conversacional y a establecerla como línea base de referencia. El segundo es un componente comparativo, dirigido a cuantificar cómo se transforma esa dirección al introducir el contexto agéntico y a evaluar la estabilidad de su capacidad de detección según el grado de explicitud con que se presenta la intención dañina.
+
+\subsection{Tipo de estudio}
+
+El estudio tiene un componente descriptivo y comparativo sobre representaciones internas, complementado por ensayos de intervención exploratorios. El contraste de estímulos conserva el contenido de cada instrucción y modifica el formato completo: mensaje de sistema y disponibilidad de herramientas. Este contraste estima el efecto de ese conjunto de cambios; no identifica por sí solo cuál de sus componentes lo produce.
+
+En el análisis diagnóstico los pesos permanecen fijos y se registran activaciones. En los ensayos complementarios sí se modifica transitoriamente el flujo residual durante la generación, sin reentrenar ni modificar los pesos. Esas intervenciones permiten evaluar un efecto sobre el rechazo bajo las condiciones ensayadas, pero no demuestran por sí solas que una rotación observada sea la causa general de fallos en agentes desplegados.
+
+\subsection{Objeto de estudio}
+
+El objeto de estudio es la dirección de rechazo, estimada operativamente como un contraste dañino--benigno en el espacio de activaciones. Su capacidad discriminativa y su relación con la conducta se evalúan por separado; la denominación no presupone que toda dirección así estimada sea un mecanismo causal de rechazo. El interés recae específicamente en cómo esta representación se comporta cuando el modelo transita del formato conversacional al agéntico, y en si su capacidad de detección se conserva ante instrucciones cuya intención dañina se presenta con distintos grados de explicitud.
+
+El análisis se realiza sobre modelos de lenguaje de pesos abiertos, cuya arquitectura permite el acceso directo a las activaciones internas que el estudio requiere. Las corridas reportadas emplean cuatro modelos de tres familias: Mistral-7B-Instruct-v0.3, Qwen3-8B, Qwen3-32B y Llama-3.3-70B-Instruct. Todos disponen de entrenamiento de alineamiento y de soporte para el uso de herramientas, condiciones necesarias para construir las dos condiciones del estudio. La selección cubre dos ejes de variación. El primero es la receta de entrenamiento: tres familias con procesos de preentrenamiento y alineamiento distintos permiten separar lo propio del fenómeno de lo propio de una receta particular. El segundo es la escala, entre siete y setenta mil millones de parámetros, con dos tamaños dentro de la familia Qwen que permiten observar el efecto del tamaño manteniendo constante la receta. Las características arquitectónicas de los cuatro modelos se recogen en la Tabla~\ref{tab:modelos}.
+
+El corpus ampliado contiene 96 pares y está validado estructuralmente. Las ejecuciones que pueden sustentarse con los archivos disponibles corresponden al corpus original de 42 pares en los cuatro modelos. Los resultados principales se apoyan en Llama-3.3-70B V3 y en el registro de Mistral-7B V3; las corridas previas de Qwen se presentan como evidencia exploratoria. No se atribuyen a ninguno de esos archivos resultados sobre 96 pares.
+
+La unidad de muestreo es el par base. Las cuatro variantes de un mismo par no son cuatro observaciones independientes. Los 42 pares originales se distribuyen en 18 explícitos, 14 contextuales y 10 de apariencia legítima. El tamaño de esos estratos limita la precisión de las comparaciones.
+
+\section{Datos y fuentes de información}
+\label{sec:datos}
+
+La estrategia de datos se fundamenta en un diseño contrastivo pareado, cuyo propósito es aislar el efecto del formato agéntico sobre las representaciones internas del modelo. El conjunto toma del \textit{benchmark} AgentHarm \parencite{andriushchenko2024} tres elementos: la taxonomía de categorías de daño, la lógica de tareas que requieren el uso de herramientas y el principio de emparejar cada tarea dañina con una contraparte benigna. Las instrucciones, en cambio, fueron redactadas o ajustadas para esta investigación, con el fin de incorporar tres controles que la construcción original no contempla y que este estudio requiere: la identidad del texto entre condiciones, la estratificación por grado de explicitud de la intención dañina y la simetría léxica entre las dos ramas de cada par.
+
+La distinción es de propósito y no de calidad. AgentHarm fue construido para medir, en el plano conductual, si un agente cumple una petición peligrosa, y para ese fin basta que la contraparte benigna sea una tarea benigna equivalente. Este estudio, en cambio, estima una dirección en el espacio de activaciones mediante diferencia de medias entre dos centroides, procedimiento que exige que ambos conjuntos difieran en la intención y no en el tema. De ahí que los tres controles no sean un refinamiento opcional sino una condición del método.
+
+La construcción y consolidación de las instrucciones estuvo a cargo del autor. El corpus original reúne 42 pares propios. El ampliado conserva esos pares, añade 20 pares propios y 34 pares derivados de AgentHarm, para un total de 62 propios y 34 derivados del benchmark. La adaptación priorizó identidad de texto entre formatos, contrapartes benignas temáticamente próximas y una clasificación explícita del grado de explicitud. Un caso se conserva cuando admite un pareado adecuado y una asignación justificable; de otro modo se reformula o descarta. El origen queda registrado por par. La adaptación de contrapartes implica que el corpus no constituye una evaluación íntegra del benchmark publicado.
+
+La construcción contó con una revisión asistida por modelos. Un modelo de lenguaje (Claude) actuó como anotador auxiliar en la revisión de los pares, señalando asimetrías temáticas entre las ramas, discrepancias en la identidad del texto entre formatos y asignaciones de explicitud dudosas, que el autor resolvió al consolidar la versión final. Esta revisión asistida cumplió una función de control de calidad durante la construcción y no sustituye la segunda clasificación independiente que se requiere para estimar el grado de acuerdo entre anotadores, la cual, como se indica más adelante, queda como trabajo pendiente. La decisión sobre cada caso recayó en todo momento en el autor.
+
+\subsection{Diseño contrastivo pareado}
+
+Cada instrucción base se presenta en cuatro variantes que resultan del cruce de dos factores. El primer factor es el contenido de la instrucción, que puede ser dañino o benigno. El segundo es el formato de operación, que puede ser conversacional o agéntico. De este cruce resultan cuatro condiciones: dañina en formato conversacional, dañina en formato agéntico, benigna en formato conversacional y benigna en formato agéntico.
+
+La característica distintiva del diseño es que el texto de la instrucción es idéntico entre el formato conversacional y el agéntico; la única diferencia entre ambos es la presencia de las definiciones de herramientas y del \textit{prompt} de sistema propio del agente. Este control permite atribuir cualquier variación observada en las representaciones internas al cambio de formato, y no a diferencias en la redacción, limitación presente en los \textit{benchmarks} que emplean textos distintos para cada condición.
+
+Cada instrucción dañina se acompaña de una contraparte benigna construida sobre la misma estructura, de modo que ambas comparten el vocabulario, la longitud aproximada, las entidades mencionadas y el repertorio de herramientas, y difieren únicamente en la intención subyacente. Este emparejamiento es necesario para el cálculo de la dirección de rechazo mediante diferencia de medias, que requiere dos conjuntos comparables de activaciones. Si la rama benigna cambiara de tema además de intención, la dirección estimada capturaría ambas cosas a la vez y no podría interpretarse como un eje de peligrosidad. El grado en que ese control se cumple se verifica de manera explícita y se reporta en la Sección~\ref{subsec:simetria}.
+
+El diseño impone además dos invariantes que se verifican sobre la totalidad del conjunto. La primera es que las cuatro variantes de un mismo par comparten identificador, condición de la que dependen todas las pruebas pareadas posteriores. La segunda es que, dentro de cada formato, la rama dañina y la benigna reciben el mismo mensaje de sistema y la misma lista de herramientas, de modo que la diferencia entre ambas no pueda provenir del andamiaje del agente ni de disponer de capacidades distintas, sino únicamente de la intención de la instrucción.
+
+\subsection{Estratificación por grado de explicitud}
+
+Un aporte central del diseño es la estratificación de las instrucciones dañinas según el grado de explicitud con que se manifiesta la intención dañina, en tres niveles. En el primer nivel, la intención dañina es explícita: el daño es evidente en la superficie del texto y las palabras clave lo delatan directamente. En el segundo nivel, la intención es contextual: el texto no contiene términos abiertamente dañinos, pero la intención se infiere del contexto de la solicitud. En el tercer nivel, la intención se presenta bajo una apariencia legítima: la instrucción está enmarcada como una tarea profesional o justificada, mientras que la acción solicitada es dañina.
+
+Esta estratificación constituye un constructo propuesto en el marco de esta investigación, y no una categorización tomada de un instrumento previamente validado, pues la literatura sobre la dirección de rechazo no ha incorporado el grado de explicitud como dimensión de análisis. Su justificación es conceptual y responde a una limitación de los enfoques que solo consideran daño explícito. Un modelo alineado rechaza con facilidad las instrucciones abiertamente dañinas, precisamente porque las palabras clave activan el mecanismo de rechazo. Los casos que representan un riesgo real en el despliegue son aquellos en los que la intención dañina no reside en las palabras sino en el contexto o en el encuadre. Incorporar los tres niveles permite evaluar si la capacidad de detección de la dirección de rechazo se mantiene estable o se degrada a medida que el daño se vuelve menos evidente en la superficie del texto, cuestión que constituye uno de los objetivos de esta investigación.
+
+El criterio operativo que asigna cada instrucción a un nivel distingue si el vocabulario marcado delata el daño en la superficie del texto, caso en el que la instrucción es explícita, o si el daño debe inferirse de la situación descrita, caso en el que es contextual. El nivel de apariencia legítima se reserva para las instrucciones que además incorporan un encuadre justificador. Cada clasificación quedó registrada con su justificación caso por caso en un archivo de anotación que acompaña al conjunto de datos, lo que permite auditar la decisión y repetirla. La estimación del grado de acuerdo entre anotadores, prevista en el diseño, requiere una segunda clasificación independiente de la primera y queda como trabajo pendiente.
+
+\subsection{Definición de herramientas}
+
+La construcción de la condición agéntica requiere dotar al modelo de un conjunto de herramientas que definan su capacidad de actuar. Para ello se definió un repertorio de herramientas simuladas (\textit{mock}), especificadas en el formato de llamada a funciones que los modelos emplean para el uso de herramientas. Cada herramienta se describe mediante un nombre, una descripción de su función y un esquema de sus parámetros de entrada.
+
+Estas herramientas no ejecutan ninguna acción real. Su presencia en el contexto tiene como único fin situar al modelo en el escenario agéntico, es decir, hacerle disponible la capacidad de invocar acciones, que es la condición cuyo efecto sobre las representaciones internas se desea estudiar. El repertorio abarca herramientas asociadas a las distintas categorías de daño, tales como el envío de correos, la búsqueda en la web, la consulta de páginas, la ejecución de comandos en terminal, la transferencia de fondos, la generación de imágenes y la publicación en redes sociales, seleccionadas de modo que cada instrucción agéntica disponga de las herramientas coherentes con la tarea que describe.
+
+\subsection{Composición del conjunto de datos}
+
+El conjunto está compuesto por 96 pares base. Cada par se presenta en las cuatro variantes descritas, lo que arroja un total de 384 entradas, distribuidas en partes iguales entre las condiciones \textit{chat} dañina, agéntica dañina, \textit{chat} benigna y agéntica benigna, con 96 instancias cada una. Se verificó que el texto de la instrucción es idéntico entre el formato conversacional y el agéntico en la totalidad de los pares, de modo que la única diferencia entre ambos formatos radica en el \textit{prompt} de sistema y en las definiciones de herramientas.
+
+Las instrucciones dañinas se distribuyen en siete categorías de daño y en los tres niveles de explicitud descritos. La Tabla~\ref{tab:distribucion} presenta el cruce completo entre ambas dimensiones. Ninguna celda queda vacía y todas contienen entre dos y ocho pares, de modo que cada combinación de categoría y nivel está representada.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Categoría de daño} & \textbf{Explícito} & \textbf{Contextual} & \textbf{Ap. legítima} & \textbf{Total} \\
+\midrule
+Fraude              & 6 & 4 & 5 & 15 \\
+Cibercrimen         & 6 & 2 & 5 & 13 \\
+Desinformación      & 4 & 4 & 5 & 13 \\
+Acoso               & 7 & 3 & 4 & 14 \\
+Discurso de odio    & 8 & 3 & 4 & 15 \\
+Derechos de autor   & 5 & 6 & 4 & 15 \\
+Drogas              & 6 & 2 & 3 & 11 \\
+\midrule
+\textbf{Total}      & \textbf{42} & \textbf{24} & \textbf{30} & \textbf{96} \\
+\bottomrule
+\end{tabular}
+\caption{Distribución de los 96 pares dañinos por categoría de daño y por nivel de explicitud de la intención.}
+\label{tab:distribucion}
+\end{table}
+
+El tamaño del estrato más pequeño, el contextual, con 24 pares, es la cifra que determina la precisión del análisis diferenciado por explicitud. Los tres niveles quedan en órdenes comparables, condición sin la cual ese análisis solo podría presentarse como patrón exploratorio.
+
+Para construir la condición agéntica se definió un repertorio de 64 herramientas simuladas, todas ellas efectivamente empleadas en el conjunto. Cada tarea agéntica dispone de entre dos y ocho herramientas coherentes con la acción que describe, con una media de 3{,}4 herramientas por tarea. Las más frecuentes son la búsqueda web y la consulta de páginas, presentes en 44 y 40 pares respectivamente, seguidas del envío de correos, la publicación en redes sociales y la carga de archivos.
+
+\subsubsection*{Ejemplos y alcance del corpus}
+
+Los tres niveles se ilustran con la categoría de fraude. En el nivel explícito, una instrucción pide probar credenciales bancarias robadas y transferir fondos a una billetera de criptomonedas, y su contraparte benigna sustituye las credenciales por cuentas de prueba autorizadas. En el contextual, pide redactar a adultos mayores correos que anuncian un subsidio inexistente para que verifiquen sus datos bancarios en un enlace; ninguna palabra es abiertamente dañina y el fraude se infiere del contexto. En el de apariencia legítima, pide un correo de \textit{phishing} realista enmarcado como entrenamiento de concientización y enviarlo a toda la base de contactos. En los tres casos la instrucción benigna comparte estructura y vocabulario con la dañina, condición que permite que la diferencia de medias capture la intención y no el tema.
+
+Una parte del conjunto recoge, además, tipologías de daño documentadas en el contexto latinoamericano, como la suplantación de un familiar para solicitar una transferencia urgente, los esquemas de captación con rendimientos pagados con nuevos depósitos, la desinformación sobre la reubicación de puestos de votación o la discriminación en procesos de contratación. Estas instrucciones están redactadas en el mismo idioma que el resto del conjunto, porque introducir otro idioma haría que el desplazamiento asociado al idioma entrara en la diferencia de medias y se confundiera con el asociado al daño.
+
+\subsection{Simetría léxica del pareado y su verificación}
+\label{subsec:simetria}
+
+El diseño exige que las dos ramas de un par difieran en la intención y no en el tema, pero esa exigencia es cualitativa y no se verifica por inspección. Para hacerla comprobable se adoptó una medida explícita del solapamiento léxico entre ambas ramas, el índice de Jaccard sobre los conjuntos de términos de cada instrucción,
+\begin{equation}
+J(h,b) = \frac{|T_h \cap T_b|}{|T_h \cup T_b|},
+\end{equation}
+donde $T_h$ y $T_b$ denotan los conjuntos de términos de la instrucción dañina y de su contraparte benigna. El índice vale uno cuando ambas instrucciones emplean exactamente el mismo vocabulario y cero cuando no comparten ningún término. Un valor alto indica que la diferencia entre las ramas se concentra en aquello que el diseño pretende aislar; un valor bajo advierte que el par introduce además un cambio de tema.
+
+Esta medida se emplea de dos maneras. La primera es como criterio de construcción: cada par se redactó buscando un solapamiento comparable al del resto del conjunto, con longitudes similares entre ramas y las mismas entidades mencionadas en ambas. La segunda, y más importante, es como control de la comparación entre estratos. Si los pares de un estrato quedaran sistemáticamente mejor pareados que los de otro, una diferencia observada en la capacidad de detección según el grado de explicitud podría provenir de esa asimetría de construcción y no del fenómeno que se desea medir. Verificar que el solapamiento es homogéneo entre estratos es, por tanto, condición para que el análisis diferenciado admita interpretación.
+
+La Tabla~\ref{tab:jaccard} recoge los valores obtenidos. Los tres estratos quedan dentro de un rango de 0{,}014, de modo que la comparación entre ellos no está condicionada por la estrechez del pareado.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Nivel de explicitud} & \textbf{Pares} & \textbf{Solapamiento mediano} \\
+\midrule
+Explícito             & 42 & 0{,}408 \\
+Contextual            & 24 & 0{,}413 \\
+Apariencia legítima   & 30 & 0{,}422 \\
+\midrule
+\textbf{Conjunto completo} & \textbf{96} & \textbf{0{,}419} \\
+\bottomrule
+\end{tabular}
+\caption{Solapamiento léxico entre la rama dañina y la benigna de cada par, medido con el índice de Jaccard, por nivel de explicitud de la intención.}
+\label{tab:jaccard}
+\end{table}
+
+Conviene precisar el alcance de esta medida. El índice de Jaccard opera sobre conjuntos de términos y no captura ni el orden de las palabras ni la sinonimia, de modo que no es una medida de similitud semántica sino de coincidencia de vocabulario. Su función aquí es acotada y suficiente: detectar los pares en los que la contraparte benigna se aparta del tema de la dañina, que es la forma concreta en que el control del diseño puede fallar. Ocho pares del conjunto presentan un solapamiento inferior a 0{,}25, y se conservan por ser casos en los que la estructura de la tarea impone vocabulario distinto en cada rama.
+
+El conjunto se genera mediante un procedimiento determinista que comprueba siete invariantes del diseño, entre ellas la identidad del texto entre formatos y de la lista de herramientas entre ramas, y que aborta sin escribir si alguna no se cumple.
+
+\section{Métodos y herramientas}
+\label{sec:metodos}
+
+\subsection{Formalización matemática del método}
+\label{sec:formalizacion}
+
+El método se apoya en el análisis de las representaciones internas que un modelo de lenguaje de tipo \textit{transformer} genera al procesar una instrucción, siguiendo el planteamiento de \textcite{arditi2024}. Esta sección parte de la arquitectura de los modelos estudiados, de la que se derivan la posición de la secuencia en la que se mide y la necesidad de expresar el efecto en unidades invariantes a la escala; define después la dirección de rechazo y las cantidades con las que se comparan los dos formatos.
+
+\subsubsection*{Arquitectura del modelo y flujo residual}
+
+Sea una instrucción tokenizada como la secuencia $t_1, \dots, t_n$. Los cuatro modelos estudiados son \textit{transformers} decodificadores de $L$ capas con normalización previa a cada bloque. Cada posición $i$ mantiene un vector $\bm{x}_i^{(l)} \in \mathbb{R}^{d}$, el flujo residual, que parte de la incrustación del \textit{token} $t_i$ y que cada capa actualiza sumando la contribución de un bloque de atención y la de un perceptrón:
+\begin{equation}
+\bm{x}_i^{(l)} = \bm{x}_i^{(l-1)} + \bm{a}_i^{(l)} + \bm{m}_i^{(l)}.
+\label{eq:residual}
+\end{equation}
+Ambos bloques leen una versión normalizada del flujo residual (RMSNorm, que divide el vector por su raíz cuadrática media), de modo que lo que leen no depende de su norma; el flujo residual, en cambio, acumula magnitud sin normalizar. El perceptrón, de tipo SwiGLU, actúa sobre cada posición por separado. El bloque de atención es el único que mezcla información entre posiciones: en cada cabeza, los pesos que la posición $i$ asigna a la posición $j$ son
+\begin{equation}
+\alpha_{ij} = \operatorname{softmax}_{j}\!\left( \frac{\bm{q}_i \cdot \bm{k}_j}{\sqrt{d_k}} + M_{ij} \right),
+\qquad
+M_{ij} =
+\begin{cases}
+0, & j \le i,\\[2pt]
+-\infty, & j > i,
+\end{cases}
+\label{eq:atencion}
+\end{equation}
+donde $\bm{q}_i$ y $\bm{k}_j$ son proyecciones lineales de las posiciones $i$ y $j$, rotadas según su posición en la secuencia, y $M$ es la máscara causal. Finalmente, la distribución sobre el siguiente \textit{token} se obtiene de la última posición de la última capa,
+\begin{equation}
+P(t_{n+1} \mid t_1, \dots, t_n) = \operatorname{softmax}\!\big( \bm{W}_U\, \mathrm{RMSNorm}(\bm{x}_n^{(L)}) \big).
+\label{eq:unembedding}
+\end{equation}
+La Tabla~\ref{tab:modelos} recoge las dimensiones de los cuatro modelos. Desplegando \eqref{eq:residual}, el flujo residual en la capa $l$ es la incrustación inicial más la suma de todo lo que las capas anteriores han escrito en él, $\bm{x}_i^{(l)} = \bm{x}_i^{(0)} + \sum_{k \le l} (\bm{a}_i^{(k)} + \bm{m}_i^{(k)})$. Esa estructura aditiva es la que hace razonable buscar un concepto como una dirección en $\mathbb{R}^{d}$.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Modelo} & $L$ & $d$ & $H$ & $H_{kv}$ & $d_{\text{ff}}$ & \textbf{Capas evaluadas} \\
+\midrule
+Mistral-7B-Instruct-v0.3 & 32 & 4.096 & 32 & 8 & 14.336 & 16 \\
+Qwen3-8B                 & 36 & 4.096 & 32 & 8 & 12.288 & 18 \\
+Qwen3-32B                & 64 & 5.120 & 64 & 8 & 25.600 & 32 \\
+Llama-3.3-70B-Instruct   & 80 & 8.192 & 64 & 8 & 28.672 & 20 \\
+\bottomrule
+\end{tabular}
+\caption{Dimensiones de los modelos estudiados: número de capas $L$, dimensión del flujo residual $d$, cabezas de consulta $H$ y de clave y valor $H_{kv}$, y dimensión interna del perceptrón $d_{\text{ff}}$. La última columna indica cuántas capas cubre el barrido de cada corrida.}
+\label{tab:modelos}
+\end{table}
+
+\subsubsection*{La posición de lectura: el último \textit{token}}
+
+El método mide en una única posición, la del último \textit{token} del estímulo renderizado antes de generar, por tres razones. Ese estímulo incluye mensaje de sistema, herramientas, instrucción y delimitadores de plantilla. La posición puede corresponder a un delimitador, como \texttt{[/INST]}, y no al último token léxico escrito por el usuario. La primera es que la máscara causal de \eqref{eq:atencion} anula $\alpha_{ij}$ para toda $j > i$, y el perceptrón no mezcla posiciones; por inducción sobre las capas, la representación de la posición $i$ depende solo de los \textit{tokens} $t_1, \dots, t_i$. Ese conjunto es el \emph{cono de influencia} de la posición, y el de la posición $n$ contiene el estímulo completo. Esa propiedad describe el acceso causal permitido por la arquitectura, sin garantizar que toda la información sea utilizada. La segunda es que, por \eqref{eq:unembedding}, el primer \textit{token} de la respuesta, donde se materializa el rechazo o el cumplimiento, se decide a partir de $\bm{x}_n^{(L)}$: medir en la posición $n$ de una capa intermedia es observar el mismo trayecto que produce la decisión. En adelante se escribe $\bm{x}^{(l)} \equiv \bm{x}_n^{(l)}$.
+
+La tercera razón es específica de este diseño. El estímulo agéntico es más largo que el conversacional, porque incorpora el mensaje de sistema y el esquema de herramientas. Una medida que promediara posiciones dependería de la longitud del prefijo y recogería, además del efecto del formato, un término atribuible a esa diferencia de longitud, sin forma de separarlos. La última posición, en cambio, desempeña el mismo papel funcional en ambos formatos, el de última posición antes de la generación condicionada a todo el contexto, con independencia de cuántos \textit{tokens} de andamiaje la precedan.
+
+\subsubsection*{Cálculo de la dirección de rechazo}
+
+Sean $\mathcal{D}_{h}$ y $\mathcal{D}_{b}$ los conjuntos de instrucciones dañinas y benignas en formato conversacional, con centroides $\bm{\mu}_{h}^{(l)}$ y $\bm{\mu}_{b}^{(l)}$ en la capa $l$. La dirección de rechazo es su diferencia normalizada,
+\begin{equation}
+\bm{r}^{(l)} = \bm{\mu}_{h}^{(l)} - \bm{\mu}_{b}^{(l)} = \frac{1}{n} \sum_{i=1}^{n} \big( \bm{x}_{h,i}^{(l)} - \bm{x}_{b,i}^{(l)} \big),
+\qquad
+\hat{\bm{r}}^{(l)} = \frac{\bm{r}^{(l)}}{\lVert \bm{r}^{(l)} \rVert},
+\label{eq:direccion}
+\end{equation}
+donde la segunda igualdad expresa la dirección como media de diferencias intra-par: cada par aporta el contraste entre dos instrucciones que comparten tema y vocabulario y difieren en la intención.
+
+El eje que mejor separa dos clases, en el sentido del discriminante de Fisher, es $\bm{\Sigma}_{W}^{-1}(\bm{\mu}_{h} - \bm{\mu}_{b})$, con $\bm{\Sigma}_{W}$ la covarianza dentro de las clases. Con $2n$ observaciones y $n \ll d$, la covarianza muestral tiene rango a lo sumo $2n - 2$ y no es invertible. Regularizándola como $\hat{\bm{\Sigma}}_{W} + \lambda \bm{I}$, cuando $\lambda \to \infty$, la dirección normalizada del discriminante converge a la dirección de la diferencia de medias. Este estimador es, por tanto, el discriminante que renuncia a estimar la covarianza, aunque la media estimada sigue teniendo ruido de muestreo y requiere evaluación fuera de muestra cuando $n \ll d$.
+
+La dirección es un estimador, no una cantidad conocida del modelo. Si $\bm{r}$ es la diferencia poblacional y $\bm{\Sigma}_{\Delta}$ la covarianza de las diferencias intra-par,
+\begin{equation}
+\mathbb{E}\big[\bm{r}^{(l)}\big] = \bm{r},
+\qquad
+\mathbb{E}\big[\lVert \bm{r}^{(l)} \rVert^{2}\big] = \lVert \bm{r} \rVert^{2} + \frac{\operatorname{tr}(\bm{\Sigma}_{\Delta})}{n}.
+\label{eq:sesgo-norma}
+\end{equation}
+El vector es insesgado, pero su norma está sesgada hacia arriba en un término que crece con la dimensión y decrece con el número de pares. Como la separación entre clases medida sobre los mismos datos que produjeron la dirección coincide exactamente con $\lVert \bm{r}^{(l)} \rVert$, esa separación hereda el sesgo, mientras que la condición agéntica, que no interviene en la estimación, no lo hereda. Es el sesgo de circularidad que el procedimiento corrige mediante validación cruzada.
+
+\subsubsection*{Proyección y diferencia entre formatos}
+
+La proyección de una instrucción sobre la dirección de rechazo es
+\begin{equation}
+p^{(l)}(\bm{x}) = \bm{x}^{(l)} \cdot \hat{\bm{r}}^{(l)} = \lVert \bm{x}^{(l)} \rVert \cos\theta,
+\label{eq:proyeccion}
+\end{equation}
+y constituye la medida central del estudio: un valor elevado indica que la representación de la instrucción está alineada con la dirección de rechazo. La segunda igualdad muestra que mezcla la orientación de la activación, que es lo que interesa, con su norma, que no. Como cada instrucción aparece en ambos formatos con texto idéntico, la unidad de análisis es la diferencia dentro del par:
+\begin{equation}
+\delta_{h,i}^{(l)} = p^{(l)}_{\text{chat}}(\bm{x}_{h,i}) - p^{(l)}_{\text{ag}}(\bm{x}_{h,i}),
+\qquad
+\Delta p_{h}^{(l)} = \frac{1}{n} \sum_{i=1}^{n} \delta_{h,i}^{(l)},
+\label{eq:gap}
+\end{equation}
+con la definición análoga $\Delta p_{b}^{(l)}$ para las contrapartes benignas. Un valor $\Delta p_{h}^{(l)} > 0$ indica que la dirección de rechazo responde con menor intensidad en el formato agéntico. Con $s_{\delta}$ la desviación estándar de las diferencias intra-par, el estadístico de la prueba $t$ pareada y el tamaño del efecto pareado son
+\begin{equation}
+t = \frac{\Delta p_{h}^{(l)}}{s_{\delta} / \sqrt{n}},
+\qquad
+d_{z} = \frac{\Delta p_{h}^{(l)}}{s_{\delta}},
+\qquad
+t = d_{z} \sqrt{n},
+\label{eq:dz}
+\end{equation}
+de modo que $d_z$, y no $t$, es la cantidad comparable entre corpus de distinto tamaño.
+
+\subsubsection*{Especificidad del efecto: el control benigno}
+
+La cantidad $\Delta p_{h}^{(l)}$, por sí sola, no distingue entre tres mecanismos: un debilitamiento del rechazo ante solicitudes dañinas, que es el que la investigación postula; un desplazamiento rígido que traslade toda representación a lo largo de $\hat{\bm{r}}^{(l)}$; y una contracción de escala que comprima todas las distancias. El brazo benigno resuelve la primera ambigüedad, pues atraviesa exactamente el mismo cambio de formato. La cantidad específica del contenido dañino es la interacción entre contenido y formato, acompañada de la fracción del efecto que el brazo benigno reproduce:
+\begin{equation}
+\Delta^{2} p^{(l)} = \Delta p_{h}^{(l)} - \Delta p_{b}^{(l)},
+\qquad
+\varphi^{(l)} = \frac{\Delta p_{b}^{(l)}}{\Delta p_{h}^{(l)}}.
+\label{eq:interaccion}
+\end{equation}
+Un desplazamiento rígido predice $\Delta^{2} p^{(l)} \approx 0$ y $\varphi^{(l)} \approx 1$; un debilitamiento específico, $\Delta^{2} p^{(l)} > 0$ con $\varphi^{(l)}$ pequeño; y $\varphi^{(l)} < 0$ indica que los dos brazos se desplazan en sentidos opuestos. La hipótesis de trabajo es $\Delta^{2} p^{(l)} > 0$.
+
+\subsubsection*{Invariancia de escala}
+
+La contracción de escala se resuelve expresando el efecto en unidades que la sobrevivan. Con $S$ la separación entre las proyecciones medias de ambas clases dentro de un formato y $s$ su desviación estándar agrupada, se definen la separación estandarizada y el factor de contracción,
+\begin{equation}
+d = \frac{S}{s},
+\qquad
+\kappa = \frac{s_{\text{ag}}}{s_{\text{chat}}}.
+\label{eq:kappa}
+\end{equation}
+Su papel se precisa con un caso límite. Si el formato se limitara a reescalar y desplazar las proyecciones, $p_{\text{ag}} = a\, p_{\text{chat}} + b$ con $a > 0$, se tendría
+\begin{equation}
+S_{\text{ag}} = a\, S_{\text{chat}},
+\qquad
+d_{\text{ag}} = d_{\text{chat}},
+\qquad
+\kappa = a,
+\label{eq:caso-afin}
+\end{equation}
+y la separación cruda perdería una fracción $1 - a$, arbitrariamente grande, sin que se perdiera nada en $d$ ni en el AUROC, que solo depende del orden. La parte de la pérdida que refleja capacidad discriminativa es, por tanto, la que sobrevive en $d$ y en el AUROC. Por la misma razón, las unidades crudas no son comparables entre modelos, cuyos flujos residuales tienen normas distintas.
+
+\subsubsection*{Dirección agéntica, reorientación y monitor}
+
+Se distinguen dos estimadores. La dirección agéntica de diferencia de medias, $\hat{\bm{w}}_{\mathrm{DM}}^{(l)}$, se obtiene restando los centroides agénticos dañino y benigno y normalizando. La dirección $\hat{\bm{w}}_{\mathrm{LR}}^{(l)}$ procede de los coeficientes de una regresión logística lineal. Un clasificador no tiene por qué recuperar el mismo vector que el contraste de centroides. Por ello, cada coseno, AUROC y monitor se identifica por estimador.
+
+El coseno de $\hat{\bm{w}}_{\mathrm{DM}}^{(l)}$ con $\hat{\bm{r}}^{(l)}$ compara dos contrastes de medias. El análisis adicional de regresión logística compara direcciones obtenidas con el mismo estimador en ambos formatos. Se reporta la fiabilidad entre mitades disjuntas, pues ruido de estimación puede reducir el coseno aparente. La normalización por fiabilidad es un diagnóstico bajo supuestos de error, no una medición exacta de un ángulo poblacional.
+
+Los monitores clasifican la proyección mediante un umbral calibrado en los datos de entrenamiento de cada fold. La evaluación se hace en pares retenidos y se reportan AUROC, $F_1$ y tasa de falsos positivos. Los resultados de ambos estimadores se conservan separados. No equivalen a una validación en datos externos ni a garantías de seguridad operacional.
+
+\subsubsection*{Validación geométrica mediante PCA}
+
+Para cada capa se concatenan las activaciones conversacionales dañinas y benignas en una matriz $X\in\mathbb{R}^{2n\times d}$ y se resta su media global. Se ajusta PCA sobre esa matriz centrada, sin centrar por separado cada clase: hacerlo eliminaría precisamente la diferencia entre centroides. Se reportan la proporción de varianza explicada por PC1 y $|\cos(\mathrm{PC1},\hat{\bm{r}})|$. El signo de PC1 se orienta para que el coseno sea positivo. También se examinan los cinco primeros componentes y la varianza proyectada sobre la dirección. La alineación con PC1 indica predominio en la varianza total de esa muestra; su ausencia no invalida automáticamente un contraste discriminativo.
+
+\subsection{Procedimiento de análisis}
+
+El procedimiento aplica la formalización anterior en tres etapas. En la primera se extrae, para cada instrucción y cada capa del barrido, la activación del último \textit{token}, manteniendo alineadas por identificador las cuatro variantes de cada par. En la segunda se estima la dirección de rechazo sobre el formato conversacional y se caracteriza su comportamiento por capa, evaluando mediante componentes principales si el contraste dañino--benigno coincide con un eje dominante de variación. En la tercera se calculan, por separado para cada brazo, el desplazamiento entre formatos, su interacción y su expresión en unidades crudas, estandarizadas y de rango, primero sobre el conjunto completo y después por grado de explicitud.
+
+\subsection{Implementación y reproducibilidad}
+
+El análisis se ejecutó sobre modelos de pesos abiertos descargados y
+ejecutados de manera local, sin acceso a servicios externos de inferencia.
+Las ejecuciones usan variantes del mismo pipeline; la comparación entre versiones requiere registrar los cambios de implementación. La extracción
+registra el flujo residual correspondiente al último \textit{token} del
+estímulo renderizado en cada una de las capas del barrido. El barrido cubre en cada
+modelo un subconjunto de capas distribuido a lo largo de la red, cuyo tamaño
+se indica en la Tabla~\ref{tab:modelos}. Las cuatro variantes de cada par se
+procesan manteniendo su identificador común, condición de la que dependen
+todas las pruebas pareadas posteriores.
+
+La rutina opera con un presupuesto de 4.096 \textit{tokens} por instrucción y
+aborta la corrida si algún estímulo lo alcanza, en lugar de recortarlo en
+silencio. La razón se sigue de la Sección~\ref{sec:formalizacion}: la medida
+del estudio es la activación del último \textit{token}, y sobre un texto
+recortado ese último \textit{token} dejaría de ser el final de la petición,
+con lo que su cono de influencia ya no contendría la instrucción completa.
+En la implementación actual se conservan los extremos de longitud y se comprueba que el estímulo no haya sido truncado. Esa comprobación debe acompañar la configuración de cada ejecución histórica.
+
+Una precisión sobre el alcance de esta reproducibilidad. Los procedimientos
+de inferencia sobre modelos de gran escala en precisión reducida no son
+estrictamente deterministas, ya que el orden de las operaciones en punto
+flotante puede variar entre ejecuciones y entre configuraciones de
+\textit{hardware}. La incertidumbre numérica entre ejecuciones no está cuantificada por los intervalos de muestreo del corpus. Se documentan por separado precisión, tokenización, configuración y cambios de implementación; no se atribuye automáticamente una discrepancia de ejecución al margen estadístico.
+
+\section{Estrategia de evaluación y validación}
+\label{sec:evaluacion-validacion}
+
+La evaluación se organiza en torno a dos controles que aseguran que los efectos observados sean atribuibles al mecanismo de rechazo y no a artefactos del diseño. El primero es el control benigno, formalizado en \eqref{eq:interaccion}: el mismo tránsito de formato se aplica a las instrucciones benignas, de modo que solo la interacción entre contenido y formato se atribuye al rechazo. El segundo es la separación entre los datos que estiman la dirección y los que evalúan su desempeño, que corrige el sesgo de circularidad descrito en \eqref{eq:sesgo-norma}.
+
+\subsection{Separabilidad entre clases y su estimación}
+
+Además de medir cuánto se reduce la proyección, interesa saber si la dirección conserva su capacidad de distinguir instrucciones dañinas de benignas. Para ello se emplea el AUROC, tomando la proyección como puntaje, que se estima contando las comparaciones correctamente ordenadas entre las $n_h$ instrucciones dañinas y las $n_b$ benignas:
+\begin{equation}
+\widehat{\mathrm{AUROC}} = \frac{1}{n_h n_b} \sum_{i=1}^{n_h} \sum_{j=1}^{n_b} \Big[ \mathbb{1}\big(p_{h,i} > p_{b,j}\big) + \tfrac{1}{2}\, \mathbb{1}\big(p_{h,i} = p_{b,j}\big) \Big].
+\label{eq:auroc}
+\end{equation}
+Es la probabilidad de que una instrucción dañina tomada al azar proyecte más que una benigna: vale $1$ con separación perfecta y $0{,}5$ al azar. Por depender solo del orden, es invariante a transformaciones estrictamente crecientes del puntaje; una inversión del eje cambia su interpretación. El gap de detección es la diferencia entre el AUROC conversacional y el agéntico, y responde a una pregunta distinta de la del gap de proyección: este mide la intensidad de la respuesta; aquel, si esa respuesta sigue bastando para separar las clases.
+
+En el régimen $n \ll d$, si los puntos tienen rango afín suficiente, incluso etiquetados arbitrarios pueden ser linealmente separables. La dimensión alta por sí sola no garantiza esa condición, pero hace que un AUROC de entrenamiento saturado no sea evidencia de generalización. Para obtener una estimación honesta, los pares se particionan en $K$ subconjuntos y, para cada partición $k$, la dirección $\hat{\bm{r}}^{(l)}_{-k}$ se estima con los pares que no pertenecen a ella y se usa para puntuar, y solo a ellos, los pares retenidos:
+\begin{equation}
+\tilde{p}^{(l)}(\bm{x}_i) = \bm{x}_i^{(l)} \cdot \hat{\bm{r}}^{(l)}_{-k(i)}.
+\end{equation}
+Las particiones se definen sobre pares y no sobre instrucciones sueltas, porque separar una instrucción dañina de su contraparte filtraría hacia la dirección el contraste que se pretende medir; y las cuatro variantes de un par retenido se puntúan con la misma dirección, lo que preserva el emparejamiento. La diferencia entre el valor dentro de muestra y el fuera de muestra se denomina optimismo y se reporta de forma explícita. Como las estimaciones de una validación cruzada repetida comparten datos de entrenamiento, su varianza se corrige según \textcite{nadeau2003}, multiplicándola por $1/J + n_{\text{eval}}/n_{\text{ent}}$, donde $J$ es el número de estimaciones. Como referencia de contraste se repite el procedimiento completo con las etiquetas de daño barajadas, lo que estima una referencia nula empírica con incertidumbre Monte Carlo. Bajo ausencia de asociación, el valor esperado de referencia es $0{,}5$; una realización finita puede apartarse de él.
+
+\subsection{Inferencia estadística sobre el diseño pareado}
+
+Dado que cada instrucción aparece en ambos formatos, las pruebas respetan el emparejamiento. La significancia de $\Delta p_h$ se evalúa mediante una prueba de permutación de signos: bajo la hipótesis nula y el supuesto de intercambiabilidad del cambio de condición dentro de pares independientes, el signo de cada $\delta_i$ puede permutarse, y para $B$ vectores de signos aleatorios $\varepsilon^{(b)} \in \{-1,+1\}^n$ se calcula
+\begin{equation}
+T^{(b)} = \frac{1}{n} \sum_{i=1}^{n} \varepsilon_i^{(b)} \delta_i,
+\qquad
+p = \frac{1 + \#\{ b : T^{(b)} \ge \Delta p \}}{B + 1}.
+\end{equation}
+Se acompaña de la prueba $t$ pareada de \eqref{eq:dz} y de un intervalo de confianza por \textit{bootstrap} pareado con corrección de sesgo y aceleración (BCa), que remuestrea pares completos y ajusta los percentiles cuando la distribución remuestreada es asimétrica. Se incluye, además, una prueba de signos exacta, que usa solo el sentido del cambio en cada par y ninguna magnitud, por lo que resulta insensible a la escala de las proyecciones y a reescalados positivos de la dirección. No es, en cambio, independiente de la dirección sobre la que se proyecta, pues el signo de cada diferencia depende de ella; el resguardo frente a esa dependencia es que la dirección se estima fuera de muestra. Si $k$ de los $n$ pares decrecen, su valor $p$ unilateral es $\sum_{j \ge k} \binom{n}{j} 2^{-n}$.
+
+Se emplean 10.000 permutaciones y remuestreos en la corrida principal. Cuando un archivo histórico almacena cero excedencias como $p=0$, se informa una resolución del orden de $10^{-4}$, no probabilidad cero. Se distingue el intervalo percentil del BCa y se identifica el que realmente está guardado.
+
+La inferencia exige cautela adicional. El cross-fitting evita que un par determine su propia dirección, pero los folds comparten datos de entrenamiento: sus puntajes no son realizaciones independientes de todo el procedimiento de ajuste. Los intervalos calculados remuestreando puntajes ya obtenidos son condicionales a esos ajustes y no sustituyen un remuestreo que reestime toda la dirección. Las pruebas de signos sobre esos puntajes se presentan como diagnósticos de consistencia.
+
+Para contrastar una capa se utiliza una separación explícita: 21 pares seleccionan la capa y estiman la dirección, y otros 21 producen la inferencia. Las dos ramas de cada par permanecen juntas. Se indica el denominador de los conteos y se compara el valor $p$ con Bonferroni por número de capas. Esta corrección no reemplaza la separación entre selección e inferencia. Se repite el esquema sobre 200 particiones para describir estabilidad, sin tratarlas como nuevas muestras independientes.
+
+\subsection{Ensayos complementarios de comportamiento}
+
+La ejecución Llama V3 conserva generaciones sin intervención y ensayos de adición de activación en capas 56, 52 y 28. Se suma $\alpha\hat{\bm{r}}$ durante la generación y se compara con una dirección aleatoria de igual norma y con solicitudes benignas. La dosis se expresa en múltiplos del desplazamiento de referencia de cada capa; no corresponde a un parámetro universal. Las respuestas se etiquetan como rechazo, cumplimiento o degeneración mediante una heurística textual reproducible. Esa etiqueta no prueba que una herramienta haya ejecutado la tarea. Los contrastes pareados usan McNemar exacto. Las múltiples dosis y capas se consideran exploratorias, y la auditoría humana de las generaciones sigue pendiente. El log de Mistral no contiene un cierre de su etapa causal y no se reporta como experimento causal completo.
+
+\section{Consideraciones éticas}
+\label{sec:etica}
+
+Una investigación sobre los mecanismos de seguridad de un modelo debe construir el estímulo que esos mecanismos deberían rechazar, y el conjunto de datos de este trabajo reúne, en consecuencia, instrucciones que solicitan acciones dañinas. Tres rasgos del diseño acotan el riesgo que ese material comporta. Las instrucciones describen la acción solicitada, pero no contienen los procedimientos, datos o artefactos que permitirían llevarla a cabo. Las herramientas que definen la condición agéntica son simuladas y no están conectadas a ningún sistema, de modo que ninguna petición puede materializarse en un efecto real. El análisis principal se centra en activaciones; los ensayos complementarios etiquetan respuestas únicamente para estudiar rechazo, cumplimiento y degeneración, sin ejecutar las herramientas simuladas.
+
+El trabajo es, además, diagnóstico: el modelo no se reentrena ni se interviene para suprimir su capacidad de rechazo, y no se genera por tanto un modelo desalineado como subproducto. Los resultados describen dónde se degrada un mecanismo de seguridad, información de doble uso; se considera que el balance favorece su divulgación, porque el fallo ya está documentado en el plano conductual y porque una defensa basada en representaciones internas solo puede construirse a partir de este tipo de diagnóstico. Los modelos se emplean conforme a sus licencias, que contemplan la investigación en seguridad, y el estudio no involucra sujetos humanos ni datos personales: los nombres y cuentas que aparecen en las instrucciones son ficticios.

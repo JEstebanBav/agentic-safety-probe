@@ -1,22 +1,18 @@
-// Sistema visual de la presentación: paleta, tipografía, layouts y ayudas de dibujo.
-//
-// Concepto: la tesis mide dónde cae cada instrucción sobre un eje (la dirección de
-// rechazo). Ese eje con sus puntos proyectados es el motivo gráfico que reaparece
-// en la portada, en los resultados y en el cierre. Los colores son semánticos y no
-// cambian en toda la presentación: rojo bermellón = instrucción dañina, azul acero
-// = instrucción benigna, ámbar = formato agéntico (frente a tinta = conversacional).
+// Sistema editorial sobrio: papel cálido, tipografía de libro y figuras abiertas.
+// Se conserva el código semántico de los gráficos; las antiguas tarjetas se
+// sustituyen por separaciones tipográficas y reglas, sin paneles decorativos.
 
 const W = 13.333, H = 7.5, MX = 0.6;
 
 const C = {
-  ink: "161A20", ink2: "434B57", mute: "6E7682", rule: "D3D7DD", mist: "F1F3F5", paper: "FFFFFF",
-  harm: "C4402A", harmL: "F4D5CD", ben: "2D6A9F", benL: "D3E2EF", ag: "C98316", agL: "F6E5C6",
-  dark: "12161C", dark2: "1F262F", darkTxt: "F2F3F5", darkMute: "A3ACB7", darkRule: "39424E",
+  ink: "26282A", ink2: "4C4D4A", mute: "77766F", rule: "D1CEC5", mist: "F0EDE6", paper: "FAF9F6",
+  harm: "A14F3D", harmL: "F0DED7", ben: "416879", benL: "DFE8E9", ag: "9B743E", agL: "EEE5D4",
+  dark: "FAF9F6", dark2: "FAF9F6", darkTxt: "26282A", darkMute: "4C4D4A", darkRule: "D1CEC5",
 };
 
 const F = {
-  head: "Georgia", body: "Franklin Gothic Book", demi: "Franklin Gothic Demi",
-  med: "Franklin Gothic Medium", math: "Cambria Math", mono: "Consolas",
+  head: "Palatino Linotype", body: "Calibri", demi: "Calibri",
+  med: "Calibri", math: "Cambria Math", mono: "Consolas",
 };
 
 const THEME = {
@@ -56,7 +52,9 @@ function definirLayouts(pres) {
 }
 
 // ------------------------------------------------------------------ texto
-function R(text, o = {}) { return { text, options: { ...o } }; }
+function R(text, o = {}) {
+  return { text, options: { ...(o.fontFace === F.demi ? { bold: true } : {}), ...o } };
+}
 
 // Párrafo: aplica las opciones de párrafo a la primera corrida y cierra con salto de línea.
 function P(runs, po = {}, ultimo = false) {
@@ -73,6 +71,7 @@ function parrafos(lista) {
 
 function txt(slide, content, o = {}) {
   const base = { isTextBox: true, fontFace: F.body, fontSize: 15, color: C.ink, margin: 0, valign: "top", align: "left", paraSpaceAfter: 0 };
+  if (o.fontFace === F.demi) base.bold = true;
   slide.addText(content, Object.assign(base, o));
 }
 
@@ -128,7 +127,14 @@ function rect(slide, pres, x, y, w, h, fill, o = {}) {
   slide.addShape(pres.shapes.RECTANGLE, Object.assign({ x, y, w, h, fill: { color: fill }, line: { color: fill, width: 0 } }, o));
 }
 function rrect(slide, pres, x, y, w, h, fill, o = {}) {
-  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, Object.assign({ x, y, w, h, rectRadius: 0.08, fill: { color: fill }, line: { color: fill, width: 0 } }, o));
+  // Los glifos de conteo y los nodos de diagramas sí conservan el relleno:
+  // su color codifica datos o condiciones experimentales.
+  if ((w < 1 && h < 1) || (w <= 2 && h <= 0.8)) {
+    rect(slide, pres, x, y, w, h, fill);
+    return;
+  }
+  // Agrupar sin encerrar el contenido en tarjetas repetidas.
+  seg(slide, pres, x, y, x + w, y, C.rule, 0.65);
 }
 function dot(slide, pres, cx, cy, dia, fill, o = {}) {
   const base = { x: cx - dia / 2, y: cy - dia / 2, w: dia, h: dia, fill: { color: fill }, line: { color: fill, width: 0 } };
@@ -161,21 +167,15 @@ function curva(slide, pres, pts, o = {}) {
 // Barra de navegación por secciones (arriba a la izquierda). Es funcional: indica en qué
 // parte del argumento está el jurado.
 function nav(slide, actual, oscuro = false) {
-  const runs = [];
-  SECCIONES.forEach((s, i) => {
-    const on = i === actual;
-    runs.push(R(`${["I", "II", "III", "IV"][i]}  ${s.toUpperCase()}`, {
-      fontFace: on ? F.demi : F.body, fontSize: 10, charSpacing: 1.5,
-      color: on ? (oscuro ? C.darkTxt : C.ink) : (oscuro ? C.darkRule : "B4BAC2"),
-    }));
-    if (i < SECCIONES.length - 1) runs.push(R("     ", { fontSize: 10 }));
+  slide.addText(`Ciencia de Datos   /   ${SECCIONES[actual]}`, {
+    x: MX, y: 0.28, w: 8, h: 0.24, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 10, color: C.mute, valign: "middle",
   });
-  slide.addText(runs, { x: MX, y: 0.28, w: 8, h: 0.24, isTextBox: true, margin: 0, valign: "middle" });
 }
 
 function etiquetaRespaldo(slide, n) {
-  slide.addText([R("RESPALDO", { fontFace: F.demi, fontSize: 10, charSpacing: 1.5, color: C.ink }),
-    R(`     R${n}  ·  para preguntas del jurado`, { fontFace: F.body, fontSize: 10, charSpacing: 1.5, color: "9AA1AA" })],
+  slide.addText([R(`Anexo R${n}`, { fontFace: F.demi, fontSize: 10, color: C.ink }),
+    R("   /   Preguntas del jurado", { fontFace: F.body, fontSize: 10, color: C.mute })],
   { x: MX, y: 0.28, w: 9, h: 0.24, isTextBox: true, margin: 0, valign: "middle" });
 }
 
@@ -186,8 +186,8 @@ function fuente(slide, texto, oscuro = false) {
 
 // Etiqueta pequeña en versalitas espaciadas
 function rotulo(slide, texto, x, y, w, color = C.ink2, o = {}) {
-  slide.addText(texto.toUpperCase(), Object.assign({ x, y, w, h: 0.26, isTextBox: true, margin: 0, fontFace: F.demi,
-    fontSize: 10.5, charSpacing: 1.2, color, valign: "middle" }, o));
+  slide.addText(texto, Object.assign({ x, y, w, h: 0.26, isTextBox: true, margin: 0, fontFace: F.demi,
+    fontSize: 11, bold: true, charSpacing: 0, color, valign: "middle" }, o));
 }
 
 // Enjambre unidimensional compacto: cada punto se coloca a la menor distancia del eje que no

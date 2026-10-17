@@ -57,20 +57,20 @@ def main(registro, carpeta_png, salida):
     doc = f"""<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Guion de sustentación</title>
 <style>
 @page {{ size: A4; margin: 16mm 16mm 18mm 16mm; }}
-body {{ font-family: 'Franklin Gothic Book', 'Segoe UI', sans-serif; color: #161A20; font-size: 10.5pt; line-height: 1.45; }}
-h1 {{ font-family: Georgia, serif; font-weight: normal; font-size: 22pt; margin: 0 0 4pt; }}
-.sub {{ font-family: Georgia, serif; font-style: italic; color: #434B57; font-size: 12pt; margin: 0 0 10pt; }}
+body {{ font-family: Calibri, 'Segoe UI', sans-serif; color: #26282A; font-size: 10.5pt; line-height: 1.45; }}
+h1 {{ font-family: 'Palatino Linotype', serif; font-weight: normal; font-size: 22pt; margin: 0 0 4pt; }}
+.sub {{ font-family: 'Palatino Linotype', serif; font-style: italic; color: #4C4D4A; font-size: 12pt; margin: 0 0 10pt; }}
 .meta {{ color: #6E7682; font-size: 9.5pt; margin-bottom: 14pt; }}
 table {{ border-collapse: collapse; width: 100%; font-size: 9.5pt; margin-bottom: 8pt; }}
 td {{ border-bottom: 0.5pt solid #E3E6EA; padding: 3pt 4pt; }}
 td.n, td.t {{ text-align: right; white-space: nowrap; color: #434B57; }}
 section {{ break-inside: avoid; page-break-inside: avoid; margin: 0 0 16pt; padding-top: 10pt; border-top: 0.75pt solid #D3D7DD; }}
 .cab {{ display: flex; align-items: baseline; gap: 8pt; margin-bottom: 6pt; }}
-.num {{ font-family: 'Franklin Gothic Medium', sans-serif; color: #C98316; font-size: 14pt; min-width: 18pt; }}
-h2 {{ font-family: Georgia, serif; font-weight: normal; font-size: 13pt; margin: 0; flex: 1; }}
+.num {{ font-family: Calibri, sans-serif; color: #9B743E; font-size: 14pt; min-width: 18pt; }}
+h2 {{ font-family: 'Palatino Linotype', serif; font-weight: normal; font-size: 13pt; margin: 0; flex: 1; }}
 .tiempo {{ color: #6E7682; font-size: 9pt; white-space: nowrap; }}
 img {{ width: 62%; border: 0.5pt solid #D3D7DD; display: block; margin: 2pt 0 6pt; }}
-h4 {{ font-family: 'Franklin Gothic Demi', sans-serif; font-weight: normal; font-size: 8.5pt; letter-spacing: 0.8pt; text-transform: uppercase; color: #434B57; margin: 6pt 0 2pt; }}
+h4 {{ font-family: Calibri, sans-serif; font-weight: bold; font-size: 8.5pt; color: #4C4D4A; margin: 6pt 0 2pt; }}
 p {{ margin: 0 0 4pt; }}
 .fu {{ color: #6E7682; font-size: 8.5pt; line-height: 1.35; }}
 </style></head><body>
