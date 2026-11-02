@@ -158,7 +158,7 @@ def main():
         (PAPER/'evidence/content_alignment.json').write_text(json.dumps(source_check,ensure_ascii=False,indent=2),encoding='utf-8')
 
     report['editorial_checks']={'authors':authors,'tagline':'Research AI Safety','university_affiliation_absent':True,'document_production_notes_absent':True}
-    report['output_sha256']={name:sha(PAPER/name) for name in ['article.md','article.pdf','article.docx','article.html','references.bib','top_10_related_research.md','research_contribution.md']}
+    report['output_sha256']={name:sha(PAPER/name) for name in ['article.md','article.pdf','article.docx','article.html','references.bib','top_10_related_research.md']}
     report['verified']=True
     (PAPER/'evidence/document_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     record['adaptation_date']='2026-10-29'

@@ -32,4 +32,4 @@ python scripts/build_research_presentation.py
 
 To regenerate numerical evidence and figures from saved runs, use `python scripts/build_paper.py` with the experiment dependencies installed. This does not update the transcribed research text or tables automatically. It does not run models.
 
-The separate [research-contribution paragraph](research_contribution.md) and [top 10 related studies](top_10_related_research.md) are correspondence aids, not additional sections of the article.
+For a focused overview of the literature, see the [top 10 related studies](top_10_related_research.md).
