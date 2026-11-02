@@ -1,0 +1,204 @@
+{
+  "chapters/Chapter1/1.5_chapter01-introduction.tex": {
+    "translation": "sections/01_introduction.md",
+    "source_sha256": "c3419c599e9d87249b8870c34bc46859642328b48cdfe83217ff839e50ee51b5",
+    "source_research_subheadings": [
+      "Planteamiento del proyecto",
+      "Pregunta o propósito central",
+      "Justificación y valor esperado",
+      "Objetivos",
+      "Objetivo general",
+      "Objetivos específicos"
+    ],
+    "translated_research_subheadings": [
+      "1.1. Problem statement",
+      "1.2. Central research question",
+      "1.3. Rationale and expected value",
+      "1.4. Research objectives",
+      "1.4.1. General objective",
+      "1.4.2. Specific objectives"
+    ],
+    "missing_numeric_values": []
+  },
+  "chapters/Chapter2/chapter02.tex": {
+    "translation": "sections/02_context_and_related_work.md",
+    "source_sha256": "aa7e3292e0bd76a4708cc39eece2442b9ef15fe7dd27ee14124afb4b230196b4",
+    "source_research_subheadings": [
+      "Caracterización del contexto",
+      "Antecedentes y referentes",
+      "Antecedentes",
+      "El alineamiento como origen del comportamiento de rechazo",
+      "Del modelo conversacional al agente y el fallo de las salvaguardas",
+      "Estado actual",
+      "La lectura de las representaciones internas mediante clasificadores lineales",
+      "La hipótesis de representación lineal y la ingeniería de representaciones",
+      "La dirección de rechazo y su auditabilidad",
+      "El rechazo en contextos de intervención y su dependencia del contexto",
+      "Brecha, necesidad u oportunidad identificada"
+    ],
+    "translated_research_subheadings": [
+      "2.1. Characterisation of the context",
+      "2.2. Background and references",
+      "2.2.1. Background",
+      "Alignment as the origin of refusal behaviour",
+      "From conversational models to agents and safeguard failure",
+      "2.2.2. Current state of knowledge",
+      "Reading internal representations with linear classifiers",
+      "The linear representation hypothesis and representation engineering",
+      "The refusal direction and its auditability",
+      "Refusal under intervention and its contextual dependence",
+      "2.3. Identified research gap"
+    ],
+    "missing_numeric_values": []
+  },
+  "chapters/Chapter3/chapter03.tex": {
+    "translation": "sections/03_design_and_methods.md",
+    "source_sha256": "40159336989749d1ee54a0c243c996640e7bf9135aa9f76ca450d0bb5bfd3289",
+    "source_research_subheadings": [
+      "Enfoque y diseño",
+      "Enfoque metodológico",
+      "Tipo de estudio",
+      "Objeto de estudio",
+      "Datos y fuentes de información",
+      "Diseño contrastivo pareado",
+      "Estratificación por grado de explicitud",
+      "Definición de herramientas",
+      "Composición del conjunto de datos",
+      "Ejemplos y alcance del corpus",
+      "Simetría léxica del pareado y su verificación",
+      "Métodos y herramientas",
+      "Formalización matemática del método",
+      "Arquitectura del modelo y flujo residual",
+      "La posición de lectura: el último \\textit{token",
+      "Cálculo de la dirección de rechazo",
+      "Proyección y diferencia entre formatos",
+      "Especificidad del efecto: el control benigno",
+      "Descomposición factorial del formato",
+      "Invariancia de escala",
+      "Dirección agéntica, reorientación y monitor",
+      "Validación geométrica mediante PCA",
+      "Procedimiento de análisis",
+      "Implementación y reproducibilidad",
+      "Estrategia de evaluación y validación",
+      "Separabilidad entre clases y su estimación",
+      "Inferencia estadística sobre el diseño pareado",
+      "Conducta sin intervención y prueba causal",
+      "Consideraciones éticas"
+    ],
+    "translated_research_subheadings": [
+      "3.1. Approach and design",
+      "3.1.1. Methodological approach",
+      "3.1.2. Type of study",
+      "3.1.3. Object of study",
+      "3.2. Data and information sources",
+      "3.2.1. Paired contrastive design",
+      "3.2.2. Stratification by intent explicitness",
+      "3.2.3. Tool definitions",
+      "3.2.4. Dataset composition",
+      "Examples and scope of the corpus",
+      "3.2.5. Lexical symmetry and its verification",
+      "3.3. Methods and tools",
+      "3.3.1. Mathematical formulation",
+      "Model architecture and residual stream",
+      "Reading position: the final token",
+      "Calculating the refusal direction",
+      "Projection and differences between formats",
+      "Effect specificity: the benign control",
+      "Factorial decomposition of format",
+      "Scale invariance",
+      "Agentic direction, reorientation and monitoring",
+      "Geometric validation with PCA",
+      "3.3.2. Analysis procedure",
+      "3.3.3. Implementation and reproducibility",
+      "3.4. Evaluation and validation strategy",
+      "3.4.1. Class separability and its estimation",
+      "3.4.2. Statistical inference for the paired design",
+      "3.4.3. Behaviour without intervention and causal test",
+      "3.5. Ethical considerations"
+    ],
+    "missing_numeric_values": []
+  },
+  "chapters/Chapter4/chapter04.tex": {
+    "translation": "sections/04_results_and_evaluation.md",
+    "source_sha256": "2a6d2bd5902bc71c551da730dad2e00ab182e1a242d336ed746f592dc32cabdb",
+    "source_research_subheadings": [
+      "Resultados, análisis e interpretación",
+      "Ejecuciones",
+      "Línea base y capacidad discriminativa",
+      "Desplazamiento y control benigno",
+      "Escala del efecto",
+      "Comportamiento por explicitud",
+      "Descomposición factorial: mensaje de sistema y herramientas",
+      "Reorientación y monitores por estimador",
+      "Evaluación y validación",
+      "PCA del contraste conversacional",
+      "Circularidad y selección de capa",
+      "Comportamiento sin intervención",
+      "Prueba causal"
+    ],
+    "translated_research_subheadings": [
+      "4.1. Results, analysis and interpretation",
+      "4.1.1. Runs",
+      "4.1.2. Baseline and discriminative capacity",
+      "4.1.3. Shift and benign control",
+      "4.1.4. Effect scale",
+      "4.1.5. Results by explicitness",
+      "4.1.6. Factorial decomposition: system message and tools",
+      "4.1.7. Reorientation and monitors by estimator",
+      "4.2. Evaluation and validation",
+      "4.2.1. PCA of the conversational contrast",
+      "4.2.2. Circularity and layer selection",
+      "4.3. Behaviour without intervention",
+      "4.4. Causal test"
+    ],
+    "missing_numeric_values": []
+  },
+  "chapters/Chapter5/chapter05.tex": {
+    "translation": "sections/05_discussion.md",
+    "source_sha256": "e3f0def8585539c56a3684cb4f6a777bef1dbbc05fb75fb99d1e62dc8deea1b3",
+    "source_research_subheadings": [
+      "Síntesis de los hallazgos",
+      "Interpretación del cambio de representación",
+      "Escala y familia de modelos",
+      "Explicitud de la intención",
+      "Relación entre representación y conducta",
+      "Lo que aporta la prueba causal",
+      "Implicaciones para el monitoreo",
+      "Limitaciones y alcance de validez"
+    ],
+    "translated_research_subheadings": [
+      "5.1. Synthesis of findings",
+      "5.2. Interpreting the representation change",
+      "5.3. Model scale and family",
+      "5.4. Intent explicitness",
+      "5.5. Representation and behaviour",
+      "5.6. Contribution of the causal test",
+      "5.7. Monitoring implications",
+      "5.8. Limitations and scope of validity"
+    ],
+    "missing_numeric_values": []
+  },
+  "chapters/Chapter6/chapter06.tex": {
+    "translation": "sections/06_conclusions_and_recommendations.md",
+    "source_sha256": "d67c836f58bc378208b8526bee632c14cf859fb61b259bd97470f8fb46078e52",
+    "source_research_subheadings": [
+      "Conclusiones",
+      "Aportes del trabajo",
+      "Recomendaciones"
+    ],
+    "translated_research_subheadings": [
+      "6.1. Conclusions",
+      "6.2. Contributions",
+      "6.3. Recommendations"
+    ],
+    "missing_numeric_values": []
+  },
+  "presentation_exclusions": [
+    "Institutional cover, university affiliation, degree-modality and advisor blocks.",
+    "Duplicated-language abstract, front-matter indexes and document-roadmap paragraphs.",
+    "Degree-related wording and the university-setting clause; the research rationale is retained.",
+    "File-production instructions and archive/translation commentary; experimental reproducibility is retained."
+  ],
+  "bibliography_resolution": "Original 17-entry bibliography retained; the Pinto URL is pinned to v1 to match the original title and claims. Later v3 findings are excluded.",
+  "methodological_scope": "English prose follows the original scientific sections and preserves their reported claims and limitations; headings, equation/table numbering and decimal typography follow the standalone format."
+}

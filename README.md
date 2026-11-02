@@ -1,5 +1,7 @@
 ﻿# Agentic Safety Probe
 
+The current **96-pair, four-model study** is available as an [English research manuscript](docs/paper/article.pdf), with an [editable Word version](docs/paper/article.docx), an [English research presentation](docs/paper/Research_Presentation.pptx), [source and evidence](docs/paper/README.md), and a [top 10 of related research](docs/paper/top_10_related_research.md). This manuscript documents the final results; some descriptions below refer to earlier exploratory runs. Degree documents and defense materials are stored outside this repository; see the [relocation record](docs/THESIS_ARCHIVE.md).
+
 **A mechanistic interpretability framework that explains WHY LLMs comply with harmful requests in agentic mode and provides an O(1) safety monitor based on activation geometry.**
 
 ---

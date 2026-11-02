@@ -1,0 +1,9 @@
+# Keep generated research documents and recorded evidence byte-for-byte.
+# Their provenance records use SHA-256 hashes of the saved files.
+docs/paper/** -text whitespace=cr-at-eol
+results/ultimos_resultados/qwen3_8b_v3/** -text whitespace=cr-at-eol
+
+# Markdown hard line breaks and recorded console padding are intentional.
+docs/paper/*.md whitespace=cr-at-eol,-blank-at-eol
+docs/paper/sections/*.md whitespace=cr-at-eol,-blank-at-eol
+results/ultimos_resultados/qwen3_8b_v3/**/*.log whitespace=cr-at-eol,-blank-at-eol

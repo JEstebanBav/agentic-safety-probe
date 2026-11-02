@@ -1,0 +1,33 @@
+## 6. Conclusions and recommendations
+
+### 6.1. Conclusions
+
+This work asked whether, when a language model moves from conversation to acting as an agent, its refusal direction retains the capacity to detect harmful intent, including when that intent is concealed. The answer supported by the results is that it retains this capacity partially. In the four models studied, from three families and with between seven and seventy billion parameters, the direction continues to separate harmful instructions from benign instructions in the agentic format, but with a significantly smaller margin, and this loss of margin is accompanied by a fall in actual refusal of harmful instructions.
+
+With respect to the first objective, a contrastive dataset of 96 harmful–benign pairs, with 384 variants, was constructed. The text of each instruction is identical across formats, both arms of a pair receive the same agentic scaffold, and the instructions are stratified into three levels of explicitness with homogeneous lexical overlap across strata. The dataset isolates the effect of format within each pair and allows that effect to be decomposed into its components.
+
+With respect to the second objective, the refusal direction estimated by a difference of means discriminates in the conversational format with out-of-sample AUROC between 0.92 and 0.97. Beyond a depth that varies between models, the contrast coincides with the dominant principal component of the activations, and the information supporting it is linearly accessible: a nonlinear probe does not improve it.
+
+With respect to the third objective, for identical instructions, projection onto that direction falls when moving to the agentic format in every model, in between 87 and 93 of the 96 pairs depending on the model. The effect is specific to harmful content, because benign instructions do not reproduce it; it persists in standardised units and AUROC, so it does not reduce to a change of scale; and it withstands the correction for circularity and the separation between layer selection and inference. The direction does not merely weaken: it reorients, and in the agentic format the contrast between classes occupies an axis forming an angle of between 63° and 79° with the conversational axis. Most of the effect comes from tool schemas rather than from the system message.
+
+With respect to the fourth objective, the loss of discriminative capacity affects all three levels of explicitness, and none falls to chance. Explicit instructions retain the best discrimination in the agentic format, while contextual instructions, whose intent is inferred from the situation described, lose the most and are left with the smallest margin in all four models. The agentic format does not selectively degrade concealed harm, but it leaves it in the most vulnerable position.
+
+With respect to the fifth objective, the conversational direction applied to the agentic format without adjustment does not, by itself, offer enough margin for monitoring. The signal about harm nevertheless remains in the agentic activations, and a monitor fitted in that format recovers it with out-of-sample AUROC between 0.93 and 0.98. The viability of a representation-based monitor depends on calibrating it in the deployment context.
+
+Finally, the relationship between the direction and behaviour was subjected to a causal test in three models. In Llama-3.3-70B, restoring the projection removed by the agentic format restores refusal for 40%–47% of the harmful instructions that the model complied with, compared with 4% under a random control, without substantially increasing refusal of benign instructions. In Mistral-7B, the effect is weaker and requires twice that dose. In Qwen3-8B, it is not observed in the layer intervened on. The refusal direction therefore has a causal role in behaviour in some models and layers, rather than a universal one, and doses exceeding that level induce indiscriminate refusal instead of repairing the mechanism.
+
+### 6.2. Contributions
+
+First, the work contributes a mechanistic diagnosis of a failure that, until now, was known at the behavioural level: the loss of safeguards in the agentic format is accompanied by a loss of margin and a reorientation of the representation of harm, replicated across three model families.
+
+Second, it contributes a contrastive dataset of 96 pairs with identical text across formats, symmetry of the scaffold between arms and stratification by explicitness, together with the procedure that verifies those properties.
+
+Third, it contributes an analysis procedure that distinguishes raw effect, standardised effect and discriminative capacity; controls the common effect using the benign arm; corrects the circularity of estimating and evaluating on the same sample; separates layer selection from inference; decomposes the format into its components; and subjects the relationship between representation and behaviour to a causal test with a calibrated dose and random and benign controls.
+
+Fourth, it contributes a result concerning the causal relationship between the refusal direction and behaviour that is heterogeneous across models, cautioning against assuming that a direction identified in one model governs refusal in another.
+
+### 6.3. Recommendations
+
+For the safety evaluation of models deployed as agents, it is recommended that guarantees obtained in the conversational format should not be transferred to that context, either behaviourally or in terms of internal representations, and that requests whose harmful intent depends on context should be specifically evaluated. For the design of representation-based monitors, it is recommended that they should be calibrated in the format in which the system will operate and evaluated on data external to the fitting corpus.
+
+For subsequent research, five extensions follow directly from the limitations of this work. The first is to separate the content of tool schemas from their length using control stimuli of equivalent length without a capacity for action. The second is to study multi-step trajectories, with tools that return results, to observe whether the loss of margin accumulates over the course of a task. The third is to extend the causal test to more layers per model and to Qwen3-32B, with a generation budget sufficient for models that reason before answering. The fourth is to check behavioural labels against an independent human reading and estimate agreement in explicitness classification with a second annotation. The fifth is to evaluate monitors on external datasets and in deployment conditions different from those used to fit them.

@@ -22,8 +22,16 @@ Thumbs.db
 # file limit. Keep them next to the results locally; do not commit them.
 activations.npz
 
-# Keep thesis sources and downloadable Overleaf projects in version control.
-!docs/tesis/*.zip
+# Degree documents and presentations are maintained in a separate desktop archive.
+/docs/tesis/
+/docs/sustentacion/
+/docs/sustentacion_ligera/
+/docs/Tesis v2.pdf
+/docs/guion_sustentacion.html
+/docs/presentacion_corte.html
+/docs/presentacion_tutor.html
+/scripts/tesis_final.py
+/scripts/actualizar_tesis_avances.py
 
 # Preserve experimental run logs; compiler logs remain ignored.
 !results/**/*.log

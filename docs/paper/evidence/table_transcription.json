@@ -1,0 +1,2738 @@
+{
+  "tab:distribucion": {
+    "number": 1,
+    "headers": [
+      "Harm category",
+      "Explicit",
+      "Contextual",
+      "Legitimately framed",
+      "Total"
+    ],
+    "rows": [
+      [
+        "Fraud",
+        "6",
+        "4",
+        "5",
+        "15"
+      ],
+      [
+        "Cybercrime",
+        "6",
+        "2",
+        "5",
+        "13"
+      ],
+      [
+        "Disinformation",
+        "4",
+        "4",
+        "5",
+        "13"
+      ],
+      [
+        "Harassment",
+        "7",
+        "3",
+        "4",
+        "14"
+      ],
+      [
+        "Hate speech",
+        "8",
+        "3",
+        "4",
+        "15"
+      ],
+      [
+        "Copyright",
+        "5",
+        "6",
+        "4",
+        "15"
+      ],
+      [
+        "Drugs",
+        "6",
+        "2",
+        "3",
+        "11"
+      ],
+      [
+        "Total",
+        "42",
+        "24",
+        "30",
+        "96"
+      ]
+    ],
+    "caption": "Distribution of the 96 harmful pairs by harm category and level of intent explicitness.",
+    "source_relative_path": "chapters/Chapter3/chapter03.tex",
+    "source_table_sha256": "e90c87745d8afea6c1864f878f72e414e56a0adde2447e566619a635e4227c09",
+    "numeric_cells": [
+      [],
+      [
+        "6"
+      ],
+      [
+        "4"
+      ],
+      [
+        "5"
+      ],
+      [
+        "15"
+      ],
+      [],
+      [
+        "6"
+      ],
+      [
+        "2"
+      ],
+      [
+        "5"
+      ],
+      [
+        "13"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "4"
+      ],
+      [
+        "5"
+      ],
+      [
+        "13"
+      ],
+      [],
+      [
+        "7"
+      ],
+      [
+        "3"
+      ],
+      [
+        "4"
+      ],
+      [
+        "14"
+      ],
+      [],
+      [
+        "8"
+      ],
+      [
+        "3"
+      ],
+      [
+        "4"
+      ],
+      [
+        "15"
+      ],
+      [],
+      [
+        "5"
+      ],
+      [
+        "6"
+      ],
+      [
+        "4"
+      ],
+      [
+        "15"
+      ],
+      [],
+      [
+        "6"
+      ],
+      [
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "11"
+      ],
+      [],
+      [
+        "42"
+      ],
+      [
+        "24"
+      ],
+      [
+        "30"
+      ],
+      [
+        "96"
+      ]
+    ]
+  },
+  "tab:jaccard": {
+    "number": 2,
+    "headers": [
+      "Intent explicitness",
+      "Pairs",
+      "Median overlap"
+    ],
+    "rows": [
+      [
+        "Explicit",
+        "42",
+        "0.408"
+      ],
+      [
+        "Contextual",
+        "24",
+        "0.413"
+      ],
+      [
+        "Legitimately framed",
+        "30",
+        "0.422"
+      ],
+      [
+        "Full corpus",
+        "96",
+        "0.419"
+      ]
+    ],
+    "caption": "Lexical overlap between the harmful and benign arms of each pair, measured with the Jaccard index, by level of intent explicitness.",
+    "source_relative_path": "chapters/Chapter3/chapter03.tex",
+    "source_table_sha256": "0e448c3241efb430051c35674c8c81c77953a3e90fe00e21e73598a4b47e1a65",
+    "numeric_cells": [
+      [],
+      [
+        "42"
+      ],
+      [
+        "0.408"
+      ],
+      [],
+      [
+        "24"
+      ],
+      [
+        "0.413"
+      ],
+      [],
+      [
+        "30"
+      ],
+      [
+        "0.422"
+      ],
+      [],
+      [
+        "96"
+      ],
+      [
+        "0.419"
+      ]
+    ]
+  },
+  "tab:modelos": {
+    "number": 3,
+    "headers": [
+      "Model",
+      "L",
+      "d",
+      "H",
+      "Hkv",
+      "dff",
+      "Layers analysed"
+    ],
+    "rows": [
+      [
+        "Mistral-7B-Instruct-v0.3",
+        "32",
+        "4096",
+        "32",
+        "8",
+        "14336",
+        "16"
+      ],
+      [
+        "Qwen3-8B",
+        "36",
+        "4096",
+        "32",
+        "8",
+        "12288",
+        "18"
+      ],
+      [
+        "Qwen3-32B",
+        "64",
+        "5120",
+        "64",
+        "8",
+        "25600",
+        "32"
+      ],
+      [
+        "Llama-3.3-70B-Instruct",
+        "80",
+        "8192",
+        "64",
+        "8",
+        "28672",
+        "20"
+      ]
+    ],
+    "caption": "Dimensions of the models studied: number of layers L, residual-stream dimension d, query heads H and key/value heads Hkv, and internal feed-forward dimension dff. The last column indicates the number of layers covered by each run.",
+    "source_relative_path": "chapters/Chapter3/chapter03.tex",
+    "source_table_sha256": "b00bddb061dac0ecc6ca3f47b3e7dcd7a1d772342e3cdf91c12ab57a1b669313",
+    "numeric_cells": [
+      [
+        "-7",
+        "0.3"
+      ],
+      [
+        "32"
+      ],
+      [
+        "4096"
+      ],
+      [
+        "32"
+      ],
+      [
+        "8"
+      ],
+      [
+        "14336"
+      ],
+      [
+        "16"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "36"
+      ],
+      [
+        "4096"
+      ],
+      [
+        "32"
+      ],
+      [
+        "8"
+      ],
+      [
+        "12288"
+      ],
+      [
+        "18"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "64"
+      ],
+      [
+        "5120"
+      ],
+      [
+        "64"
+      ],
+      [
+        "8"
+      ],
+      [
+        "25600"
+      ],
+      [
+        "32"
+      ],
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "80"
+      ],
+      [
+        "8192"
+      ],
+      [
+        "64"
+      ],
+      [
+        "8"
+      ],
+      [
+        "28672"
+      ],
+      [
+        "20"
+      ]
+    ]
+  },
+  "tab:corridas": {
+    "number": 4,
+    "headers": [
+      "Model",
+      "Pairs",
+      "Layers analysed",
+      "Reference layer",
+      "Stages"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B-Instruct",
+        "96",
+        "20 of 80",
+        "76",
+        "Representation, behaviour and causal test"
+      ],
+      [
+        "Mistral-7B-Instruct-v0.3",
+        "96",
+        "16 of 32",
+        "30",
+        "Representation, behaviour and causal test"
+      ],
+      [
+        "Qwen3-8B",
+        "96",
+        "18 of 36",
+        "32",
+        "Representation, behaviour and causal test"
+      ],
+      [
+        "Qwen3-32B",
+        "96",
+        "32 of 64",
+        "62",
+        "Representation"
+      ]
+    ],
+    "caption": "Runs analysed. The reference layer maximises the projection shift in each model’s sweep and is used to describe magnitudes; layer selection with separate inference is reported in Section 4.2.2.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "1266ebf2ec24b807b811991de54fcebb4c46b8247d4d7a86a09977a161bc3436",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "96"
+      ],
+      [
+        "20",
+        "80"
+      ],
+      [
+        "76"
+      ],
+      [],
+      [
+        "-7",
+        "0.3"
+      ],
+      [
+        "96"
+      ],
+      [
+        "16",
+        "32"
+      ],
+      [
+        "30"
+      ],
+      [],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "96"
+      ],
+      [
+        "18",
+        "36"
+      ],
+      [
+        "32"
+      ],
+      [],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "96"
+      ],
+      [
+        "32",
+        "64"
+      ],
+      [
+        "62"
+      ],
+      []
+    ]
+  },
+  "tab:linea_base": {
+    "number": 5,
+    "headers": [
+      "Model",
+      "Layer",
+      "Chat AUROC",
+      "Agent AUROC",
+      "Difference"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "76",
+        "0.9682 [0.9473; 0.9849]",
+        "0.8695 [0.8200; 0.9166]",
+        "0.0987 [0.0591; 0.1402]"
+      ],
+      [
+        "Mistral-7B",
+        "30",
+        "0.9231 [0.8879; 0.9549]",
+        "0.7741 [0.7238; 0.8250]",
+        "0.1490 [0.0971; 0.2005]"
+      ],
+      [
+        "Qwen3-8B",
+        "32",
+        "0.9197 [0.8844; 0.9532]",
+        "0.7714 [0.7195; 0.8241]",
+        "0.1483 [0.1047; 0.1942]"
+      ],
+      [
+        "Qwen3-32B",
+        "62",
+        "0.9484 [0.9172; 0.9746]",
+        "0.8690 [0.8239; 0.9112]",
+        "0.0793 [0.0378; 0.1232]"
+      ]
+    ],
+    "caption": "Out-of-sample AUROC of the conversational direction, with five pair-wise folds and 96 pairs per model. Brackets contain 95% confidence intervals obtained by resampling the held-out scores. Each format comparison uses the same training direction.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "9fb7746a3ac7317bf0d7ab2ae11e3de6464eee83adbedcaea3f2ce4f3661b717",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "76"
+      ],
+      [
+        "0.9682",
+        "0.9473",
+        "0.9849"
+      ],
+      [
+        "0.8695",
+        "0.8200",
+        "0.9166"
+      ],
+      [
+        "0.0987",
+        "0.0591",
+        "0.1402"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "30"
+      ],
+      [
+        "0.9231",
+        "0.8879",
+        "0.9549"
+      ],
+      [
+        "0.7741",
+        "0.7238",
+        "0.8250"
+      ],
+      [
+        "0.1490",
+        "0.0971",
+        "0.2005"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "32"
+      ],
+      [
+        "0.9197",
+        "0.8844",
+        "0.9532"
+      ],
+      [
+        "0.7714",
+        "0.7195",
+        "0.8241"
+      ],
+      [
+        "0.1483",
+        "0.1047",
+        "0.1942"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "62"
+      ],
+      [
+        "0.9484",
+        "0.9172",
+        "0.9746"
+      ],
+      [
+        "0.8690",
+        "0.8239",
+        "0.9112"
+      ],
+      [
+        "0.0793",
+        "0.0378",
+        "0.1232"
+      ]
+    ]
+  },
+  "tab:gap": {
+    "number": 6,
+    "headers": [
+      "Model",
+      "Δph",
+      "Δpb",
+      "Δ²p",
+      "Pairs with Δ²p > 0"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "15.20 [13.80; 16.56]",
+        "-1.84 [-2.84; -0.76]",
+        "17.04 [15.45; 18.58]",
+        "94/96"
+      ],
+      [
+        "Mistral-7B",
+        "7.75 [6.81; 8.68]",
+        "-0.48 [-1.08; 0.16]",
+        "8.23 [7.21; 9.22]",
+        "93/96"
+      ],
+      [
+        "Qwen3-8B",
+        "176.47 [159.74; 192.36]",
+        "-1.30 [-18.15; 15.82]",
+        "177.77 [159.46; 195.98]",
+        "95/96"
+      ],
+      [
+        "Qwen3-32B",
+        "397.39 [362.63; 429.74]",
+        "-5.74 [-38.82; 27.43]",
+        "403.13 [365.36; 439.94]",
+        "93/96"
+      ]
+    ],
+    "caption": "Out-of-sample shift at the reference layer, with the direction refitted by fold, and 95% bootstrap intervals. The interaction preserves harmful–benign pairing. Raw units are not compared across models.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "4d4189c146bd07aa730942251ca6ee57f284c0e391c30e98fdc3b096c0d855dc",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "15.20",
+        "13.80",
+        "16.56"
+      ],
+      [
+        "-1.84",
+        "-2.84",
+        "-0.76"
+      ],
+      [
+        "17.04",
+        "15.45",
+        "18.58"
+      ],
+      [
+        "94",
+        "96"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "7.75",
+        "6.81",
+        "8.68"
+      ],
+      [
+        "-0.48",
+        "-1.08",
+        "0.16"
+      ],
+      [
+        "8.23",
+        "7.21",
+        "9.22"
+      ],
+      [
+        "93",
+        "96"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "176.47",
+        "159.74",
+        "192.36"
+      ],
+      [
+        "-1.30",
+        "-18.15",
+        "15.82"
+      ],
+      [
+        "177.77",
+        "159.46",
+        "195.98"
+      ],
+      [
+        "95",
+        "96"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "397.39",
+        "362.63",
+        "429.74"
+      ],
+      [
+        "-5.74",
+        "-38.82",
+        "27.43"
+      ],
+      [
+        "403.13",
+        "365.36",
+        "439.94"
+      ],
+      [
+        "93",
+        "96"
+      ]
+    ]
+  },
+  "tab:escala": {
+    "number": 7,
+    "headers": [
+      "Model",
+      "Raw loss",
+      "dchat",
+      "dagent",
+      "Loss in d",
+      "κ"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "83.9 %",
+        "2.95",
+        "1.50",
+        "49.2 %",
+        "0.317"
+      ],
+      [
+        "Mistral-7B",
+        "86.0 %",
+        "2.23",
+        "0.86",
+        "61.6 %",
+        "0.366"
+      ],
+      [
+        "Qwen3-8B",
+        "86.0 %",
+        "2.18",
+        "1.09",
+        "50.1 %",
+        "0.280"
+      ],
+      [
+        "Qwen3-32B",
+        "86.9 %",
+        "2.59",
+        "1.50",
+        "42.2 %",
+        "0.227"
+      ]
+    ],
+    "caption": "Class separation on out-of-sample scores, in raw and standardised units. These d values measure within-format class separation and differ from the paired effect size of the format change.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "5b970d8462fc27c574ed60ef2d6eb0468efdd9467cf8793546a64c8e9c9e2319",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "83.9"
+      ],
+      [
+        "2.95"
+      ],
+      [
+        "1.50"
+      ],
+      [
+        "49.2"
+      ],
+      [
+        "0.317"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "86.0"
+      ],
+      [
+        "2.23"
+      ],
+      [
+        "0.86"
+      ],
+      [
+        "61.6"
+      ],
+      [
+        "0.366"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "86.0"
+      ],
+      [
+        "2.18"
+      ],
+      [
+        "1.09"
+      ],
+      [
+        "50.1"
+      ],
+      [
+        "0.280"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "86.9"
+      ],
+      [
+        "2.59"
+      ],
+      [
+        "1.50"
+      ],
+      [
+        "42.2"
+      ],
+      [
+        "0.227"
+      ]
+    ]
+  },
+  "tab:estratos": {
+    "number": 8,
+    "headers": [
+      "Model",
+      "Stratum",
+      "Chat AUROC",
+      "Agent AUROC",
+      "AUROC loss",
+      "Loss in d"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "Explicit",
+        "0.9915",
+        "0.8991",
+        "0.0924",
+        "57.9 %"
+      ],
+      [
+        "",
+        "Contextual",
+        "0.9115",
+        "0.7917",
+        "0.1198",
+        "43.6 %"
+      ],
+      [
+        "",
+        "Legitimately framed",
+        "0.9722",
+        "0.8878",
+        "0.0844",
+        "44.9 %"
+      ],
+      [
+        "Mistral-7B",
+        "Explicit",
+        "0.9785",
+        "0.8707",
+        "0.1077",
+        "67.4 %"
+      ],
+      [
+        "",
+        "Contextual",
+        "0.8819",
+        "0.6736",
+        "0.2083",
+        "62.6 %"
+      ],
+      [
+        "",
+        "Legitimately framed",
+        "0.9156",
+        "0.7078",
+        "0.2078",
+        "63.2 %"
+      ],
+      [
+        "Qwen3-8B",
+        "Explicit",
+        "0.9824",
+        "0.8560",
+        "0.1264",
+        "53.6 %"
+      ],
+      [
+        "",
+        "Contextual",
+        "0.9097",
+        "0.7622",
+        "0.1476",
+        "50.9 %"
+      ],
+      [
+        "",
+        "Legitimately framed",
+        "0.8744",
+        "0.7322",
+        "0.1422",
+        "49.4 %"
+      ],
+      [
+        "Qwen3-32B",
+        "Explicit",
+        "0.9904",
+        "0.9150",
+        "0.0754",
+        "48.2 %"
+      ],
+      [
+        "",
+        "Contextual",
+        "0.8993",
+        "0.8003",
+        "0.0990",
+        "44.7 %"
+      ],
+      [
+        "",
+        "Legitimately framed",
+        "0.9367",
+        "0.8778",
+        "0.0589",
+        "40.6 %"
+      ]
+    ],
+    "caption": "Discriminative capacity by level of explicitness at the reference layer, using out-of-sample scores. The strata contain 42, 24 and 30 pairs; stratum-specific estimates are reported without intervals, so differences between strata are descriptive.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "1167ba9651c6a9a37b6766e26607258e29c010ea024b96306b7013e4d9398dd7",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [],
+      [
+        "0.9915"
+      ],
+      [
+        "0.8991"
+      ],
+      [
+        "0.0924"
+      ],
+      [
+        "57.9"
+      ],
+      [],
+      [],
+      [
+        "0.9115"
+      ],
+      [
+        "0.7917"
+      ],
+      [
+        "0.1198"
+      ],
+      [
+        "43.6"
+      ],
+      [],
+      [],
+      [
+        "0.9722"
+      ],
+      [
+        "0.8878"
+      ],
+      [
+        "0.0844"
+      ],
+      [
+        "44.9"
+      ],
+      [
+        "-7"
+      ],
+      [],
+      [
+        "0.9785"
+      ],
+      [
+        "0.8707"
+      ],
+      [
+        "0.1077"
+      ],
+      [
+        "67.4"
+      ],
+      [],
+      [],
+      [
+        "0.8819"
+      ],
+      [
+        "0.6736"
+      ],
+      [
+        "0.2083"
+      ],
+      [
+        "62.6"
+      ],
+      [],
+      [],
+      [
+        "0.9156"
+      ],
+      [
+        "0.7078"
+      ],
+      [
+        "0.2078"
+      ],
+      [
+        "63.2"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [],
+      [
+        "0.9824"
+      ],
+      [
+        "0.8560"
+      ],
+      [
+        "0.1264"
+      ],
+      [
+        "53.6"
+      ],
+      [],
+      [],
+      [
+        "0.9097"
+      ],
+      [
+        "0.7622"
+      ],
+      [
+        "0.1476"
+      ],
+      [
+        "50.9"
+      ],
+      [],
+      [],
+      [
+        "0.8744"
+      ],
+      [
+        "0.7322"
+      ],
+      [
+        "0.1422"
+      ],
+      [
+        "49.4"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [],
+      [
+        "0.9904"
+      ],
+      [
+        "0.9150"
+      ],
+      [
+        "0.0754"
+      ],
+      [
+        "48.2"
+      ],
+      [],
+      [],
+      [
+        "0.8993"
+      ],
+      [
+        "0.8003"
+      ],
+      [
+        "0.0990"
+      ],
+      [
+        "44.7"
+      ],
+      [],
+      [],
+      [
+        "0.9367"
+      ],
+      [
+        "0.8778"
+      ],
+      [
+        "0.0589"
+      ],
+      [
+        "40.6"
+      ]
+    ]
+  },
+  "tab:factorial": {
+    "number": 9,
+    "headers": [
+      "Model",
+      "System only",
+      "Tools only",
+      "Full format",
+      "Non-additivity"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "5.87 (33.4 %)",
+        "17.44 (99.2 %)",
+        "17.59",
+        "-5.72"
+      ],
+      [
+        "Mistral-7B",
+        "4.70 (56.0 %)",
+        "5.74 (68.4 %)",
+        "8.40",
+        "-2.04"
+      ],
+      [
+        "Qwen3-8B",
+        "106.07 (58.1 %)",
+        "176.28 (96.6 %)",
+        "182.43",
+        "-99.92"
+      ],
+      [
+        "Qwen3-32B",
+        "317.69 (75.1 %)",
+        "418.52 (98.9 %)",
+        "423.01",
+        "-313.19"
+      ]
+    ],
+    "caption": "Harmful–benign interaction in projection shift by format component, at the reference layer. Parentheses show the fraction of the full-format interaction. Non-additivity is the full format minus the sum of both components. All 95% intervals exclude zero. The decomposition uses the full-sample direction and is descriptive.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "afd337a358164bb211b266bfea5a248c6f13d3d0512132153d0bbc0ad0f4b67e",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "5.87",
+        "33.4"
+      ],
+      [
+        "17.44",
+        "99.2"
+      ],
+      [
+        "17.59"
+      ],
+      [
+        "-5.72"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "4.70",
+        "56.0"
+      ],
+      [
+        "5.74",
+        "68.4"
+      ],
+      [
+        "8.40"
+      ],
+      [
+        "-2.04"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "106.07",
+        "58.1"
+      ],
+      [
+        "176.28",
+        "96.6"
+      ],
+      [
+        "182.43"
+      ],
+      [
+        "-99.92"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "317.69",
+        "75.1"
+      ],
+      [
+        "418.52",
+        "98.9"
+      ],
+      [
+        "423.01"
+      ],
+      [
+        "-313.19"
+      ]
+    ]
+  },
+  "tab:rotacion": {
+    "number": 10,
+    "headers": [
+      "Model",
+      "DM cosine",
+      "DM reliability: chat / agent",
+      "Normalised DM cosine",
+      "DM angle",
+      "LR cosine"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "0.224",
+        "0.951 / 0.957",
+        "0.228",
+        "76.8°",
+        "0.067"
+      ],
+      [
+        "Mistral-7B",
+        "0.445",
+        "0.972 / 0.954",
+        "0.450",
+        "63.3°",
+        "0.159"
+      ],
+      [
+        "Qwen3-8B",
+        "0.235",
+        "0.962 / 0.939",
+        "0.240",
+        "76.1°",
+        "0.093"
+      ],
+      [
+        "Qwen3-32B",
+        "0.181",
+        "0.923 / 0.952",
+        "0.186",
+        "79.3°",
+        "0.087"
+      ]
+    ],
+    "caption": "Full-sample cosine between conversational and agentic directions, estimated with the same method in both formats. Reliability is the cosine between directions estimated on disjoint pair halves; the normalised cosine divides by the square root of the product of reliabilities. DM: difference of means; LR: logistic regression.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "ecb98bf81f990d884e9789a855996166e896af0b64076c4ee935c2d22ad0d61e",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "0.224"
+      ],
+      [
+        "0.951",
+        "0.957"
+      ],
+      [
+        "0.228"
+      ],
+      [
+        "76.8"
+      ],
+      [
+        "0.067"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "0.445"
+      ],
+      [
+        "0.972",
+        "0.954"
+      ],
+      [
+        "0.450"
+      ],
+      [
+        "63.3"
+      ],
+      [
+        "0.159"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "0.235"
+      ],
+      [
+        "0.962",
+        "0.939"
+      ],
+      [
+        "0.240"
+      ],
+      [
+        "76.1"
+      ],
+      [
+        "0.093"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "0.181"
+      ],
+      [
+        "0.923",
+        "0.952"
+      ],
+      [
+        "0.186"
+      ],
+      [
+        "79.3"
+      ],
+      [
+        "0.087"
+      ]
+    ]
+  },
+  "tab:monitores": {
+    "number": 11,
+    "headers": [
+      "Model",
+      "DM AUROC",
+      "DM F1",
+      "DM FPR",
+      "LR AUROC",
+      "LR F1",
+      "LR FPR"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "0.9180",
+        "0.8449",
+        "0.1250",
+        "0.9810",
+        "0.9153",
+        "0.0000"
+      ],
+      [
+        "Mistral-7B",
+        "0.8018",
+        "0.7042",
+        "0.4375",
+        "0.9313",
+        "0.8242",
+        "0.1146"
+      ],
+      [
+        "Qwen3-8B",
+        "0.8852",
+        "0.7869",
+        "0.1562",
+        "0.9369",
+        "0.8587",
+        "0.0938"
+      ],
+      [
+        "Qwen3-32B",
+        "0.9298",
+        "0.8136",
+        "0.0938",
+        "0.9631",
+        "0.9130",
+        "0.0417"
+      ]
+    ],
+    "caption": "Agentic monitors evaluated out of sample with five pair-wise folds, at the reference layer. AUROC is the mean across folds; F1 and the false-positive rate (FPR) use thresholds calibrated on each fold’s training data. DM: difference of means; LR: logistic regression.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "91bdc3c29c01839e732a22af29257e96e6863e3af178ebc43bd8b68ac2ef46c9",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "0.9180"
+      ],
+      [
+        "0.8449"
+      ],
+      [
+        "0.1250"
+      ],
+      [
+        "0.9810"
+      ],
+      [
+        "0.9153"
+      ],
+      [
+        "0.0000"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "0.8018"
+      ],
+      [
+        "0.7042"
+      ],
+      [
+        "0.4375"
+      ],
+      [
+        "0.9313"
+      ],
+      [
+        "0.8242"
+      ],
+      [
+        "0.1146"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "0.8852"
+      ],
+      [
+        "0.7869"
+      ],
+      [
+        "0.1562"
+      ],
+      [
+        "0.9369"
+      ],
+      [
+        "0.8587"
+      ],
+      [
+        "0.0938"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "0.9298"
+      ],
+      [
+        "0.8136"
+      ],
+      [
+        "0.0938"
+      ],
+      [
+        "0.9631"
+      ],
+      [
+        "0.9130"
+      ],
+      [
+        "0.0417"
+      ]
+    ]
+  },
+  "tab:pca": {
+    "number": 12,
+    "headers": [
+      "Model",
+      "Layer",
+      "Absolute PC1–direction cosine",
+      "PC1 variance"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "28",
+        "0.993",
+        "33.5 %"
+      ],
+      [
+        "",
+        "76",
+        "0.990",
+        "18.7 %"
+      ],
+      [
+        "Mistral-7B",
+        "18",
+        "0.972",
+        "29.2 %"
+      ],
+      [
+        "",
+        "30",
+        "0.951",
+        "28.0 %"
+      ],
+      [
+        "Qwen3-8B",
+        "16",
+        "0.981",
+        "26.5 %"
+      ],
+      [
+        "",
+        "32",
+        "0.968",
+        "26.4 %"
+      ],
+      [
+        "Qwen3-32B",
+        "40",
+        "0.952",
+        "14.5 %"
+      ],
+      [
+        "",
+        "62",
+        "0.972",
+        "13.7 %"
+      ]
+    ],
+    "caption": "Descriptive, in-sample geometric validation. Alignment with PC1 does not replace out-of-sample AUROC evaluation.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "db864f3927f3e9cae569904d84519cba89d9b917ee88b878e41729e77ac4e65a",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "28"
+      ],
+      [
+        "0.993"
+      ],
+      [
+        "33.5"
+      ],
+      [],
+      [
+        "76"
+      ],
+      [
+        "0.990"
+      ],
+      [
+        "18.7"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "18"
+      ],
+      [
+        "0.972"
+      ],
+      [
+        "29.2"
+      ],
+      [],
+      [
+        "30"
+      ],
+      [
+        "0.951"
+      ],
+      [
+        "28.0"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "16"
+      ],
+      [
+        "0.981"
+      ],
+      [
+        "26.5"
+      ],
+      [],
+      [
+        "32"
+      ],
+      [
+        "0.968"
+      ],
+      [
+        "26.4"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "40"
+      ],
+      [
+        "0.952"
+      ],
+      [
+        "14.5"
+      ],
+      [],
+      [
+        "62"
+      ],
+      [
+        "0.972"
+      ],
+      [
+        "13.7"
+      ]
+    ]
+  },
+  "tab:seleccion": {
+    "number": 13,
+    "headers": [
+      "Model",
+      "Selection / inference",
+      "Layer",
+      "Decreasing",
+      "Inference Δp",
+      "Sign-test p",
+      "Bonferroni threshold"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "48 / 48",
+        "76",
+        "46/48",
+        "13.95 [11.84; 15.92]",
+        "8.4 × 10<sup>-12</sup>",
+        "0.0025"
+      ],
+      [
+        "Mistral-7B",
+        "48 / 48",
+        "30",
+        "44/48",
+        "7.44 [6.18; 8.66]",
+        "1.5 × 10<sup>-9</sup>",
+        "0.0031"
+      ],
+      [
+        "Qwen3-8B",
+        "48 / 48",
+        "32",
+        "46/48",
+        "172.60 [151.25; 192.20]",
+        "8.4 × 10<sup>-12</sup>",
+        "0.0028"
+      ],
+      [
+        "Qwen3-32B",
+        "48 / 48",
+        "62",
+        "47/48",
+        "371.87 [325.74; 413.30]",
+        "3.5 × 10<sup>-13</sup>",
+        "0.0016"
+      ]
+    ],
+    "caption": "Layer selection and inference on disjoint pair halves. The Bonferroni threshold corrects for the number of layers in each model’s sweep.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "4d29f2ad7c48bc53ebde351dfa531b97b76e52e43c92e46459e342092813ed0d",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "48",
+        "48"
+      ],
+      [
+        "76"
+      ],
+      [
+        "46",
+        "48"
+      ],
+      [
+        "13.95",
+        "11.84",
+        "15.92"
+      ],
+      [
+        "8.4",
+        "10",
+        "-12"
+      ],
+      [
+        "0.0025"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "48",
+        "48"
+      ],
+      [
+        "30"
+      ],
+      [
+        "44",
+        "48"
+      ],
+      [
+        "7.44",
+        "6.18",
+        "8.66"
+      ],
+      [
+        "1.5",
+        "10",
+        "-9"
+      ],
+      [
+        "0.0031"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "48",
+        "48"
+      ],
+      [
+        "32"
+      ],
+      [
+        "46",
+        "48"
+      ],
+      [
+        "172.60",
+        "151.25",
+        "192.20"
+      ],
+      [
+        "8.4",
+        "10",
+        "-12"
+      ],
+      [
+        "0.0028"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "48",
+        "48"
+      ],
+      [
+        "62"
+      ],
+      [
+        "47",
+        "48"
+      ],
+      [
+        "371.87",
+        "325.74",
+        "413.30"
+      ],
+      [
+        "3.5",
+        "10",
+        "-13"
+      ],
+      [
+        "0.0016"
+      ]
+    ]
+  },
+  "tab:conducta": {
+    "number": 14,
+    "headers": [
+      "Condition",
+      "Llama refusal",
+      "Llama tool call",
+      "Mistral refusal",
+      "Mistral tool call",
+      "Qwen3-8B refusal",
+      "Qwen3-8B tool call"
+    ],
+    "rows": [
+      [
+        "Chat, harmful",
+        "82/96 (85.4 %)",
+        "0/96",
+        "47/96 (49.0 %)",
+        "0/96",
+        "82/96 (85.4 %)",
+        "0/96"
+      ],
+      [
+        "Agent, harmful",
+        "43/96 (44.8 %)",
+        "51/96",
+        "9/96 (9.4 %)",
+        "71/96",
+        "25/96 (26.0 %)",
+        "35/96"
+      ],
+      [
+        "Chat, benign",
+        "8/96 (8.3 %)",
+        "0/96",
+        "2/96 (2.1 %)",
+        "0/96",
+        "35/96 (36.5 %)",
+        "0/96"
+      ],
+      [
+        "Agent, benign",
+        "2/96 (2.1 %)",
+        "93/96",
+        "0/96 (0.0 %)",
+        "88/96",
+        "4/96 (4.2 %)",
+        "56/96"
+      ]
+    ],
+    "caption": "Behaviour without intervention. Refusal: responses labelled as refusal by the textual classifier. Tool call: responses invoking one of the offered tools. In Qwen3-8B, 32 harmful and 30 benign agentic responses did not finish reasoning within the generation budget and count as non-refusal in this table.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "f09a1d77998272ecd189e977c1da1e31096000c10ba603170c37692ababd3c4a",
+    "numeric_cells": [
+      [],
+      [
+        "82",
+        "96",
+        "85.4"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [
+        "47",
+        "96",
+        "49.0"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [
+        "82",
+        "96",
+        "85.4"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [],
+      [
+        "43",
+        "96",
+        "44.8"
+      ],
+      [
+        "51",
+        "96"
+      ],
+      [
+        "9",
+        "96",
+        "9.4"
+      ],
+      [
+        "71",
+        "96"
+      ],
+      [
+        "25",
+        "96",
+        "26.0"
+      ],
+      [
+        "35",
+        "96"
+      ],
+      [],
+      [
+        "8",
+        "96",
+        "8.3"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [
+        "2",
+        "96",
+        "2.1"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [
+        "35",
+        "96",
+        "36.5"
+      ],
+      [
+        "0",
+        "96"
+      ],
+      [],
+      [
+        "2",
+        "96",
+        "2.1"
+      ],
+      [
+        "93",
+        "96"
+      ],
+      [
+        "0",
+        "96",
+        "0.0"
+      ],
+      [
+        "88",
+        "96"
+      ],
+      [
+        "4",
+        "96",
+        "4.2"
+      ],
+      [
+        "56",
+        "96"
+      ]
+    ]
+  },
+  "tab:causal": {
+    "number": 15,
+    "headers": [
+      "Model and layer",
+      "Dose",
+      "Refusal direction",
+      "Random direction",
+      "Benign refusals",
+      "p"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B, layer 76",
+        "0.5",
+        "7/53",
+        "0/53",
+        "0/94",
+        "0.016"
+      ],
+      [
+        "",
+        "1",
+        "21/53",
+        "2/53",
+        "6/94",
+        "<0.001"
+      ],
+      [
+        "",
+        "2",
+        "36/53 (6 deg.)",
+        "1/53",
+        "49/94 (9 deg.)",
+        "<0.001"
+      ],
+      [
+        "",
+        "4",
+        "0/53 (49 deg.)",
+        "1/53",
+        "1/94 (93 deg.)",
+        "1.000"
+      ],
+      [
+        "Llama-3.3-70B, layer 56",
+        "0.5",
+        "8/53",
+        "2/53",
+        "0/94",
+        "0.031"
+      ],
+      [
+        "",
+        "1",
+        "25/53",
+        "2/53",
+        "7/94",
+        "<0.001"
+      ],
+      [
+        "",
+        "2",
+        "51/53",
+        "2/53",
+        "91/94",
+        "<0.001"
+      ],
+      [
+        "",
+        "4",
+        "53/53",
+        "2/53",
+        "75/94 (19 deg.)",
+        "<0.001"
+      ],
+      [
+        "Llama-3.3-70B, layer 28",
+        "0.5",
+        "3/53",
+        "0/53",
+        "0/94",
+        "0.250"
+      ],
+      [
+        "",
+        "1",
+        "3/53",
+        "1/53",
+        "1/94",
+        "0.500"
+      ],
+      [
+        "",
+        "2",
+        "13/53",
+        "2/53",
+        "2/94",
+        "0.003"
+      ],
+      [
+        "",
+        "4",
+        "45/53",
+        "24/53",
+        "53/94",
+        "<0.001"
+      ],
+      [
+        "Mistral-7B, layer 30",
+        "0.5",
+        "2/87",
+        "0/87",
+        "1/96",
+        "0.500"
+      ],
+      [
+        "",
+        "1",
+        "6/87",
+        "1/87",
+        "1/96",
+        "0.063"
+      ],
+      [
+        "",
+        "2",
+        "22/87",
+        "4/87",
+        "1/96",
+        "<0.001"
+      ],
+      [
+        "",
+        "4",
+        "18/87 (11 deg.)",
+        "6/87",
+        "6/96 (4 deg.)",
+        "0.002"
+      ],
+      [
+        "Qwen3-8B, layer 32",
+        "0.5",
+        "2/39",
+        "2/39",
+        "1/61",
+        "1.000"
+      ],
+      [
+        "",
+        "1",
+        "3/39",
+        "5/39",
+        "1/61",
+        "0.625"
+      ],
+      [
+        "",
+        "2",
+        "6/39",
+        "4/39",
+        "0/61",
+        "0.688"
+      ],
+      [
+        "",
+        "4",
+        "15/39",
+        "9/39",
+        "3/61",
+        "0.109"
+      ]
+    ],
+    "caption": "Causal test. Denominators: instructions the model did not refuse in the agentic format without intervention. Deg.: degenerate outputs, counted as non-refusal. p: exact paired McNemar test between the refusal and random directions on the same instructions. The p values are not corrected for the number of layers and doses.",
+    "source_relative_path": "chapters/Chapter4/chapter04.tex",
+    "source_table_sha256": "a387396957c8d70bf40513837520ec4c79a80e5d2fed9f6ead33562fe84c9319",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70",
+        "76"
+      ],
+      [
+        "0.5"
+      ],
+      [
+        "7",
+        "53"
+      ],
+      [
+        "0",
+        "53"
+      ],
+      [
+        "0",
+        "94"
+      ],
+      [
+        "0.016"
+      ],
+      [],
+      [
+        "1"
+      ],
+      [
+        "21",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "6",
+        "94"
+      ],
+      [
+        "0.001"
+      ],
+      [],
+      [
+        "2"
+      ],
+      [
+        "36",
+        "53",
+        "6"
+      ],
+      [
+        "1",
+        "53"
+      ],
+      [
+        "49",
+        "94",
+        "9"
+      ],
+      [
+        "0.001"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "0",
+        "53",
+        "49"
+      ],
+      [
+        "1",
+        "53"
+      ],
+      [
+        "1",
+        "94",
+        "93"
+      ],
+      [
+        "1.000"
+      ],
+      [
+        "-3.3",
+        "-70",
+        "56"
+      ],
+      [
+        "0.5"
+      ],
+      [
+        "8",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "0",
+        "94"
+      ],
+      [
+        "0.031"
+      ],
+      [],
+      [
+        "1"
+      ],
+      [
+        "25",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "7",
+        "94"
+      ],
+      [
+        "0.001"
+      ],
+      [],
+      [
+        "2"
+      ],
+      [
+        "51",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "91",
+        "94"
+      ],
+      [
+        "0.001"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "53",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "75",
+        "94",
+        "19"
+      ],
+      [
+        "0.001"
+      ],
+      [
+        "-3.3",
+        "-70",
+        "28"
+      ],
+      [
+        "0.5"
+      ],
+      [
+        "3",
+        "53"
+      ],
+      [
+        "0",
+        "53"
+      ],
+      [
+        "0",
+        "94"
+      ],
+      [
+        "0.250"
+      ],
+      [],
+      [
+        "1"
+      ],
+      [
+        "3",
+        "53"
+      ],
+      [
+        "1",
+        "53"
+      ],
+      [
+        "1",
+        "94"
+      ],
+      [
+        "0.500"
+      ],
+      [],
+      [
+        "2"
+      ],
+      [
+        "13",
+        "53"
+      ],
+      [
+        "2",
+        "53"
+      ],
+      [
+        "2",
+        "94"
+      ],
+      [
+        "0.003"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "45",
+        "53"
+      ],
+      [
+        "24",
+        "53"
+      ],
+      [
+        "53",
+        "94"
+      ],
+      [
+        "0.001"
+      ],
+      [
+        "-7",
+        "30"
+      ],
+      [
+        "0.5"
+      ],
+      [
+        "2",
+        "87"
+      ],
+      [
+        "0",
+        "87"
+      ],
+      [
+        "1",
+        "96"
+      ],
+      [
+        "0.500"
+      ],
+      [],
+      [
+        "1"
+      ],
+      [
+        "6",
+        "87"
+      ],
+      [
+        "1",
+        "87"
+      ],
+      [
+        "1",
+        "96"
+      ],
+      [
+        "0.063"
+      ],
+      [],
+      [
+        "2"
+      ],
+      [
+        "22",
+        "87"
+      ],
+      [
+        "4",
+        "87"
+      ],
+      [
+        "1",
+        "96"
+      ],
+      [
+        "0.001"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "18",
+        "87",
+        "11"
+      ],
+      [
+        "6",
+        "87"
+      ],
+      [
+        "6",
+        "96",
+        "4"
+      ],
+      [
+        "0.002"
+      ],
+      [
+        "3",
+        "-8",
+        "32"
+      ],
+      [
+        "0.5"
+      ],
+      [
+        "2",
+        "39"
+      ],
+      [
+        "2",
+        "39"
+      ],
+      [
+        "1",
+        "61"
+      ],
+      [
+        "1.000"
+      ],
+      [],
+      [
+        "1"
+      ],
+      [
+        "3",
+        "39"
+      ],
+      [
+        "5",
+        "39"
+      ],
+      [
+        "1",
+        "61"
+      ],
+      [
+        "0.625"
+      ],
+      [],
+      [
+        "2"
+      ],
+      [
+        "6",
+        "39"
+      ],
+      [
+        "4",
+        "39"
+      ],
+      [
+        "0",
+        "61"
+      ],
+      [
+        "0.688"
+      ],
+      [],
+      [
+        "4"
+      ],
+      [
+        "15",
+        "39"
+      ],
+      [
+        "9",
+        "39"
+      ],
+      [
+        "3",
+        "61"
+      ],
+      [
+        "0.109"
+      ]
+    ]
+  },
+  "tab:config": {
+    "number": 16,
+    "headers": [
+      "Model",
+      "Identifier",
+      "Layer sweep",
+      "Causal test"
+    ],
+    "rows": [
+      [
+        "Llama-3.3-70B",
+        "meta-llama/Llama-3.3-70B-Instruct",
+        "0, 4, …, 76",
+        "Layers 76, 56 and 28"
+      ],
+      [
+        "Mistral-7B",
+        "mistralai/Mistral-7B-Instruct-v0.3",
+        "0, 2, …, 30",
+        "Layer 30"
+      ],
+      [
+        "Qwen3-8B",
+        "Qwen/Qwen3-8B",
+        "0, 2, …, 34",
+        "Layer 32"
+      ],
+      [
+        "Qwen3-32B",
+        "Qwen/Qwen3-32B",
+        "0, 2, …, 62",
+        "---"
+      ]
+    ],
+    "caption": "Run-specific configuration. The causal-test doses are 0.5, 1, 2 and 4 in every case, with 64 answer tokens and, for Qwen3-8B, up to 1,024 reasoning tokens.",
+    "source_relative_path": "chapters/Appendix/anexos.tex",
+    "source_table_sha256": "f52aa732eecbc7bb70401dfebb1255df63db618ceae3c817a0ffada15bc47241",
+    "numeric_cells": [
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "-3.3",
+        "-70"
+      ],
+      [
+        "0",
+        "4",
+        "76"
+      ],
+      [
+        "76",
+        "56",
+        "28"
+      ],
+      [
+        "-7"
+      ],
+      [
+        "-7",
+        "0.3"
+      ],
+      [
+        "0",
+        "2",
+        "30"
+      ],
+      [
+        "30"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "3",
+        "-8"
+      ],
+      [
+        "0",
+        "2",
+        "34"
+      ],
+      [
+        "32"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "3",
+        "-32"
+      ],
+      [
+        "0",
+        "2",
+        "62"
+      ],
+      []
+    ]
+  }
+}
