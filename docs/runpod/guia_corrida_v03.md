@@ -93,17 +93,14 @@ sha256sum data/v03/dataset_v03_rerun.jsonl     # debe empezar con c96d4bd6
 
 Debe decir `transformers 5.24.0`, torch 2.8 o superior, y no mostrar la línea `Disabling PyTorch`.
 
-Descarga los modelos de esa máquina:
+Descarga los modelos de esa máquina, en segundo plano, mientras se instala PyTorch:
 
 ```bash
-# 1A (~465 GB, 30-60 min)
-for m in meta-llama/Llama-3.3-70B-Instruct Qwen/Qwen3-32B Qwen/Qwen3.8-27B google/gemma-4-31B-it \
-         meta-models/Muse-Glimmer-30B openai/gpt-oss-20b openai/gpt-oss-120b; do hf download "$m" || echo "FALLO $m"; done
-# 1B
-for m in mistralai/Mistral-7B-Instruct-v0.3 Qwen/Qwen3-8B; do hf download "$m" || echo "FALLO $m"; done
-# 2
-hf download zai-org/GLM-5.3-Flash
+bash scripts/runpod/descargar_v03.sh h200     # o l40s / glm
+grep "FALLO\|TERMINADA" /workspace/descarga.log   # al final: TERMINADA y ningún FALLO
 ```
+
+**No uses `hf download` sin exclusiones.** Llama-3.3 trae una carpeta `original/` (~141 GB de `.pth`), y cada gpt-oss trae `original/` y `metal/` (triplican su tamaño). Transformers no usa ninguna de ellas. En el primer pod, bajarlas todas hizo fallar la descarga de gpt-oss-120b. El script las excluye: la H200 queda en ~400 GB.
 
 ## 5. Pruebas (obligatorias, en cada pod)
 
