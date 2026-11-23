@@ -1,5 +1,5 @@
 {
-  "_descripcion": "Lo que ningún archivo de resultados registra: modelo exacto en corridas antiguas, carpeta anterior, relación entre versiones y dónde se cita cada una. scripts/generar_fichas.py lo combina con los archivos de cada carpeta para escribir su FICHA.md. Claves: ruta relativa a results/.",
+  "_descripcion": "Lo que ningún archivo de resultados registra: modelo exacto en corridas antiguas, carpeta anterior, relación entre versiones y dónde se cita cada una. scripts/analisis/generar_fichas.py lo combina con los archivos de cada carpeta para escribir su FICHA.md. Claves: ruta relativa a results/.",
   "corridas": {
     "corridas/llama33_70b/v1": {
       "etiqueta": "Llama-3.3-70B · V1",

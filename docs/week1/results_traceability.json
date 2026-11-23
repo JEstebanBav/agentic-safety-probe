@@ -1,0 +1,164 @@
+{
+  "models": [
+    {
+      "model": "llama",
+      "source": "results/ultimos_resultados/llama3380B_v4",
+      "fresh_extraction_matches_recorded_evidence": true
+    },
+    {
+      "model": "mistral",
+      "source": "results/ultimos_resultados/mistral7b_v4",
+      "fresh_extraction_matches_recorded_evidence": true
+    },
+    {
+      "model": "qwen8b",
+      "source": "results/ultimos_resultados/qwen3_8b_v3/v3",
+      "fresh_extraction_matches_recorded_evidence": true
+    },
+    {
+      "model": "qwen32b",
+      "source": "results/ultimos_resultados/qwen32B_v3",
+      "fresh_extraction_matches_recorded_evidence": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/agent_direction_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/causal_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/factorial_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/format_effect_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/robust_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/llama3380B_v4/stratified_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/agent_direction_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/causal_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/factorial_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/format_effect_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/robust_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/mistral7b_v4/stratified_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/agent_direction_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/causal_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/factorial_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/format_effect_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/robust_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen3_8b_v3/v3/stratified_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/agent_direction_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/factorial_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/format_effect_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/robust_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    },
+    {
+      "path": "results/ultimos_resultados/qwen32B_v3/stratified_results.json",
+      "hash_matches_recorded": true,
+      "tracked_in_local_git": true
+    }
+  ],
+  "tables_mapped": 16,
+  "scope": "Re-extraction of the existing evidence plus source hashes and table-to-source mapping; not fresh model runs or an independent check of every rounded table cell.",
+  "remote_github_checked": false
+}

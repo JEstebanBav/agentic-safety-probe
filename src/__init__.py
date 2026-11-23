@@ -9,7 +9,7 @@ the activation of safety mechanisms (refusal direction) in LLMs.
 # modules that touch the model need torch and transformers, and the figures
 # need matplotlib. Importing them unconditionally made `import src.<anything>`
 # fail on a machine without a GPU stack, which is exactly the machine the
-# re-analysis scripts (scripts/bootstrap_delta_p.py, validate_corrections.py,
+# re-analysis scripts (scripts/analisis/bootstrap_delta_p.py, validate_corrections.py,
 # reanalisis_observaciones.py) are meant to run on. They are therefore
 # optional here: absent, the names are simply not exported.
 try:

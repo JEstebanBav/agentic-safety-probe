@@ -1,0 +1,106 @@
+{
+  "status": "Exploratory AI opinion only. Not an independent/blinded third human annotation; no effect on study.",
+  "date": "2026-11-03",
+  "judgments_sha256_before_comparison": "7baee647260b160de4003b230ce9e5ba6e04e7129a2fbc1acb729a98adb8a38b",
+  "prior_exposure": "The reviewer has seen both annotations and the discussion in earlier turns. This is not a blinded or independent validation. Judgments below were fixed before calculating agreement with A/B in this turn.",
+  "reviewed": 96,
+  "assigned": 89,
+  "unassigned": 7,
+  "unassigned_ids": [
+    "H010",
+    "H019",
+    "H034",
+    "H059",
+    "H070",
+    "H085",
+    "H088"
+  ],
+  "ai_label_distribution": {
+    "explicit": 51,
+    "framed": 25,
+    "unassigned": 7,
+    "contextual": 13
+  },
+  "all_assigned": {
+    "A": {
+      "matches": 46,
+      "n": 89,
+      "agreement": 0.5168539325842697
+    },
+    "B": {
+      "matches": 50,
+      "n": 89,
+      "agreement": 0.5617977528089888
+    }
+  },
+  "high_confidence_only": {
+    "A": {
+      "matches": 36,
+      "n": 72,
+      "agreement": 0.5
+    },
+    "B": {
+      "matches": 45,
+      "n": 72,
+      "agreement": 0.625
+    }
+  },
+  "by_ai_label": {
+    "explicit": {
+      "A": {
+        "matches": 22,
+        "n": 51,
+        "agreement": 0.43137254901960786
+      },
+      "B": {
+        "matches": 38,
+        "n": 51,
+        "agreement": 0.7450980392156863
+      }
+    },
+    "contextual": {
+      "A": {
+        "matches": 9,
+        "n": 13,
+        "agreement": 0.6923076923076923
+      },
+      "B": {
+        "matches": 3,
+        "n": 13,
+        "agreement": 0.23076923076923078
+      }
+    },
+    "framed": {
+      "A": {
+        "matches": 15,
+        "n": 25,
+        "agreement": 0.6
+      },
+      "B": {
+        "matches": 9,
+        "n": 25,
+        "agreement": 0.36
+      }
+    }
+  },
+  "among_53_human_disagreements": {
+    "B": 21,
+    "ninguno": 9,
+    "A": 17,
+    "sin_asignar": 6
+  },
+  "authoritative_files_sha256": {
+    "data/dataset_v2.jsonl": "ab0eef647db082525d586f48c6faf3ee2db65736672e8a1d4d67e9214dcde070",
+    "data/week1/strata_annotator_A_BLIND_ES.xlsx": "cbcc65a14e37f67c10d542bd063556c7d3e07a41e8e00258f1dc7a78f63ffffb",
+    "data/week1/strata_annotator_B_BLIND_ES.xlsx": "8c065420c1c67513f52a1bafc72b92d5cefb88941ec44c28a351cc555d084a76",
+    "data/week1/strata_consensus.csv": "1365289815a6739ee6d34476d7422fafafc7a0008736ceff9cbaded578382a51",
+    "data/week1/strata_consensus_round1.xlsx": "a277afc91f407f4634d26a573326c7349b366926229e18a543e8c6d5a550d384",
+    "data/week1/strata_adjudication.json": "2250297a8c250931eb2612733b143db45ac2f634bc0356ad95d40003e70de280",
+    "docs/week1/human_agreement.json": "270a6c76358ac3e7a566ca01a609743c7f72e43048892ce1e3fe4b93223d76f6",
+    "docs/week1/round1_agreement.json": "3f6b0bbf84df66109c9b74e685d807bea992854942046e42f763ca36c64f351f",
+    "docs/week1/codebook.md": "ceca136b483e06a1c4da7d549ce68017dc93e3c2e532489ebb04f9e1c5b3c85d",
+    "docs/paper/evidence/metrics.json": "d66af1d874aab0c8890406bf0f79df3043b187d160595d9d92458fadb2c0d197"
+  },
+  "interpretation": "Agreement is similarity to this AI judgment, not accuracy against ground truth. Cases withheld for missing context are not counted as human errors. Same denominator is used for A and B.",
+  "authoritative_files_unchanged": true
+}

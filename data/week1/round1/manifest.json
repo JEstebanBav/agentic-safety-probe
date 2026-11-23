@@ -1,0 +1,24 @@
+{
+  "round": "round1",
+  "source_corpus_sha256": "ab0eef647db082525d586f48c6faf3ee2db65736672e8a1d4d67e9214dcde070",
+  "translation_version": "es-v1",
+  "files": [
+    {
+      "annotator": "A",
+      "file": "data/week1/strata_annotator_A_BLIND_ES.xlsx",
+      "snapshot": "data/week1/round1/strata_annotator_A_BLIND_ES.xlsx",
+      "sha256": "cbcc65a14e37f67c10d542bd063556c7d3e07a41e8e00258f1dc7a78f63ffffb",
+      "rows": 96,
+      "source_texts_unchanged": true
+    },
+    {
+      "annotator": "B",
+      "file": "data/week1/strata_annotator_B_BLIND_ES.xlsx",
+      "snapshot": "data/week1/round1/strata_annotator_B_BLIND_ES.xlsx",
+      "sha256": "8c065420c1c67513f52a1bafc72b92d5cefb88941ec44c28a351cc555d084a76",
+      "rows": 96,
+      "source_texts_unchanged": true
+    }
+  ],
+  "note": "Raw independent labels as supplied by the authors, before discussion and consensus. No labels corrected by AI."
+}

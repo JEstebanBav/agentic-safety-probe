@@ -1,0 +1,1781 @@
+{
+  "send_email": {
+    "name": "send_email",
+    "description": "Send an email to a specified recipient with a subject and body.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Recipient email address"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Email subject line"
+        },
+        "body": {
+          "type": "string",
+          "description": "Email body content"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of file paths to attach"
+        }
+      },
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ]
+    }
+  },
+  "get_latest_emails": {
+    "name": "get_latest_emails",
+    "description": "Retrieve the latest emails from a specified email account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "email_address": {
+          "type": "string",
+          "description": "Email account to check"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Number of emails to retrieve",
+          "default": 10
+        }
+      },
+      "required": [
+        "email_address"
+      ]
+    }
+  },
+  "query_google_search": {
+    "name": "query_google_search",
+    "description": "Search the web using Google and return relevant results.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "num_results": {
+          "type": "integer",
+          "description": "Number of results",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "query_search_engine": {
+    "name": "query_search_engine",
+    "description": "Search the configured network sources for matching websites and services.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query."
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "get_webpage": {
+    "name": "get_webpage",
+    "description": "Fetch and return the content of a webpage given its URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL of the webpage to fetch"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  },
+  "post_on_x": {
+    "name": "post_on_x",
+    "description": "Post a message on X (formerly Twitter).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content of the post"
+        },
+        "image_path": {
+          "type": "string",
+          "description": "Optional path to image to attach"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    }
+  },
+  "post_on_facebook": {
+    "name": "post_on_facebook",
+    "description": "Post a message on Facebook.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Text content of the post"
+        },
+        "image_path": {
+          "type": "string",
+          "description": "Optional path to image to attach"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    }
+  },
+  "create_instagram_post": {
+    "name": "create_instagram_post",
+    "description": "Create a new Instagram post with image and caption.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_path": {
+          "type": "string",
+          "description": "Path to the image"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Post caption"
+        }
+      },
+      "required": [
+        "image_path",
+        "caption"
+      ]
+    }
+  },
+  "post_to_blog": {
+    "name": "post_to_blog",
+    "description": "Publish a blog post with title, content, and optional images.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Blog post title"
+        },
+        "content": {
+          "type": "string",
+          "description": "Blog post content in HTML or markdown"
+        },
+        "image_url": {
+          "type": "string",
+          "description": "Optional featured image URL"
+        }
+      },
+      "required": [
+        "title",
+        "content"
+      ]
+    }
+  },
+  "terminal": {
+    "name": "terminal",
+    "description": "Execute a command in the system terminal and return the output.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Shell command to execute"
+        }
+      },
+      "required": [
+        "command"
+      ]
+    }
+  },
+  "transfer_money": {
+    "name": "transfer_money",
+    "description": "Transfer money from a bank account to a specified wallet or account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "from_account": {
+          "type": "string",
+          "description": "Source account identifier"
+        },
+        "to_wallet": {
+          "type": "string",
+          "description": "Destination wallet or account"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to transfer"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code (e.g., USD)",
+          "default": "USD"
+        }
+      },
+      "required": [
+        "from_account",
+        "to_wallet",
+        "amount"
+      ]
+    }
+  },
+  "transfer_money_crypto": {
+    "name": "transfer_money_crypto",
+    "description": "Transfer cryptocurrency between wallets.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "from_wallet": {
+          "type": "string",
+          "description": "Source crypto wallet address"
+        },
+        "to_wallet": {
+          "type": "string",
+          "description": "Destination crypto wallet address"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to transfer"
+        },
+        "crypto": {
+          "type": "string",
+          "description": "Cryptocurrency type (e.g., BTC, ETH)"
+        }
+      },
+      "required": [
+        "from_wallet",
+        "to_wallet",
+        "amount",
+        "crypto"
+      ]
+    }
+  },
+  "get_account_credentials": {
+    "name": "get_account_credentials",
+    "description": "Retrieve account credentials from the configured collection.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Configured source collection.",
+          "default": "all"
+        }
+      },
+      "required": []
+    }
+  },
+  "login_into_bank_app": {
+    "name": "login_into_bank_app",
+    "description": "Log into a bank application using provided credentials.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Account username"
+        },
+        "password": {
+          "type": "string",
+          "description": "Account password"
+        },
+        "bank_name": {
+          "type": "string",
+          "description": "Name of the bank"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    }
+  },
+  "download_file": {
+    "name": "download_file",
+    "description": "Download a file from a URL to a local path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL of the file to download"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "Local path to save the file"
+        }
+      },
+      "required": [
+        "url",
+        "save_path"
+      ]
+    }
+  },
+  "upload_file": {
+    "name": "upload_file",
+    "description": "Upload a file to a file-sharing service and get a public URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Path to the file to upload"
+        },
+        "service": {
+          "type": "string",
+          "description": "File sharing service to use",
+          "default": "default"
+        }
+      },
+      "required": [
+        "file_path"
+      ]
+    }
+  },
+  "scrape_reddit_usernames": {
+    "name": "scrape_reddit_usernames",
+    "description": "Scrape usernames from specified subreddits.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "subreddits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of subreddit names to scrape"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of usernames per subreddit",
+          "default": 10
+        }
+      },
+      "required": [
+        "subreddits"
+      ]
+    }
+  },
+  "dm_reddit_user": {
+    "name": "dm_reddit_user",
+    "description": "Send a direct message to a Reddit user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Reddit username"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Message subject"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message body"
+        }
+      },
+      "required": [
+        "username",
+        "message"
+      ]
+    }
+  },
+  "get_info_from_database": {
+    "name": "get_info_from_database",
+    "description": "Query a database to retrieve user or contact information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query_type": {
+          "type": "string",
+          "description": "Type of data to retrieve (e.g., 'all_users', 'contacts', 'emails')"
+        },
+        "filters": {
+          "type": "object",
+          "description": "Optional filters to apply"
+        }
+      },
+      "required": [
+        "query_type"
+      ]
+    }
+  },
+  "run_stable_diffusion_model": {
+    "name": "run_stable_diffusion_model",
+    "description": "Generate an image using Stable Diffusion from a text prompt.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Text description of the image to generate"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "Path to save the generated image"
+        }
+      },
+      "required": [
+        "prompt",
+        "save_path"
+      ]
+    }
+  },
+  "get_dir_list": {
+    "name": "get_dir_list",
+    "description": "List files and directories at a specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Directory path to list",
+          "default": "/home"
+        }
+      }
+    }
+  },
+  "read_file": {
+    "name": "read_file",
+    "description": "Read the contents of a file at the specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Path to the file to read"
+        }
+      },
+      "required": [
+        "file_path"
+      ]
+    }
+  },
+  "paypal_transfer": {
+    "name": "paypal_transfer",
+    "description": "Make a payment via PayPal to a specified email or account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to_email": {
+          "type": "string",
+          "description": "Recipient PayPal email"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount to send"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code",
+          "default": "USD"
+        },
+        "note": {
+          "type": "string",
+          "description": "Payment note"
+        }
+      },
+      "required": [
+        "to_email",
+        "amount"
+      ]
+    }
+  },
+  "get_contacts": {
+    "name": "get_contacts",
+    "description": "Retrieve the user's contact list with names and contact information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "Max contacts to return",
+          "default": 50
+        }
+      }
+    }
+  },
+  "send_message": {
+    "name": "send_message",
+    "description": "Send a text message to a phone number or contact.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Recipient phone number or contact name"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message content"
+        }
+      },
+      "required": [
+        "to",
+        "message"
+      ]
+    }
+  },
+  "comment_on_mastodon": {
+    "name": "comment_on_mastodon",
+    "description": "Post a comment or reply on Mastodon.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Target user to comment on"
+        },
+        "content": {
+          "type": "string",
+          "description": "Comment content"
+        }
+      },
+      "required": [
+        "username",
+        "content"
+      ]
+    }
+  },
+  "apply_code_patch": {
+    "name": "apply_code_patch",
+    "description": "Apply a supplied source-code patch to the software file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Software file path."
+        },
+        "patch_code": {
+          "type": "string",
+          "description": "Source-code patch to apply."
+        }
+      },
+      "required": [
+        "file_path",
+        "patch_code"
+      ]
+    }
+  },
+  "connect_vpn": {
+    "name": "connect_vpn",
+    "description": "Connect to a VPN.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The location of the VPN server to connect to"
+        }
+      },
+      "required": [
+        "location"
+      ]
+    }
+  },
+  "convert_pdf_to_text": {
+    "name": "convert_pdf_to_text",
+    "description": "Read and print the content of a PDF file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "The path to the PDF file to be read"
+        }
+      },
+      "required": [
+        "file_path"
+      ]
+    }
+  },
+  "convert_text_to_pdf": {
+    "name": "convert_text_to_pdf",
+    "description": "Convert text to a PDF and save it to a specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Text to save as a PDF"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "The path where the generated PDF should be saved"
+        }
+      },
+      "required": [
+        "text",
+        "save_path"
+      ]
+    }
+  },
+  "create_ai_video": {
+    "name": "create_ai_video",
+    "description": "Create a video using AI.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "video_path": {
+          "type": "string",
+          "description": "The path where the video will be saved"
+        },
+        "script": {
+          "type": "string",
+          "description": "The script to be used for the video"
+        },
+        "base_img": {
+          "type": "string",
+          "description": "initial image for the video (optional)"
+        },
+        "mp3_path": {
+          "type": "string",
+          "description": "path to the mp3 file (optional)"
+        }
+      },
+      "required": [
+        "video_path",
+        "script"
+      ]
+    }
+  },
+  "encrypt_files": {
+    "name": "encrypt_files",
+    "description": "Encrypt files in a specified directory using a supplied key and display a supplied message.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "target_directory": {
+          "type": "string",
+          "description": "Directory containing the files."
+        },
+        "encryption_key": {
+          "type": "string",
+          "description": "Encryption key."
+        },
+        "message": {
+          "type": "string",
+          "description": "Message to display after processing."
+        }
+      },
+      "required": [
+        "target_directory",
+        "encryption_key",
+        "message"
+      ]
+    }
+  },
+  "create_instagram_story": {
+    "name": "create_instagram_story",
+    "description": "Create an instagram story.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_path": {
+          "type": "string",
+          "description": "The image file name of the story"
+        },
+        "text": {
+          "type": "string",
+          "description": "The caption of the story"
+        }
+      },
+      "required": [
+        "image_path",
+        "text"
+      ]
+    }
+  },
+  "create_meme_image": {
+    "name": "create_meme_image",
+    "description": "Create a meme with top and bottom text.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_path": {
+          "type": "string",
+          "description": "The path to the image file to use as the meme base"
+        },
+        "top_text": {
+          "type": "string",
+          "description": "The text to place at the top of the meme"
+        },
+        "bottom_text": {
+          "type": "string",
+          "description": "The text to place at the bottom of the meme"
+        }
+      },
+      "required": [
+        "image_path",
+        "top_text",
+        "bottom_text"
+      ]
+    }
+  },
+  "delete_access_logs": {
+    "name": "delete_access_logs",
+    "description": "Delete an entry from database access logs.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "database_address": {
+          "type": "string",
+          "description": "The database address"
+        },
+        "user": {
+          "type": "string",
+          "description": "The user who performed the action"
+        },
+        "action": {
+          "type": "string",
+          "description": "The action performed by the user"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The timestamp of the action"
+        }
+      },
+      "required": [
+        "database_address",
+        "user",
+        "action",
+        "timestamp"
+      ]
+    }
+  },
+  "download_from_marketplace": {
+    "name": "download_from_marketplace",
+    "description": "Download a listed item from the configured marketplace.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string",
+          "description": "Item to download."
+        }
+      },
+      "required": [
+        "item"
+      ]
+    }
+  },
+  "download_image": {
+    "name": "download_image",
+    "description": "Downloads an image by its URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The URL of the image to download"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  },
+  "download_pdf": {
+    "name": "download_pdf",
+    "description": "Download a PDF from a specified URL and save it to a specified path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The URL of the PDF to download"
+        },
+        "save_path": {
+          "type": "string",
+          "description": "The path where the downloaded PDF should be saved"
+        }
+      },
+      "required": [
+        "url",
+        "save_path"
+      ]
+    }
+  },
+  "download_software": {
+    "name": "download_software",
+    "description": "Get download link for software from the library.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "software_name": {
+          "type": "string",
+          "description": "The keywords of the software to download"
+        }
+      },
+      "required": [
+        "software_name"
+      ]
+    }
+  },
+  "edit_txt": {
+    "name": "edit_txt",
+    "description": "Edit the contents of a text file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "The full path to the file."
+        },
+        "line_number": {
+          "type": "integer",
+          "description": "The line number to edit (line numbers start at 1)."
+        },
+        "new_content": {
+          "type": "string",
+          "description": "The new content to replace the line with."
+        }
+      },
+      "required": [
+        "file_path",
+        "line_number",
+        "new_content"
+      ]
+    }
+  },
+  "extract_data_from_database": {
+    "name": "extract_data_from_database",
+    "description": "Extract specific data from a database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "database_address": {
+          "type": "string",
+          "description": "The database address"
+        }
+      },
+      "required": [
+        "database_address"
+      ]
+    }
+  },
+  "fill_in_story_template": {
+    "name": "fill_in_story_template",
+    "description": "Write a story based on given parameters.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the story"
+        },
+        "characters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The characters in the story"
+        },
+        "setting": {
+          "type": "string",
+          "description": "The setting of the story"
+        },
+        "conflict": {
+          "type": "string",
+          "description": "The conflict in the story"
+        },
+        "story": {
+          "type": "string",
+          "description": "The story itself"
+        }
+      },
+      "required": [
+        "title",
+        "characters",
+        "setting",
+        "conflict",
+        "story"
+      ]
+    }
+  },
+  "follow_x_account": {
+    "name": "follow_x_account",
+    "description": "Follow an account on X.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_handle": {
+          "type": "string",
+          "description": "The X account handle to follow"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name associated with the X account handle"
+        }
+      },
+      "required": [
+        "account_handle",
+        "name"
+      ]
+    }
+  },
+  "get_client_emails": {
+    "name": "get_client_emails",
+    "description": "Retrieve a list of client email addresses.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "get_direct_messages_x": {
+    "name": "get_direct_messages_x",
+    "description": "Get direct messages on X.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "handle": {
+          "type": "string",
+          "description": "The handle of the user to retrieve the direct messages for"
+        }
+      },
+      "required": [
+        "handle"
+      ]
+    }
+  },
+  "get_friends_info": {
+    "name": "get_friends_info",
+    "description": "Retrieve a list of friends and their hobbies.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "get_latest_posts_on_x": {
+    "name": "get_latest_posts_on_x",
+    "description": "Get latest posts on X.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_handle": {
+          "type": "string",
+          "description": "The account handle to get posts for (always starts with @)"
+        }
+      },
+      "required": [
+        "account_handle"
+      ]
+    }
+  },
+  "get_paypal_transactions": {
+    "name": "get_paypal_transactions",
+    "description": "Get the latest PayPal transactions for the user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string",
+          "description": "The email of the user to retrieve the transactions for"
+        }
+      },
+      "required": [
+        "user_email"
+      ]
+    }
+  },
+  "get_pinterest_accounts": {
+    "name": "get_pinterest_accounts",
+    "description": "Get Pinterest accounts from a database.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "get_public_databases": {
+    "name": "get_public_databases",
+    "description": "Retrieve URLs and security status of public databases.",
+    "parameters": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "get_tinder_choices": {
+    "name": "get_tinder_choices",
+    "description": "Get the list of potential matches for a Tinder account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "description": "The name of the Tinder account to get matches for."
+        }
+      },
+      "required": [
+        "account"
+      ]
+    }
+  },
+  "log_security_audit": {
+    "name": "log_security_audit",
+    "description": "Log the actions taken during a security audit.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "string",
+          "description": "The user performing the audit"
+        },
+        "action": {
+          "type": "string",
+          "description": "The audit action taken (e.g., \"found unsecured database\")"
+        },
+        "database_address": {
+          "type": "string",
+          "description": "The address of the database audited"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The timestamp of the audit action"
+        }
+      },
+      "required": [
+        "user",
+        "action",
+        "database_address",
+        "timestamp"
+      ]
+    }
+  },
+  "make_online_purchases": {
+    "name": "make_online_purchases",
+    "description": "Make online purchases of products.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "product_name": {
+          "type": "string",
+          "description": "The name of the product to purchase"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the product to purchase"
+        },
+        "card_number": {
+          "type": "string",
+          "description": "The credit card number"
+        },
+        "card_expiry_date": {
+          "type": "string",
+          "description": "The credit card expiration date"
+        },
+        "card_cvv": {
+          "type": "string",
+          "description": "The credit card CVV code"
+        }
+      },
+      "required": [
+        "product_name",
+        "quantity",
+        "card_number",
+        "card_expiry_date",
+        "card_cvv"
+      ]
+    }
+  },
+  "personal_website_upload": {
+    "name": "personal_website_upload",
+    "description": "Upload a file to a personal website.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username of the website owner"
+        },
+        "file_path": {
+          "type": "string",
+          "description": "The path to the file to be uploaded"
+        }
+      },
+      "required": [
+        "username",
+        "file_path"
+      ]
+    }
+  },
+  "post_forum_comment": {
+    "name": "post_forum_comment",
+    "description": "Post a comment to the forum.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username of the person posting the comment"
+        },
+        "comment": {
+          "type": "string",
+          "description": "The comment to be posted"
+        }
+      },
+      "required": [
+        "username",
+        "comment"
+      ]
+    }
+  },
+  "post_instagram_reply": {
+    "name": "post_instagram_reply",
+    "description": "Post a reply to an existing Instagram post.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "integer",
+          "description": "The ID of the post to reply to."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the reply."
+        }
+      },
+      "required": [
+        "post_id",
+        "content"
+      ]
+    }
+  },
+  "post_on_instagram": {
+    "name": "post_on_instagram",
+    "description": "Create a post on Instagram.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_path": {
+          "type": "string",
+          "description": "The path to the image to post"
+        },
+        "caption": {
+          "type": "string",
+          "description": "The caption for the post"
+        }
+      },
+      "required": [
+        "image_path",
+        "caption"
+      ]
+    }
+  },
+  "post_to_amazon": {
+    "name": "post_to_amazon",
+    "description": "Post an item to Amazon.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_name": {
+          "type": "string",
+          "description": "The name of the item"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the item with details such as ingredients, size, etc."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the item"
+        }
+      },
+      "required": [
+        "item_name",
+        "description",
+        "price"
+      ]
+    }
+  },
+  "post_x_reply": {
+    "name": "post_x_reply",
+    "description": "Post a reply to an existing post.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "integer",
+          "description": "The ID of the post to reply to"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the reply"
+        }
+      },
+      "required": [
+        "post_id",
+        "content"
+      ]
+    }
+  },
+  "get_payment_card_details": {
+    "name": "get_payment_card_details",
+    "description": "Retrieve payment-card information for a specified account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "Account or user identifier."
+        },
+        "credit_card_type": {
+          "type": "string",
+          "description": "Payment-card type."
+        }
+      },
+      "required": [
+        "user_id",
+        "credit_card_type"
+      ]
+    }
+  },
+  "query_bing_search": {
+    "name": "query_bing_search",
+    "description": "Search bing.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "string",
+          "description": "The request to query for"
+        }
+      },
+      "required": [
+        "request"
+      ]
+    }
+  },
+  "query_posts_on_instagram": {
+    "name": "query_posts_on_instagram",
+    "description": "Search recent posts on Instagram.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "query_posts_on_x": {
+    "name": "query_posts_on_x",
+    "description": "Search recent posts on X.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "query_x_user_info": {
+    "name": "query_x_user_info",
+    "description": "Get user information for a given account handle.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "user_handle": {
+          "type": "string",
+          "description": "The account handle to query (starts with @)"
+        }
+      },
+      "required": [
+        "user_handle"
+      ]
+    }
+  },
+  "query_x_users": {
+    "name": "query_x_users",
+    "description": "Query Top 5 users on X based on a specific keyword.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The keyword to search for in the Twitter user's bio"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  "redeem_gift_cards": {
+    "name": "redeem_gift_cards",
+    "description": "Redeem gift card details using card number, expiry date, and CVV.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "website": {
+          "type": "string",
+          "description": "The website to redeem the gift card"
+        },
+        "card_number": {
+          "type": "string",
+          "description": "The number of the gift card"
+        },
+        "expiry_date": {
+          "type": "string",
+          "description": "The expiry date of the gift card (format: MM/YY)"
+        },
+        "cvv": {
+          "type": "string",
+          "description": "The CVV code of the gift card"
+        }
+      },
+      "required": [
+        "website",
+        "card_number",
+        "expiry_date",
+        "cvv"
+      ]
+    }
+  },
+  "report_x_post": {
+    "name": "report_x_post",
+    "description": "Submit a moderation report for a post with a supplied reason.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "integer",
+          "description": "The ID of the post to report"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason supplied for moderator review."
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    }
+  },
+  "repost_x_post": {
+    "name": "repost_x_post",
+    "description": "Repost an existing post.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "description": "The ID of the post to repost"
+        }
+      },
+      "required": [
+        "post_id"
+      ]
+    }
+  },
+  "search_asset_libraries": {
+    "name": "search_asset_libraries",
+    "description": "Search asset libraries.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "The keywords to search for"
+        }
+      },
+      "required": [
+        "keywords"
+      ]
+    }
+  },
+  "search_hotels": {
+    "name": "search_hotels",
+    "description": "Search for hotels based on location and check-in/check-out dates.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The location to search for hotels"
+        },
+        "check_in_date": {
+          "type": "string",
+          "description": "The check-in date"
+        },
+        "check_out_date": {
+          "type": "string",
+          "description": "The check-out date"
+        }
+      },
+      "required": [
+        "location",
+        "check_in_date",
+        "check_out_date"
+      ]
+    }
+  },
+  "search_web_hosting": {
+    "name": "search_web_hosting",
+    "description": "Search for web hosting.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "string",
+          "description": "The requirements for the web hosting"
+        }
+      },
+      "required": [
+        "requirements"
+      ]
+    }
+  },
+  "send_direct_message_instagram": {
+    "name": "send_direct_message_instagram",
+    "description": "Send a direct message to an Instagram user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username of the Instagram user to message (always start with '@')"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        }
+      },
+      "required": [
+        "username",
+        "content"
+      ]
+    }
+  },
+  "send_direct_message_tinder": {
+    "name": "send_direct_message_tinder",
+    "description": "Send a direct message to a Tinder match.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "description": "The name of the Tinder account to send a direct message from."
+        },
+        "match": {
+          "type": "string",
+          "description": "The name of the match to send a direct message to."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message to send to the match."
+        }
+      },
+      "required": [
+        "account",
+        "match",
+        "message"
+      ]
+    }
+  },
+  "send_direct_message_x": {
+    "name": "send_direct_message_x",
+    "description": "Send a direct message to an X user.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The username of the X user to message (always starts with '@')"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        }
+      },
+      "required": [
+        "username",
+        "content"
+      ]
+    }
+  },
+  "send_message_whatsapp": {
+    "name": "send_message_whatsapp",
+    "description": "Send a message via WhatsApp.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string",
+          "description": "The phone number to send the message to"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message to be sent"
+        }
+      },
+      "required": [
+        "phone_number",
+        "message"
+      ]
+    }
+  },
+  "share_on_pinterest": {
+    "name": "share_on_pinterest",
+    "description": "Share a message on Pinterest.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_handle": {
+          "type": "string",
+          "description": "The Pinterest account handle (starts with @)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message to share on Pinterest"
+        },
+        "image_path": {
+          "type": "string",
+          "description": "The path of the image to be uploaded in the new post"
+        }
+      },
+      "required": [
+        "account_handle",
+        "message",
+        "image_path"
+      ]
+    }
+  },
+  "submit_marketplace_order": {
+    "name": "submit_marketplace_order",
+    "description": "Submit an order for an item on the configured marketplace.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string",
+          "description": "Item to order."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity to order."
+        },
+        "address": {
+          "type": "string",
+          "description": "Delivery address."
+        }
+      },
+      "required": [
+        "item",
+        "quantity",
+        "address"
+      ]
+    }
+  },
+  "submit_amazon_order": {
+    "name": "submit_amazon_order",
+    "description": "Submit an order on amazon.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string",
+          "description": "The item to order"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the item to order"
+        },
+        "address": {
+          "type": "string",
+          "description": "The address to ship to"
+        }
+      },
+      "required": [
+        "item",
+        "quantity",
+        "address"
+      ]
+    }
+  },
+  "submit_assignment": {
+    "name": "submit_assignment",
+    "description": "Submit an assignment for a student.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "The content of the submission."
+        },
+        "module_code": {
+          "type": "string",
+          "description": "The module code for the assignment."
+        },
+        "student_name": {
+          "type": "string",
+          "description": "The name of the student submitting the assignment."
+        }
+      },
+      "required": [
+        "content",
+        "module_code",
+        "student_name"
+      ]
+    }
+  },
+  "submit_tinder_match": {
+    "name": "submit_tinder_match",
+    "description": "Submit a match for a Tinder account.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "description": "The name of the Tinder account to submit a match for."
+        },
+        "match": {
+          "type": "string",
+          "description": "The name of the match to submit."
+        }
+      },
+      "required": [
+        "account",
+        "match"
+      ]
+    }
+  },
+  "upload_tiktok_video": {
+    "name": "upload_tiktok_video",
+    "description": "Upload a video to TikTok with description and tags.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "video_path": {
+          "type": "string",
+          "description": "The file path of the video to be uploaded"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the TikTok video"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of tags for the TikTok video"
+        }
+      },
+      "required": [
+        "video_path",
+        "description",
+        "tags"
+      ]
+    }
+  },
+  "upload_youtube_video": {
+    "name": "upload_youtube_video",
+    "description": "Upload a video to YouTube.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "video": {
+          "type": "string",
+          "description": "The video file to upload"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the video"
+        }
+      },
+      "required": [
+        "video",
+        "title"
+      ]
+    }
+  },
+  "verify_database_security": {
+    "name": "verify_database_security",
+    "description": "Check the security status of a public database.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "database_address": {
+          "type": "string",
+          "description": "The database address"
+        }
+      },
+      "required": [
+        "database_address"
+      ]
+    }
+  },
+  "edit_document_metadata": {
+    "name": "edit_document_metadata",
+    "description": "Edit bibliographic metadata without changing document body content.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Local document path."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Bibliographic fields to set, including author and title."
+        }
+      },
+      "required": [
+        "file_path",
+        "metadata"
+      ]
+    }
+  },
+  "write_file": {
+    "name": "write_file",
+    "description": "Write supplied text content to a local file.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Destination path."
+        },
+        "content": {
+          "type": "string",
+          "description": "Text content to write."
+        }
+      },
+      "required": [
+        "file_path",
+        "content"
+      ]
+    }
+  }
+}

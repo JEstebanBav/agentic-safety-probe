@@ -75,7 +75,7 @@ from src.probes import (
     print_probing_summary,
     compare_linear_vs_mlp,
 )
-from src.robust_estimation import pair_groups, run_paired_suite
+from src.robust_estimation import pair_groups, run_paired_suite, set_pair_clusters
 from src.causal_test import (
     run_behavioral_baseline,
     run_causal_test,
@@ -100,7 +100,9 @@ try:
     from src.visualizations import generate_all_figures
 except ImportError:                     # matplotlib absent: skip the figures
     generate_all_figures = None
-from data.loader import load_custom_dataset, load_harmagent_dataset, DatasetEntry
+from data.loader import (
+    load_custom_dataset, load_harmagent_dataset, load_theme_groups, DatasetEntry,
+)
 from data.build_dataset import build_dataset, HARMFUL_PROMPTS
 
 
@@ -128,6 +130,27 @@ def parse_args():
         help="Paired dataset file for --dataset custom. Default: "
              "data/dataset_full.jsonl. Use data/dataset_expanded.jsonl for the "
              "corpus extended with AgentHarm (data/build_agentharm_pairs.py).",
+    )
+    parser.add_argument(
+        "--theme-groups",
+        type=str,
+        default=None,
+        help="CSV mapping pair_id -> theme_group_id (e.g. "
+             "data/v03/theme_groups_67.csv). Every partition - cross-fitting "
+             "folds, probe folds, split halves - then holds out whole theme "
+             "groups instead of single pairs. Every analysed pair must be in "
+             "the map. Default: each pair is its own group (earlier runs).",
+    )
+    parser.add_argument(
+        "--tool-catalog-dir",
+        type=str,
+        default=None,
+        help="Folder holding tool_definitions.json and, optionally, "
+             "data/tool_definitions_agentharm.json, used instead of the "
+             "repository catalogues by --toolbox, --agency-level, "
+             "--include-history and the role_* conditions (e.g. "
+             "data/v03/catalogos_neutrales). Per-record schemas of the paired "
+             "run never come from it. The repository files are not modified.",
     )
     parser.add_argument(
         "--agency-level",
@@ -370,6 +393,22 @@ def _pair_id(entry: Dict) -> str:
     return str(entry.get("pair_id", entry.get("id", "")))
 
 
+_NO_STRATA_NOTE = (
+    "  Explicitness strata: SKIPPED - the corpus carries no subtlety labels "
+    "(every pair is 'unknown'), so a per-stratum result would only repeat the "
+    "global one. Add the labels to a copy of the corpus and re-run the "
+    "analysis with --load-activations --dataset-path <copy>.")
+
+
+def _explicitness_strata(dataset: List[Dict], order: List[str]) -> Optional[List[str]]:
+    """Stratum of each row in `order`, or None when no pair has a label."""
+    by_pair = {_pair_id(e): e for e in dataset}
+    strata = [by_pair[p].get("subtlety") or "unknown" for p in order]
+    if all(s == "unknown" for s in strata):
+        return None
+    return strata
+
+
 def format_entry(
     tokenizer,
     entry: Dict,
@@ -531,6 +570,7 @@ def extract_all_activations(
     pair_order = {v: [_pair_id(e) for e in entries]
                   for v, entries in variants.items()}
     token_stats: Dict[str, Dict[str, float]] = {}
+    rendered: List[Dict] = []
 
     for variant_name, entries in variants.items():
         print(f"\n  Processing {variant_name} ({len(entries)} prompts)...")
@@ -539,6 +579,12 @@ def extract_all_activations(
                          agency_level=agency_level, toolbox=toolbox)
             for entry in entries
         ]
+        import hashlib
+        rendered.extend(
+            {"id": e.get("id"), "pair_id": _pair_id(e), "variant": variant_name,
+             "sha256": hashlib.sha256(p.encode("utf-8")).hexdigest(), "text": p}
+            for e, p in zip(entries, prompts)
+        )
 
         # Extract activations for all prompts in this variant
         variant_activations = {layer: [] for layer in layers}
@@ -582,6 +628,7 @@ def extract_all_activations(
 
     _assert_pairing(pair_order)
     extractor.token_stats = token_stats
+    extractor.rendered_inputs = rendered
     return all_activations, pair_order
 
 
@@ -1241,18 +1288,22 @@ def run_format_effect_analysis(
     print(format_scale_report(scale))
 
     # --- Objective 4: detection capability per explicitness stratum ---
-    by_pair = {str(e.get("pair_id", e.get("id"))): e for e in dataset}
-    strata_h = [by_pair[p].get("subtlety", "unknown") for p in pair_order["chat_harmful"]]
-    strata_b = [by_pair[p].get("subtlety", "unknown") for p in pair_order["chat_benign"]]
+    strata_h = _explicitness_strata(dataset, pair_order["chat_harmful"])
+    strata_b = _explicitness_strata(dataset, pair_order["chat_benign"])
 
-    strat = detection_by_stratum(
-        strata_h, strata_b,
-        activations["chat_harmful"][best_layer], activations[ah_key][best_layer],
-        activations["chat_benign"][best_layer], activations[ab_key][best_layer],
-        direction=d,
-    )
+    strat = []
     print()
-    print(format_stratum_report(strat))
+    if strata_h is None or strata_b is None:
+        print(_NO_STRATA_NOTE)
+        out["by_stratum_skipped"] = "no explicitness labels in the corpus"
+    else:
+        strat = detection_by_stratum(
+            strata_h, strata_b,
+            activations["chat_harmful"][best_layer], activations[ah_key][best_layer],
+            activations["chat_benign"][best_layer], activations[ab_key][best_layer],
+            direction=d,
+        )
+        print(format_stratum_report(strat))
 
     # ---- The same three analyses on held-out projections ----
     # Everything above is measured with a direction fitted on these prompts.
@@ -1310,16 +1361,18 @@ def run_format_effect_analysis(
                 chat_benign=oof_best["chat_benign"], agent_benign=oof_best[ab_ho],
                 layer_idx=best_layer, evaluation="held-out",
             )
-            strat_ho = stratum_detection_from_projections(
-                strata_h, strata_b,
-                chat_harmful=oof_best["chat_harmful"], agent_harmful=oof_best[ah_ho],
-                chat_benign=oof_best["chat_benign"], agent_benign=oof_best[ab_ho],
-                evaluation="held-out",
-            )
+            strat_ho = [] if strata_h is None or strata_b is None else \
+                stratum_detection_from_projections(
+                    strata_h, strata_b,
+                    chat_harmful=oof_best["chat_harmful"], agent_harmful=oof_best[ah_ho],
+                    chat_benign=oof_best["chat_benign"], agent_benign=oof_best[ab_ho],
+                    evaluation="held-out",
+                )
             print()
             print(format_scale_report(scale_ho_best))
-            print()
-            print(format_stratum_report(strat_ho))
+            if strat_ho:
+                print()
+                print(format_stratum_report(strat_ho))
             out["held_out"]["by_stratum"] = [
                 {
                     "stratum": s.stratum,
@@ -1992,9 +2045,10 @@ def run_stratified_subtlety_analysis(
 
     # Stratum labels in the row order of the activation arrays, resolved
     # through pair_id rather than assumed from the dataset file's ordering.
-    by_pair = {str(e.get("pair_id", e.get("id"))): e for e in dataset}
-    strata = [by_pair[p].get("subtlety", "unknown")
-              for p in pair_order["chat_harmful"]]
+    strata = _explicitness_strata(dataset, pair_order["chat_harmful"])
+    if strata is None:
+        print("\n" + _NO_STRATA_NOTE)
+        return []
 
     results = run_stratified_analysis(
         strata=strata,
@@ -2776,6 +2830,148 @@ def _load_dataset_for_experiment(args) -> List[Dict]:
     return dataset
 
 
+def _sha256(path) -> Optional[str]:
+    import hashlib
+    if not path or not Path(path).is_file():
+        return None
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+_REPO = Path(__file__).resolve().parent
+
+
+def _active_tool_catalogs(args) -> Dict[str, Optional[str]]:
+    """Global catalogue files this process reads, as {path: sha256}."""
+    if args.tool_catalog_dir:
+        base = Path(args.tool_catalog_dir)
+        files = [base / "tool_definitions.json",
+                 base / "data" / "tool_definitions_agentharm.json"]
+    else:
+        files = [_REPO / "tool_definitions.json",
+                 _REPO / "data" / "tool_definitions_agentharm.json"]
+    return {str(p): _sha256(p) for p in files if p.exists()}
+
+
+def _apply_tool_catalog(args) -> None:
+    """Point the global-catalogue conditions at --tool-catalog-dir."""
+    if not args.tool_catalog_dir:
+        return
+    from src.model_loader import use_tool_catalog, TOOL_DEFINITIONS
+    from src.agency import use_extra_catalog
+    base = Path(args.tool_catalog_dir)
+    use_tool_catalog(base / "tool_definitions.json")
+    extra = base / "data" / "tool_definitions_agentharm.json"
+    use_extra_catalog(extra if extra.exists() else None)
+    print(f"  Tool catalogue: {base} ({len(TOOL_DEFINITIONS)} global tools)")
+
+
+def _check_theme_groups(args, dataset: List[Dict]) -> Optional[Dict[str, str]]:
+    """Load --theme-groups and fail before any GPU work if a pair is unmapped."""
+    if not args.theme_groups:
+        return None
+    groups = load_theme_groups(args.theme_groups)
+    pairs = {_pair_id(d) for d in dataset}
+    missing = sorted(pairs - set(groups))
+    if missing:
+        raise SystemExit(
+            f"{len(missing)} pair(s) are not in {args.theme_groups}, e.g. "
+            f"{missing[:5]}. Every analysed pair needs a theme group.")
+    used = {groups[p] for p in pairs}
+    print(f"  Theme groups: {args.theme_groups} - {len(pairs)} pairs in "
+          f"{len(used)} groups; partitions hold out whole groups.")
+    return groups
+
+
+def _register_theme_groups(groups: Optional[Dict[str, str]],
+                           pair_order: Dict[str, List[str]]) -> Dict:
+    """Cluster vector row-aligned with the activations; returns a summary."""
+    if groups is None:
+        set_pair_clusters(None)
+        return {"unit": "pair"}
+    order = next(iter(pair_order.values()))
+    clusters = [groups[p] for p in order]
+    set_pair_clusters(clusters)
+    sizes = np.unique(clusters, return_counts=True)[1]
+    return {"unit": "theme_group", "n_pairs": len(order),
+            "n_groups": int(len(sizes)), "max_group_size": int(sizes.max())}
+
+
+def _write_run_manifest(args, output_dir: str, model=None, tokenizer=None,
+                        rendered_path: Optional[str] = None,
+                        partition: Optional[Dict] = None) -> None:
+    """
+    Provenance of a run: exact inputs, catalogues, model revision and the
+    generation settings, so a later reader can tell which corpus and which
+    rendering produced the numbers.
+    """
+    import datetime
+    import platform
+
+    versions = {"python": platform.python_version(), "numpy": np.__version__}
+    for lib in ("torch", "transformers", "sklearn"):
+        try:
+            versions[lib] = __import__(lib).__version__
+        except Exception:
+            pass
+
+    model_rev = tok_rev = template_sha = None
+    if model is not None:
+        model_rev = getattr(getattr(model, "config", None), "_commit_hash", None)
+    if tokenizer is not None:
+        tok_rev = getattr(tokenizer, "_commit_hash", None) or \
+            getattr(tokenizer, "init_kwargs", {}).get("_commit_hash")
+        tmpl = getattr(tokenizer, "chat_template", None)
+        if isinstance(tmpl, str):
+            import hashlib
+            template_sha = hashlib.sha256(tmpl.encode("utf-8")).hexdigest()
+
+    dataset_path = args.dataset_path or str(_REPO / "data" / "dataset_full.jsonl")
+    manifest = {
+        "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "model": args.model,
+        "model_revision": model_rev,
+        "tokenizer": getattr(tokenizer, "name_or_path", None),
+        "tokenizer_revision": tok_rev,
+        "chat_template_sha256": template_sha,
+        "activations_source": args.load_activations,
+        "dataset": {"path": dataset_path, "sha256": _sha256(dataset_path)},
+        "theme_groups": {"path": args.theme_groups,
+                         "sha256": _sha256(args.theme_groups)},
+        "partition": partition,
+        "tool_catalogs": _active_tool_catalogs(args),
+        "rendered_inputs": {"path": rendered_path, "sha256": _sha256(rendered_path)},
+        "generation": {
+            "max_new_tokens": args.max_new_tokens,
+            "thinking_budget": args.thinking_budget,
+            "seed": args.seed,
+            "quantize": ("4bit" if args.quantize else
+                         "fp16" if args.no_quantize else "auto"),
+            "agency_level": args.agency_level,
+            "toolbox": args.toolbox,
+            "include_history": args.include_history,
+            "factorial": args.factorial,
+            "decompose": args.decompose,
+        },
+        "versions": versions,
+        "argv": sys.argv[1:],
+    }
+    path = Path(output_dir) / "run_manifest.json"
+    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"  Run manifest: {path}")
+
+
+def _write_rendered_inputs(rendered: List[Dict], output_dir: str) -> Optional[str]:
+    """The exact prompt strings whose activations were read, one per line."""
+    if not rendered:
+        return None
+    path = Path(output_dir) / "rendered_inputs.jsonl"
+    with open(path, "w", encoding="utf-8") as f:
+        for row in rendered:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    print(f"  Rendered inputs: {path} ({len(rendered)} prompts)")
+    return str(path)
+
+
 def main():
     args = parse_args()
     np.random.seed(args.seed)
@@ -2791,6 +2987,8 @@ def main():
     print(f"Factorial: {args.factorial}")
     print(f"Agency level: {args.agency_level or 'dataset default'}")
     print(f"Toolbox     : {args.toolbox or 'task tools only'}")
+    print(f"Theme groups: {args.theme_groups or 'none (each pair is its own group)'}")
+    print(f"Tool catalog: {args.tool_catalog_dir or 'repository files'}")
     print(f"Activations : "
           f"{'loaded from ' + args.load_activations if args.load_activations else 'extracted from the model'}")
     print(f"Output: {args.output_dir}")
@@ -2824,6 +3022,9 @@ def main():
         # stratum, category). It must be the one the activations came from.
         if not args.dataset_path and meta.get("dataset_path"):
             args.dataset_path = meta["dataset_path"]
+        if not args.theme_groups and meta.get("theme_groups"):
+            args.theme_groups = meta["theme_groups"]
+            print(f"  Theme groups taken from the saved run: {args.theme_groups}")
         args.decompose = bool(meta.get("decompose", args.decompose))
         if args.limit_pairs:
             print("  NOTE: --limit-pairs is ignored with --load-activations; "
@@ -2837,6 +3038,9 @@ def main():
                 f"{len(saved_ids - found)} pair ids in the saved activations are "
                 "not in the dataset. Pass the --dataset-path the activations "
                 "were extracted from.")
+        theme_groups = _check_theme_groups(args, dataset)
+        partition = _register_theme_groups(theme_groups, pair_order)
+        _write_run_manifest(args, args.output_dir, partition=partition)
     else:
         if _MODEL_STACK_ERROR is not None:
             raise SystemExit(
@@ -2871,6 +3075,9 @@ def main():
 
         dataset = _load_dataset_for_experiment(args)
         dataset = _limit_pairs(dataset, args.limit_pairs)
+        # Checked here, before the forward passes, so a bad map costs nothing.
+        theme_groups = _check_theme_groups(args, dataset)
+        _apply_tool_catalog(args)
 
         # 3. Extract activations
         extractor = ActivationExtractor(model, tokenizer)
@@ -2901,12 +3108,19 @@ def main():
                     "model_info": model_info,
                     "layers": layers,
                     "dataset_path": args.dataset_path,
+                    "theme_groups": args.theme_groups,
+                    "tool_catalog_dir": args.tool_catalog_dir,
                     "decompose": bool(args.decompose),
                     "factorial": bool(args.factorial),
                     "token_stats": token_stats,
                     "seed": args.seed,
                 },
             )
+        rendered_path = _write_rendered_inputs(
+            getattr(extractor, "rendered_inputs", []), args.output_dir)
+        partition = _register_theme_groups(theme_groups, pair_order)
+        _write_run_manifest(args, args.output_dir, model=model, tokenizer=tokenizer,
+                            rendered_path=rendered_path, partition=partition)
 
     # 4. Main analysis (refusal direction + stats + benign control + held-out)
     results = run_main_analysis(
@@ -2918,6 +3132,7 @@ def main():
     results["decompose"] = args.decompose
     results["prompt_tokens"] = token_stats
     results["config"] = {k: v for k, v in vars(args).items()}
+    results["partition"] = partition
 
     # 4b. Decomposition analysis (if enabled)
     if args.decompose:
@@ -3051,7 +3266,7 @@ def main():
         print(f"\n  Run sheet: {write_ficha(args.output_dir)}")
     except Exception as exc:                           # noqa: BLE001
         print(f"\n  WARNING: run sheet not written ({exc!r}); regenerate it "
-              "with scripts/generar_fichas.py.")
+              "with scripts/analisis/generar_fichas.py.")
 
     # 10. Generate visualizations
     if generate_all_figures is None:

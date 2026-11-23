@@ -49,3 +49,8 @@ activations.npz
 *.run.xml
 *.synctex.gz
 *.toc
+
+# Blinding keys of the week-1 annotation: they map opaque ids to model,
+# condition and classifier label. The repository is public and the 100
+# response annotations are still pending, so they stay local.
+*_PRIVATE.*

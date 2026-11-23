@@ -23,16 +23,18 @@ from transformers import (
 # Wrapped in OpenAI function-calling format for the model.
 # ============================================================
 
-def _load_tool_definitions() -> Dict:
-    """Load tool definitions from the canonical JSON file."""
+def _load_tool_definitions(path=None) -> Dict:
+    """Load tool definitions from the canonical JSON file, or from `path`."""
     import json
     from pathlib import Path
 
     # Check multiple locations
-    candidates = [
+    candidates = [Path(path)] if path is not None else [
         Path(__file__).parent.parent / "tool_definitions.json",
         Path(__file__).parent.parent / "data" / "tool_definitions.json",
     ]
+    if path is not None and not candidates[0].exists():
+        raise FileNotFoundError(f"Tool catalogue not found: {path}")
     for p in candidates:
         if p.exists():
             with open(p, "r", encoding="utf-8") as f:
@@ -86,6 +88,19 @@ def _load_tool_definitions() -> Dict:
 
 
 TOOL_DEFINITIONS = _load_tool_definitions()
+
+
+def use_tool_catalog(path) -> None:
+    """
+    Replace the global catalogue with the one in `path` for this process.
+
+    Updated in place, so modules that imported TOOL_DEFINITIONS see the new
+    tools. Only the global-catalogue conditions read it (role_*, history,
+    --agency-level, --toolbox); per-record schemas are untouched.
+    """
+    new = _load_tool_definitions(path)
+    TOOL_DEFINITIONS.clear()
+    TOOL_DEFINITIONS.update(new)
 
 
 # ============================================================

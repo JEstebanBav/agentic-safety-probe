@@ -1,0 +1,13 @@
+﻿source,layer,variant,n,old_refuse,new_refuse,mixed
+results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl,76,chat_harmful,96,82,82,0
+results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl,76,agent_harmful,96,43,45,0
+results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl,76,chat_benign,96,8,8,0
+results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl,76,agent_benign,96,2,2,0
+results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl,30,chat_harmful,96,47,47,0
+results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl,30,agent_harmful,96,9,9,0
+results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl,30,chat_benign,96,2,2,0
+results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl,30,agent_benign,96,0,0,0
+results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl,32,chat_harmful,96,82,82,0
+results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl,32,agent_harmful,96,25,25,1
+results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl,32,chat_benign,96,35,36,0
+results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl,32,agent_benign,96,4,4,0

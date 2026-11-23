@@ -1,0 +1,17 @@
+﻿table,key,source_files,selector,status_or_limit
+1,tab:distribucion,data/dataset_v2.jsonl,category/subtlety counts,Current labels; needs human adjudication
+2,tab:jaccard,data/dataset_v2.jsonl,lexical_jaccard by subtlety,Overlap does not establish a valid minimal pair
+3,tab:modelos,results/ultimos_resultados/*/results.json; model architecture configuration,model dimensions; layers_analyzed,Architecture head/FFN dimensions not independently revalidated in this audit
+4,tab:corridas,results/ultimos_resultados/*/results.json; causal_results.json,config; best_layer; layers_analyzed; available stages,"Saved runs, not a new experiment"
+5,tab:linea_base,results.json,heldout.detection -> metrics.<model>.deteccion,Needs scenario-group reevaluation after adjudication
+6,tab:gap,results.json,format_effect.held_out; heldout -> desplazamiento,Original corpus only
+7,tab:escala,results.json,format_effect.held_out.per_layer -> escala,Original corpus only
+8,tab:estratos,results.json,format_effect.held_out.by_stratum -> estratos,Human stratum labels pending
+9,tab:factorial,factorial_results.json,by_layer.<reference>.interaction -> factorial_referencia,Descriptive full-sample direction
+10,tab:rotacion,robust_results.json,rotation.<reference> -> rotacion,Original corpus only
+11,tab:monitores,robust_results.json,per_layer.<reference> -> monitores,Needs scenario-group and external evaluation
+12,tab:pca,results.json,pca_by_layer -> pca,Descriptive in-sample geometry
+13,tab:seleccion,robust_results.json,layer_selection -> seleccion,Original pair-level split
+14,tab:conducta,causal_results.json; behavior_generations.jsonl,behavior; baseline records -> conducta,Classifier correction changes Llama and Qwen counts; see separate rescore
+15,tab:causal,causal_results.json; behavior_generations.jsonl,causal.<layer>.per_dose -> causal,Reclassification affects eligibility; historical cohorts are not a new causal run
+16,tab:config,results.json; causal_results.json,config; layers_analyzed; intervention_layers,Rendered tokenizer prompts are still pending

@@ -2,6 +2,8 @@
 # Their provenance records use SHA-256 hashes of the saved files.
 docs/paper/** -text whitespace=cr-at-eol
 results/ultimos_resultados/qwen3_8b_v3/** -text whitespace=cr-at-eol
+# v0.3 rerun inputs: data/v03/audit.json records their SHA-256.
+data/v03/** -text whitespace=cr-at-eol
 
 # Markdown hard line breaks and recorded console padding are intentional.
 docs/paper/*.md whitespace=cr-at-eol,-blank-at-eol

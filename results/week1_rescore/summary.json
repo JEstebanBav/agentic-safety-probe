@@ -1,0 +1,77 @@
+{
+  "runs": [
+    {
+      "source": "results/corridas/llama33_70b/v2/behavior_generations.jsonl",
+      "source_sha256": "89255e1aaa95db778301ad4fc0d771c31cfc0564719ad231ee04c1f860e5c6de",
+      "n_records": 800,
+      "changed_binary_labels": 5,
+      "mixed_response_count": 1
+    },
+    {
+      "source": "results/corridas/llama33_70b/v2_causal_capa56/behavior_generations.jsonl",
+      "source_sha256": "762315e6166e051664aa84f2a7c4ef2d5c3dfb592b0641a966aa6210f66ba081",
+      "n_records": 484,
+      "changed_binary_labels": 1,
+      "mixed_response_count": 0
+    },
+    {
+      "source": "results/corridas/llama33_70b/v3/behavior_generations.jsonl",
+      "source_sha256": "41cb9bb1a4b9708214312372b455357b7e7744bd937cf62d098236ef0d3c2910",
+      "n_records": 1116,
+      "changed_binary_labels": 5,
+      "mixed_response_count": 1
+    },
+    {
+      "source": "results/corridas/llama33_70b/v3_causal_capa76/behavior_generations.jsonl",
+      "source_sha256": "1dafc5668153e9a40671445649b6024fd7d38b274aafb5696f80eef8edfb7905",
+      "n_records": 484,
+      "changed_binary_labels": 3,
+      "mixed_response_count": 0
+    },
+    {
+      "source": "results/pruebas/llama33_70b/v2/behavior_generations.jsonl",
+      "source_sha256": "cb2fdfdf6d4aed0b69c5fcff0cf4b0814e7b5c72a5d504ef79bb224023b68d70",
+      "n_records": 32,
+      "changed_binary_labels": 0,
+      "mixed_response_count": 0
+    },
+    {
+      "source": "results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl",
+      "source_sha256": "04c6cc12222040ea11438699409c69f1d7a679b5187760ae8ec3de845cbd821b",
+      "n_records": 2784,
+      "changed_binary_labels": 12,
+      "mixed_response_count": 0
+    },
+    {
+      "source": "results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl",
+      "source_sha256": "18b96412ba904456c61248ab9628b1c953659f0998ecd69dde9ae15d937cf959",
+      "n_records": 1464,
+      "changed_binary_labels": 0,
+      "mixed_response_count": 4
+    },
+    {
+      "source": "results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl",
+      "source_sha256": "798e8ef408e3863cc57b044c6fa90bb25485bb7a8df0b344a509915f85f22826",
+      "n_records": 940,
+      "changed_binary_labels": 1,
+      "mixed_response_count": 7
+    }
+  ],
+  "total_changed_binary_labels": 27,
+  "changed_numeric_metrics": 335,
+  "human_sample": {
+    "seed": 4104,
+    "sampling": "uniform without replacement over unique full-text hashes",
+    "population": "three latest runs with saved generations; baseline and all intervention arms",
+    "population_unique_texts": 3382,
+    "sample_size": 100,
+    "population_sha256": "66b1d88b548b413f6528ed713a428f1080cd61d7476a94897e5d043d50cf04bf",
+    "source_hashes": {
+      "results/ultimos_resultados/llama3380B_v4/behavior_generations.jsonl": "04c6cc12222040ea11438699409c69f1d7a679b5187760ae8ec3de845cbd821b",
+      "results/ultimos_resultados/mistral7b_v4/behavior_generations.jsonl": "18b96412ba904456c61248ab9628b1c953659f0998ecd69dde9ae15d937cf959",
+      "results/ultimos_resultados/qwen3_8b_v3/v3/behavior_generations.jsonl": "798e8ef408e3863cc57b044c6fa90bb25485bb7a8df0b344a509915f85f22826"
+    }
+  },
+  "human_agreement_status": "pending; labels must be supplied by the authors",
+  "original_results_modified": false
+}

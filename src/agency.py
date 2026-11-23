@@ -214,6 +214,19 @@ LEVEL_DIMENSIONS = {
 # herramientas del caso llegan mezcladas con distractores.
 
 _POOL = None
+_EXTRA_CATALOG = Path(__file__).resolve().parent.parent / "data" / "tool_definitions_agentharm.json"
+
+
+def use_extra_catalog(path) -> None:
+    """
+    Catálogo adicional de distractores para este proceso (None = ninguno).
+
+    Con un catálogo neutral alternativo no se recurre al del repositorio:
+    mezclarlo reintroduciría las herramientas que el neutral reemplaza.
+    """
+    global _POOL, _EXTRA_CATALOG
+    _EXTRA_CATALOG = Path(path) if path is not None else None
+    _POOL = None
 
 
 def tool_pool():
@@ -221,8 +234,8 @@ def tool_pool():
     global _POOL
     if _POOL is None:
         pool = dict(TOOL_DEFINITIONS)
-        extra = Path(__file__).resolve().parent.parent / "data" / "tool_definitions_agentharm.json"
-        if extra.exists():
+        extra = _EXTRA_CATALOG
+        if extra is not None and extra.exists():
             pool.update(json.loads(extra.read_text(encoding="utf-8")))
         _POOL = pool
     return _POOL

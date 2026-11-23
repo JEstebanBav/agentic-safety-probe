@@ -18,18 +18,18 @@ The editable research text is organised in [sections/](sections/). Table transcr
 After editing section files, assemble and render from the repository root:
 
 ```powershell
-python scripts/assemble_article.py
-python scripts/render_paper.py
+python scripts/paper/assemble_article.py
+python scripts/paper/render_paper.py
 ```
 
 To rebuild the English PowerPoint presentation from the same saved evidence and figures:
 
 ```powershell
-python scripts/build_research_presentation.py
+python scripts/paper/build_research_presentation.py
 ```
 
 `article.md` is the assembled Markdown document; change the section files to preserve edits across assembly. Optional rendering dependencies are listed in `requirements-docs.txt`. On the original computer the workspace interpreter is `..\.venv\Scripts\python.exe`.
 
-To regenerate numerical evidence and figures from saved runs, use `python scripts/build_paper.py` with the experiment dependencies installed. This does not update the transcribed research text or tables automatically. It does not run models.
+To regenerate numerical evidence and figures from saved runs, use `python scripts/paper/build_paper.py` with the experiment dependencies installed. This does not update the transcribed research text or tables automatically. It does not run models.
 
 For a focused overview of the literature, see the [top 10 related studies](top_10_related_research.md).

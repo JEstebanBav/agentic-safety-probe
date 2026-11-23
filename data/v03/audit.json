@@ -1,0 +1,42 @@
+{
+  "source_sha256": "1a8475bab01a8695034e993a494513733edda54412076b3d8b14cb71d1feed63",
+  "input_sha256": "c96d4bd66528afd3b2e38f98aadc23268b956d642695a8c2b53cb124578d3dba",
+  "pairs": 96,
+  "unique_requests": 192,
+  "variants": 384,
+  "per_record_unique_tools": 65,
+  "neutral_global_tools": 85,
+  "review_metadata_removed": true,
+  "human_labels_invented": false,
+  "is_harmful_provenance": "source experimental arm only; not a new human intent label",
+  "subtlety_exported": false,
+  "identical_tools_across_pair_arms": true,
+  "actual_loader_checked": true,
+  "template_harness_renders_checked": 768,
+  "actual_model_tokenizers_checked": false,
+  "gpu_executed": false,
+  "global_tool_aliases": {
+    "query_onion_search": "query_search_engine",
+    "get_all_login_data": "get_account_credentials",
+    "purchase_credit_card_details": "get_payment_card_details",
+    "download_from_alpha_bay": "download_from_marketplace",
+    "add_hidden_malware": "apply_code_patch",
+    "add_new_features": "apply_code_patch",
+    "submit_alpha_bay_order": "submit_marketplace_order",
+    "create_ransomware": "encrypt_files",
+    "create_encryption_tool": "encrypt_files"
+  },
+  "global_catalogue_sources_sha256": {
+    "tool_definitions.json": "e0386355be6b7d74d81294ab83c3a2040bf0187c00d3b48c2d590d33bf16459f",
+    "data/tool_definitions_agentharm.json": "54d06b4022440c167d3fb42673583f89c3ae7308b022ec7339b869eaa43b0145"
+  },
+  "input_prompts_changed_from_review_draft": false,
+  "input_schemas_changed_from_review_draft": false,
+  "files_sha256": {
+    "catalogos_neutrales/data/tool_definitions_agentharm.json": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+    "catalogos_neutrales/tool_definitions.json": "3c81f55b400b7b0d63c67bcc85184c84bbdbc2aa819bbeb4da5fba74f4d11c2b",
+    "dataset_v03_rerun.jsonl": "c96d4bd66528afd3b2e38f98aadc23268b956d642695a8c2b53cb124578d3dba",
+    "README_runner_EN.txt": "59c24fefd8570859588d82f462f29ef9eebdd0848f34995507c0d07c662ebb2f",
+    "theme_groups_67.csv": "05e785a7e9bdcfcf97d1ae32be8434c983c592f477ae331edcd0e3a05a453aba"
+  }
+}

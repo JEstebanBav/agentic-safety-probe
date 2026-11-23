@@ -1,0 +1,7 @@
+{
+  "source": "data/dataset_v2.jsonl",
+  "source_sha256": "ab0eef647db082525d586f48c6faf3ee2db65736672e8a1d4d67e9214dcde070",
+  "rows": 384,
+  "pairs": 96,
+  "errors": []
+}

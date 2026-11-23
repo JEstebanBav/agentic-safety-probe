@@ -50,7 +50,7 @@ from __future__ import annotations
 
 import numpy as np
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
@@ -488,18 +488,108 @@ def run_paired_suite(
 # already did. The two helpers below are the single place the partition is
 # drawn, so the rule cannot drift between estimators again.
 
+#
+# Pairs can also be near-variants of one another (same scenario, different
+# target). With a theme-group map registered through `set_pair_clusters`, the
+# unit every partition holds out is the theme group, not the pair: all pairs of
+# a group fall on the same side. Without a map each pair is its own cluster and
+# every partition is drawn exactly as before, so earlier runs reproduce.
+
+_PAIR_CLUSTERS: Optional[np.ndarray] = None
+
+
+def set_pair_clusters(clusters: Optional[Sequence]) -> None:
+    """
+    Register the cluster (theme group) of each prompt pair, row-aligned with
+    the activation arrays; None clears it. Applies to every partition drawn
+    afterwards in this process.
+    """
+    global _PAIR_CLUSTERS
+    if clusters is None:
+        _PAIR_CLUSTERS = None
+        return
+    arr = np.asarray(clusters)
+    if arr.ndim != 1 or len(arr) == 0:
+        raise ValueError("Pair clusters must be a non-empty 1-D sequence.")
+    _, codes = np.unique(arr, return_inverse=True)
+    _PAIR_CLUSTERS = codes.astype(np.int64)
+
+
+def get_pair_clusters(n_pairs: int) -> Optional[np.ndarray]:
+    """
+    Cluster code per pair, or None when no map is registered.
+
+    A registered map whose length differs from `n_pairs` means an array is not
+    the full pair-aligned corpus the map was built for. Falling back to pairs
+    there would silently break the constraint, so it raises.
+    """
+    if _PAIR_CLUSTERS is None:
+        return None
+    if len(_PAIR_CLUSTERS) != n_pairs:
+        raise ValueError(
+            f"Theme-group map covers {len(_PAIR_CLUSTERS)} pairs but this "
+            f"partition is over {n_pairs}; cannot keep groups together.")
+    return _PAIR_CLUSTERS
+
+
+def _balanced_cluster_blocks(
+    clusters: np.ndarray, k: int, rng: np.random.Generator,
+) -> List[np.ndarray]:
+    """
+    Split rows into k blocks of whole clusters with near-equal row counts.
+
+    Clusters are shuffled, then placed largest first into the lightest block,
+    so the blocks stay balanced even though cluster sizes differ. Returns the
+    row indices of each block; k is capped at the number of clusters.
+    """
+    unique, sizes = np.unique(clusters, return_counts=True)
+    k = min(k, len(unique))
+    if k < 2:
+        raise ValueError("Need at least two clusters to partition.")
+    order = rng.permutation(len(unique))
+    order = order[np.argsort(-sizes[order], kind="stable")]
+    load = np.zeros(k)
+    members: List[List] = [[] for _ in range(k)]
+    for u in order:
+        j = int(np.argmin(load))
+        members[j].append(unique[u])
+        load[j] += sizes[u]
+    return [np.flatnonzero(np.isin(clusters, m)) for m in members]
+
+
+def pair_folds(n_pairs: int, n_folds: int, rng: np.random.Generator) -> List[np.ndarray]:
+    """K blocks of pair indices; whole theme groups when a map is registered."""
+    clusters = get_pair_clusters(n_pairs)
+    if clusters is None:
+        return np.array_split(rng.permutation(n_pairs), n_folds)
+    return _balanced_cluster_blocks(clusters, n_folds, rng)
+
+
+def pair_halves(n_pairs: int, rng: np.random.Generator) -> Tuple[np.ndarray, np.ndarray]:
+    """Two disjoint halves of pair indices; whole theme groups when mapped."""
+    clusters = get_pair_clusters(n_pairs)
+    if clusters is None:
+        perm = rng.permutation(n_pairs)
+        return perm[: n_pairs // 2], perm[n_pairs // 2:]
+    a, b = _balanced_cluster_blocks(clusters, 2, rng)
+    return a, b
+
+
 def pair_groups(n_harmful: int, n_benign: int) -> Optional[np.ndarray]:
     """
     Group id for each row of a stacked [harmful; benign] matrix.
 
     Row i of each arm is the same prompt pair (the pipeline asserts this in
-    `_assert_pairing`), so both rows receive group i. Returns None when the
-    arms differ in size, in which case no pairing can be assumed and callers
-    fall back to a stratified partition over rows.
+    `_assert_pairing`), so both rows receive group i - or the theme group of
+    pair i when a map is registered. Returns None when the arms differ in
+    size, in which case no pairing can be assumed and callers fall back to a
+    stratified partition over rows.
     """
     if n_harmful != n_benign:
         return None
-    return np.concatenate([np.arange(n_harmful), np.arange(n_benign)])
+    clusters = get_pair_clusters(n_harmful)
+    base = np.arange(n_harmful) if clusters is None else clusters
+    return np.concatenate([base, base])
 
 
 def grouped_fold_indices(
@@ -527,10 +617,16 @@ def grouped_fold_indices(
     groups = np.asarray(groups)
     if len(groups) != len(y):
         raise ValueError(f"groups has {len(groups)} entries for {len(y)} rows.")
-    unique = np.unique(groups)
+    unique, sizes = np.unique(groups, return_counts=True)
     k = min(n_folds, len(unique))
     if k < 2:
         raise ValueError("Need at least two groups to cross-validate.")
+    if len(set(sizes.tolist())) > 1:
+        # Theme groups differ in size: cutting the shuffled list into equal
+        # counts of groups would give unequal folds, so balance the rows.
+        blocks = _balanced_cluster_blocks(groups, k, np.random.default_rng(seed))
+        all_rows = np.arange(len(y))
+        return [(np.setdiff1d(all_rows, test), test) for test in blocks]
     order = np.random.default_rng(seed).permutation(unique)
 
     folds: List[Tuple[np.ndarray, np.ndarray]] = []
@@ -624,8 +720,8 @@ def cross_fitted_projection_gap(
 
     # ---- Cross-fitted estimate ----
     rng = np.random.default_rng(seed)
-    order = rng.permutation(n)
-    folds = np.array_split(order, n_folds)
+    folds = pair_folds(n, n_folds, rng)
+    n_folds = len(folds)
 
     # A matched benign arm is held out with its harmful twin. Only an
     # unmatched arm (different row count) is folded on its own.
@@ -1096,8 +1192,7 @@ def format_rotation(
     across: List[float] = []
     same_half: List[float] = []
     for _ in range(n_repeats):
-        perm = rng.permutation(n)
-        A, B = perm[: n // 2], perm[n // 2:]
+        A, B = pair_halves(n, rng)
         try:
             c_a, c_b = fit(ch, cb, A), fit(ch, cb, B)
             a_a, a_b = fit(ah, ab, A), fit(ah, ab, B)
@@ -1206,10 +1301,11 @@ def select_layer_and_test(
     paired = m == n
 
     def _split(rng):
+        if paired:
+            sel, inf = pair_halves(n, rng)
+            return sel, inf, sel, inf
         perm = rng.permutation(n)
         sel, inf = perm[: n // 2], perm[n // 2:]
-        if paired:
-            return sel, inf, sel, inf
         perm_b = rng.permutation(m)
         return sel, inf, perm_b[: m // 2], perm_b[m // 2:]
 
@@ -1532,8 +1628,8 @@ def crossfit_condition_projections(
         raise ValueError(f"n_folds must be in [2, {n}], got {n_folds}")
 
     rng = np.random.default_rng(seed)
-    order = rng.permutation(n)
-    folds = np.array_split(order, n_folds)
+    folds = pair_folds(n, n_folds, rng)
+    n_folds = len(folds)
 
     H, B = arrays[fit_harmful_key], arrays[fit_benign_key]
     oof = {name: np.empty(n, dtype=np.float64) for name in arrays}

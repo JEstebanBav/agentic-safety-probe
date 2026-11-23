@@ -2,6 +2,8 @@
 
 The current **96-pair, four-model study** is available as an [English research manuscript](docs/paper/article.pdf), with an [editable Word version](docs/paper/article.docx), an [English research presentation](docs/paper/Research_Presentation.pptx), [source and evidence](docs/paper/README.md), and a [top 10 of related research](docs/paper/top_10_related_research.md). This manuscript documents the final results; some descriptions below refer to earlier exploratory runs. Degree documents and defense materials are stored outside this repository; see the [relocation record](docs/THESIS_ARCHIVE.md).
 
+The [Week 1 audit materials](docs/week1/README.md) contain a review of all 96 pairs, proposed scenario groups and benign rewrites, blind human annotation sheets, and a separate re-scoring of saved generations. Human adjudication is pending; the original corpus and experimental results are preserved.
+
 **A mechanistic interpretability framework that explains WHY LLMs comply with harmful requests in agentic mode and provides an O(1) safety monitor based on activation geometry.**
 
 ---
@@ -379,12 +381,12 @@ Three more checks run from results already on disk:
 ```bash
 # Bootstrap CIs for DeltaP at every layer, from the saved projections.
 # Percentile + BCa, paired resampling, sign test. No model needed.
-python scripts/bootstrap_delta_p.py --n-boot 10000
+python scripts/analisis/bootstrap_delta_p.py --n-boot 10000
 
 # For a run made BEFORE activations were saved: the interaction tested within
 # pairs, the split-sample layer choice read on the inference half only, and
 # the linear-vs-MLP comparison on shared folds, all from the saved projections.
-python scripts/reanalisis_observaciones.py --results results/corridas/llama33_70b/v1/results.json
+python scripts/analisis/reanalisis_observaciones.py --results results/corridas/llama33_70b/v1/results.json
 
 # Controlled proof that the estimators do what they claim, on synthetic data
 # with known ground truth. Includes the fold-hygiene experiment (E), the
@@ -392,7 +394,7 @@ python scripts/reanalisis_observaciones.py --results results/corridas/llama33_70
 # the interaction), the held-out AUROC of d_chat (G: 1.00 in-sample with
 # nothing to detect, 0.50 out-of-fold), folds over pairs versus rows (H) and
 # the paired interaction (I).
-python scripts/validate_corrections.py --trials 20
+python scripts/analisis/validate_corrections.py --trials 20
 ```
 
 ### Partitions Respect Prompt Pairs
@@ -426,12 +428,17 @@ stages link the representation to behaviour (`src/causal_test.py`):
 Every generated text is written to `behavior_generations.jsonl` beside its
 label. Only interventions that move the model toward refusing are implemented.
 
-See [docs/guia_runpod_llama33.md](docs/guia_runpod_llama33.md) for the
-step-by-step re-run of Llama-3.3-70B.
+**Current runs (corpus v0.3, all four models):** see
+[docs/runpod/guia_corrida_v03.md](docs/runpod/guia_corrida_v03.md) (Spanish):
+pod configuration, cost estimate, dry runs and the queue script
+`scripts/runpod/cola_v03.sh`.
+
+See [docs/runpod/guia_runpod_llama33.md](docs/runpod/guia_runpod_llama33.md) for the
+earlier step-by-step re-run of Llama-3.3-70B on `dataset_v2`.
 
 ### Running a Larger Model
 
-See **[docs/runpod_large_models.md](docs/runpod_large_models.md)** for choosing
+See **[docs/runpod/runpod_large_models.md](docs/runpod/runpod_large_models.md)** for choosing
 a third model, pod sizing, and the two traps that cost real money (4-bit does
 not reduce *download* size; MoE expert routing is a confound for the rotation
 claim). Model options with their disk and VRAM requirements:
@@ -461,32 +468,32 @@ agentic-safety-probe/
 │   ├── robust_estimation.py     # Cross-fitting, out-of-fold, layer selection
 │   ├── validation.py            # Activation-space + behavioral validation
 │   └── visualizations.py        # All figures
-├── data/
+├── data/                        # Index of every file: data/README.md
+│   ├── v03/                     # CURRENT corpus v0.3 + theme groups + neutral tool catalogue
+│   ├── dataset_v2.jsonl         # Previous corpus (96 pairs) - the published results
+│   ├── week1/                   # Week-1 annotation sheets, consensus and audit
+│   ├── agentharm_es/            # AgentHarm behaviours with Spanish translation
 │   ├── loader.py                # Unified loaders for all datasets
-│   ├── build_dataset.py         # Hand-crafted dataset constructor
-│   ├── build_agentharm_pairs.py # AgentHarm import (--estilo procedimientos|metas|pareado)
-│   ├── dataset_full.jsonl       # Hand-crafted corpus (42 pairs, 168 entries) - never modified
-│   ├── dataset_expanded.jsonl   # Main corpus (93 pairs, 372 entries)
-│   ├── dataset_expanded_metas.jsonl          # Goal wording (80 pairs)
-│   ├── dataset_expanded_procedimientos.jsonl # Procedure wording (80 pairs)
-│   ├── tool_definitions_agentharm.json       # 59 imported tool schemas
-│   ├── tool_effects.json        # Read-only / reversible / irreversible per tool
-│   └── *.json                   # AgentHarm benchmark data
+│   ├── build_dataset.py, build_agentharm_pairs.py, prepare_dataset_v2.py
+│   └── ...                      # Earlier corpora and AgentHarm source files (see index)
+├── scripts/
+│   ├── runpod/                  # run_modelo_v03.sh, run_modelo.sh, pod setup/resume
+│   ├── analisis/                # check_token_budget, validate_corrections, fichas, comparisons
+│   ├── paper/                   # Article and presentation build/validation
+│   ├── week1/                   # Week-1 audit, agreement, rescore, translation
+│   └── diagnostico/             # One-off diagnostics
 ├── docs/
-│   ├── ampliacion_dataset.md    # How the corpus is built and why (Spanish)
-│   ├── definicion_agentica.md   # What makes the agentic format agentic (Spanish)
-│   ├── methodology.md           # Full methodology
-│   ├── experiment_design.md     # 7 experiments detailed
-│   ├── problem_statement.md     # Research question and variables
-│   ├── runpod_large_models.md   # Choosing and running a bigger model
-│   ├── literature_review.md     # Related work
+│   ├── runpod/                  # How to run the models on RunPod (v0.3 guide first)
+│   ├── week1/                   # Week-1 reports
+│   ├── paper/                   # English article and presentation
+│   ├── methodology.md, experiment_design.md, problem_statement.md, ...
 │   └── decision_log.md          # Design decisions and rationale
-├── tool_definitions.json        # 26 original tool schemas (85 with the imported ones)
+├── results/                     # corridas/ (one folder per model/version), registro.json
+├── tests/                       # python -m unittest discover -s tests
+├── tool_definitions.json        # Repository tool catalogue (global conditions only)
 ├── run_experiment.py            # Main CLI pipeline
 ├── notebooks/run_experiment_runpod.ipynb   # Cloud notebook
-├── bootstrap_delta_p.py         # DeltaP CIs from saved results (no GPU)
-├── validate_corrections.py      # Ground-truth checks of the estimators (no GPU)
-└── requirements.txt
+└── requirements*.txt            # requirements_runpod.txt is the one for pods
 ```
 
 ---

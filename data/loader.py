@@ -142,6 +142,39 @@ def load_custom_dataset(
     return entries
 
 
+def load_theme_groups(path: str) -> Dict[str, str]:
+    """
+    Load a pair_id -> theme_group_id map (e.g. data/v03/theme_groups_67.csv).
+
+    Pairs in the same theme group are near-variants of one scenario. Every
+    partition the pipeline draws (cross-fitting folds, probe folds, split
+    halves) must keep a group on one side, or a fitted direction sees a close
+    paraphrase of the prompts it is then scored on. The map only says which
+    pairs belong together; any other column (names, a proposed fold) is ignored.
+
+    Raises ValueError on a missing column, an empty id or a pair listed twice.
+    """
+    import csv
+
+    with open(path, "r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        missing = {"pair_id", "theme_group_id"} - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f"{path} lacks column(s) {sorted(missing)}.")
+        groups: Dict[str, str] = {}
+        for line, row in enumerate(reader, start=2):
+            pair = (row["pair_id"] or "").strip()
+            group = (row["theme_group_id"] or "").strip()
+            if not pair or not group:
+                raise ValueError(f"{path}:{line} has an empty pair_id or theme_group_id.")
+            if pair in groups:
+                raise ValueError(f"{path}:{line} lists pair {pair!r} twice.")
+            groups[pair] = group
+    if not groups:
+        raise ValueError(f"{path} has no rows.")
+    return groups
+
+
 def load_harmagent_dataset(
     split: Literal["test", "validation"] = "test",
     condition: Literal["agent", "chat", "both"] = "both",

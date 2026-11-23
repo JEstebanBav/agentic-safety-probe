@@ -24,7 +24,7 @@ corpus en todos los modelos.
 **Una corrida nueva** va en la siguiente versión libre del modelo
 (`results/corridas/<modelo>/vN/`). `run_experiment.py` escribe su ficha al
 terminar; después añade su entrada en `registro.json` (etiqueta, origen,
-relación, uso) y corre `python scripts/generar_fichas.py`.
+relación, uso) y corre `python scripts/analisis/generar_fichas.py`.
 
 `activations.npz` no se sube a git (pesa cientos de MB): existe solo en la
 máquina donde se descargó. La ficha marca si está presente.

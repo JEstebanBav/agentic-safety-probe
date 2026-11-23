@@ -1,0 +1,26 @@
+{
+  "review_date": "2026-11-02",
+  "reviewer": "Codex (AI-assisted review; not a human annotator)",
+  "source_sha256": "ab0eef647db082525d586f48c6faf3ee2db65736672e8a1d4d67e9214dcde070",
+  "pairs_reviewed": 96,
+  "structural_errors": 0,
+  "pairs_with_semantic_findings": 58,
+  "findings_by_code": {
+    "benign_contradiction": 1,
+    "pair_confound": 19,
+    "benign_ambiguity": 14,
+    "capability_gap": 11,
+    "harmful_ambiguity": 16,
+    "stratum_review": 18,
+    "category_review": 2
+  },
+  "pairs_with_tool_cues": 15,
+  "pairs_requiring_review": 68,
+  "similarity_threshold": 0.25,
+  "lexical_candidate_links": 25,
+  "proposed_theme_groups": 66,
+  "multi_pair_theme_groups": 28,
+  "theme_mapping_status": "proposed_not_adjudicated",
+  "human_annotations_complete": false,
+  "note": "Lexical candidates are not proven duplicates. Theme groups include conservative scenario families. No semantic correction or stratum change has been applied to the original corpus."
+}

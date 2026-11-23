@@ -17,7 +17,7 @@ The one inference made is precision for older runs, from the memory the model
 occupied; the sheet says so when it does.
 
 run_experiment.py writes the sheet at the end of every run;
-scripts/generar_fichas.py regenerates all of them and the results/ index.
+scripts/analisis/generar_fichas.py regenerates all of them and the results/ index.
 
 Pure standard library + numpy-free on purpose: it must run on a laptop
 against results downloaded from a pod.
@@ -272,7 +272,7 @@ def render(d: Dict) -> str:
     L += [f"# Ficha · {titulo}", ""]
     if reg.get("resumen"):
         L += [reg["resumen"], ""]
-    L += ["> Generada por `scripts/generar_fichas.py` a partir de los archivos de "
+    L += ["> Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de "
           "esta carpeta y de `results/registro.json`. No la edites a mano: "
           "corrige el registro y regenera.", ""]
 

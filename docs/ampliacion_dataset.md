@@ -13,7 +13,7 @@ Implementación: [`data/build_agentharm_pairs.py`](../data/build_agentharm_pairs
 ```bash
 python data/prepare_dataset_v2.py --input <ruta>/dataset_v2.jsonl \
        --etiquetado <ruta>/etiquetado_anotado.csv
-./scripts/run_modelo.sh <modelo> <salida> --no-quantize --dataset-path data/dataset_v2.jsonl
+./scripts/runpod/run_modelo.sh <modelo> <salida> --no-quantize --dataset-path data/dataset_v2.jsonl
 ```
 
 ### Qué corrige
@@ -231,13 +231,13 @@ python data/build_agentharm_pairs.py
 python data/build_agentharm_pairs.py --estilo pareado
 
 # Análisis principal, máxima potencia
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/ampliado --no-quantize \
+./scripts/runpod/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/ampliado --no-quantize \
     --dataset-path data/dataset_expanded.jsonl
 
 # Metas frente a procedimientos: dos corridas, misma composición
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/procedimientos --no-quantize \
+./scripts/runpod/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/procedimientos --no-quantize \
     --dataset-path data/dataset_expanded_procedimientos.jsonl --agency-level autonomous
-./scripts/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/metas --no-quantize \
+./scripts/runpod/run_modelo.sh Qwen/Qwen3-8B ./results/corridas/qwen3_8b/metas --no-quantize \
     --dataset-path data/dataset_expanded_metas.jsonl --agency-level autonomous
 
 # Sin --dataset-path, el pipeline usa dataset_full.jsonl como siempre
