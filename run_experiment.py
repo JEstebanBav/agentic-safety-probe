@@ -351,6 +351,22 @@ def parse_args():
              "projection the agentic format removed (default: 0.5,1,2,4)",
     )
     parser.add_argument(
+        "--n-random-controls",
+        type=int,
+        default=3,
+        help="Random directions in the causal test's control. The first runs "
+             "at every dose, as in earlier runs; the others (seeds +1, +2, "
+             "...) at --extra-control-doses, so the control is a small "
+             "distribution instead of a single draw. 1 = earlier behaviour "
+             "(default: 3)",
+    )
+    parser.add_argument(
+        "--extra-control-doses",
+        type=str,
+        default="1,4",
+        help="Doses at which the extra random directions run (default: 1,4)",
+    )
+    parser.add_argument(
         "--intervention-pairs",
         type=int,
         default=None,
@@ -1585,6 +1601,8 @@ def run_behavior_and_causal(
     toolbox: int = 0,
     seed: int = 42,
     thinking_budget: int = 1024,
+    n_random_controls: int = 1,
+    extra_control_doses: Tuple[float, ...] = (1.0, 4.0),
 ) -> Dict:
     """
     Behavioural baseline, then the causal test of the refusal direction.
@@ -1738,6 +1756,8 @@ def run_behavior_and_causal(
         res = run_causal_test(
             generate_steered, baseline["records"], prompts, pair_ids,
             direction=direction, dose_unit=dose_unit, doses=doses, seed=seed,
+            n_random_controls=n_random_controls,
+            extra_control_doses=extra_control_doses,
         )
         for r in res["records"]:
             r["layer"] = int(layer)
@@ -2964,6 +2984,9 @@ def _write_run_manifest(args, output_dir: str, model=None, tokenizer=None,
         "generation": {
             "max_new_tokens": args.max_new_tokens,
             "thinking_budget": args.thinking_budget,
+            "intervention_pairs": args.intervention_pairs or "all",
+            "n_random_controls": args.n_random_controls,
+            "extra_control_doses": args.extra_control_doses,
             "seed": args.seed,
             "quantize": ("4bit" if args.quantize else
                          "none" if args.no_quantize else "auto"),
@@ -3258,6 +3281,9 @@ def main():
             toolbox=args.toolbox,
             seed=args.seed,
             thinking_budget=args.thinking_budget,
+            n_random_controls=args.n_random_controls,
+            extra_control_doses=tuple(
+                float(x) for x in args.extra_control_doses.split(",") if x.strip()),
         ))
 
         # 8b. w_agent at its own layer, fixed alpha grid (opt-in)
@@ -3357,6 +3383,13 @@ def main():
         ctrl = ", ".join(f"{r:.0%}" for r in c["control_rates"])
         print(f"Causal test, layer {layer}: refusal restored at dose {doses}  "
               f"(random direction: {ctrl})")
+        spread = [f"x{d:g}: {m:.0%} [{lo:.0%}-{hi:.0%}] over {k}"
+                  for d, m, (lo, hi), k in zip(
+                      c["doses"], c.get("random_control_mean", []),
+                      c.get("random_control_range", []),
+                      c.get("n_random_directions", [])) if k > 1]
+        if spread:
+            print("  random directions, mean [min-max]: " + ", ".join(spread))
     print(f"Results: {args.output_dir}/")
     print("=" * 60)
 

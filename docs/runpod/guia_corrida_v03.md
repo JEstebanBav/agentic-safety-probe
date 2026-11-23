@@ -6,26 +6,32 @@ Plan aprobado el 22 de noviembre de 2026. Corpus: [data/v03/](../../data/v03/REA
 
 | Fase | Máquina | Modelos | Horas | Costo (Community) |
 |---|---|---|---|---|
-| 1A | 1× H200 141 GB · volumen 600 GB | Llama-3.3-70B, Qwen3-32B, Qwen3.8-27B, Gemma-4-31B-it, Muse-Glimmer-30B, gpt-oss-20b, gpt-oss-120b | 26–47 | US$ 93–171 (3,59/h) |
-| 1B | 1× L40S 48 GB · volumen 100 GB, en paralelo con 1A | Mistral-7B, Qwen3-8B | 9,5–11,5 | US$ 7,5–9 (0,79/h) |
+| 1A | 1× H200 141 GB · volumen 600 GB | Llama-3.3-70B, Qwen3-32B, Qwen3.8-27B, Gemma-4-31B-it, Muse-Glimmer-30B, gpt-oss-20b, gpt-oss-120b | 52–105 | US$ 187–377 (3,59/h) |
+| 1B | 1× L40S 48 GB · volumen 100 GB, en paralelo con 1A | Mistral-7B, Qwen3-8B | 15–20 | US$ 12–16 (0,79/h) |
 | 2 | 4× H200 · volumen 450 GB, solo si queda presupuesto | GLM-5.3-Flash, solo extracción | 2,3–3,8 | US$ 33–55 (14,36/h) |
-| | | | **Total** | **US$ 140–240** + ~5 de almacenamiento |
+| | | | **Total** | **US$ 240–460** + ~8 de almacenamiento |
 
-Configuración por modelo (la pone la cola; no hay que escribirla a mano):
+El rango es amplio porque casi todo el tiempo se va en generar texto con los modelos que razonan (Qwen3-32B, Qwen3.8, Muse y gpt-oss), y no se sabe cuánto razonan hasta medirlo. Las corridas de prueba de la sección 5 lo miden y permiten recalcular antes de lanzar las reales.
 
-| Modelo | Precisión | Pares en el test causal | Otros |
-|---|---|---|---|
-| Mistral, Qwen3-8B, Qwen3-32B | FP16, como sus corridas anteriores | 96 | — |
-| Llama-3.3-70B | FP16, como la v4 | 96 | 20 capas, causal en 76/56/28, `PROBE_GPU_RESERVE=0.04` |
-| Qwen3.8, Gemma 4, Muse, gpt-oss ×2 | BF16 (nativa; gpt-oss mantiene MXFP4) | 48 (`NUEVOS_PARES`) | — |
-| GLM-5.3-Flash | BF16 + FP8 nativo | sin generación | análisis completo después, en el portátil |
+Configuración, igual para todos (la pone la cola):
 
-El análisis de activaciones usa siempre los 96 pares. El análisis por explicitud sale omitido (`Explicitness strata: SKIPPED`) hasta que se agreguen los estratos (paso 9).
+- **96 pares en todas las etapas, test causal incluido.**
+- Hasta **4096 tokens de razonamiento**. Con 1024, el 31–33 % de las respuestas agénticas de Qwen3-8B no terminaba. Las respuestas que terminan antes no cambian.
+- **3 direcciones aleatorias** en el control causal. La original corre en todas las dosis, como antes; las dos nuevas en ×1 y ×4.
 
-**Puntos de control del presupuesto:**
-1. **Después de las pruebas:** si la proyección de la Fase 1A pasa de 50 h, relanza los modelos nuevos con `NUEVOS_PARES=24` o deja fuera el más caro.
-2. **Antes de la Fase 2:** si lo gastado supera US$ 240, pospón GLM.
-3. **Si solo hay Secure Cloud:** H200 a ~5,29/h y L40S a ~1,09/h; el total sube a ~US$ 200–350, y GLM es lo primero que sale.
+| Modelo | Precisión | Otros |
+|---|---|---|
+| Mistral, Qwen3-8B, Qwen3-32B | FP16, como sus corridas anteriores | — |
+| Llama-3.3-70B | FP16, como la v4 | 20 capas, causal en 76/56/28, `PROBE_GPU_RESERVE=0.04` |
+| Qwen3.8, Gemma 4, Muse, gpt-oss ×2 | BF16 (nativa; gpt-oss mantiene MXFP4) | — |
+| GLM-5.3-Flash | BF16 + FP8 nativo | sin generación; análisis completo después, en el portátil |
+
+El análisis por explicitud sale omitido (`Explicitness strata: SKIPPED`) hasta que se agreguen los estratos (paso 9).
+
+**Puntos de control del presupuesto (sin reducir pares):**
+1. **Después de las pruebas:** con los minutos por par medidos, se proyecta el costo de cada modelo. La cola corre primero las re-corridas y luego los modelos nuevos en orden, así que si la proyección no cabe se decide antes de lanzar qué modelo nuevo queda fuera o se amplía el presupuesto.
+2. **Antes de la Fase 2:** si lo gastado no deja margen, pospón GLM.
+3. **Si solo hay Secure Cloud:** H200 a ~5,29/h y L40S a ~1,09/h; el total sube alrededor de un 45 %.
 
 ## 2. Ya verificado en el portátil (Fase 0)
 
@@ -113,10 +119,11 @@ Cada modelo corre 4 pares con todas las etapas, en 5–20 min. Revisa cada `/wor
 - [ ] `first tokens` con un solo token de inicio, y `last tokens` igual en todas las variantes.
 - [ ] El formato de razonamiento es el esperado: `Reasoning model (<think>)` en Qwen y GLM, `(harmony)` en gpt-oss, `(recipient)` en Muse, y ninguna línea en Mistral, Llama ni Gemma.
 - [ ] En `BEHAVIOURAL BASELINE`, la columna `tool call` es alta en `agent_*` y 0 en `chat_*`.
-- [ ] La columna `incompl.` está en 0. Si no, el razonamiento no cabe en 1024 tokens: relanza ese modelo con `--thinking-budget 2048`. Es probable en Muse, que razona en modo "high" por defecto, y en gpt-oss. Cuesta más tiempo de generación.
+- [ ] La columna `incompl.` está en 0, o casi. Con 4096 tokens no debería quedar casi ninguna. Si un modelo sigue dejando respuestas sin terminar (lo más probable es Muse, que razona en modo "high"), relánzalo con `PENSAR=8192`. Cuesta más tiempo solo en esas respuestas.
+- [ ] En `CAUSAL TEST` aparecen `control_2` y `control_3` en las dosis ×1 y ×4, y la línea `random mean [min-max]`.
 - [ ] Termina en `EXPERIMENT COMPLETE`, y en la carpeta están `run_manifest.json` y `rendered_inputs.jsonl`.
 
-**Recalcular el costo:** cada log trae `Generation stages: X min for 4 pairs (Y min per pair)`. Tiempo real ≈ Y × 96 (re-corridas) o Y × 48 (nuevos), más ~1 h por modelo de extracción y análisis. Suma por máquina y aplica los puntos de control de la sección 1.
+**Recalcular el costo:** cada log trae `Generation stages: X min for 4 pairs (Y min per pair)`. Tiempo real ≈ Y × 96, más ~1 h por modelo de extracción y análisis. Suma por máquina y aplica los puntos de control de la sección 1. Con 4 pares la estimación es gruesa: toma el valor alto del rango.
 
 ## 6. Corridas reales
 
@@ -126,7 +133,7 @@ bash scripts/runpod/cola_v03.sh h200 real 2>&1 | tee /workspace/cola_h200.log   
 bash scripts/runpod/cola_v03.sh l40s real 2>&1 | tee /workspace/cola_l40s.log     # en la 1B
 ```
 
-Para cambiar los pares de los modelos nuevos: `NUEVOS_PARES=24 bash scripts/runpod/cola_v03.sh h200 real`. Si la cola se relanza, omite las corridas que ya tienen `results.json`.
+Si la cola se relanza, omite las corridas que ya tienen `results.json`. Para dejar fuera un modelo, comenta su línea `run` en `cola_v03.sh` antes de lanzarla.
 
 Seguimiento:
 

@@ -507,9 +507,18 @@ def run_causal_test(
     doses: Sequence[float] = (0.5, 1.0, 2.0, 4.0),
     seed: int = 42,
     log: Callable[[str], None] = print,
+    n_random_controls: int = 1,
+    extra_control_doses: Sequence[float] = (1.0, 4.0),
 ) -> Dict:
     """
     Add alpha * direction on agentic prompts and see whether refusal returns.
+
+    The random control is one draw: a direction that happens to be unusually
+    effective or inert would move the comparison. With n_random_controls > 1,
+    further random directions (seeds seed+1, seed+2, ...) are run at
+    `extra_control_doses`, so the control is a small distribution rather than
+    a single sample. The first direction ("control") is the same as before and
+    still runs at every dose; the extra ones are "control_2", "control_3"...
 
     Args:
         baseline_records: the "records" of `run_behavioral_baseline`. They
@@ -541,11 +550,18 @@ def run_causal_test(
         ("control", "agent_harmful", control_dir),
         ("benign",  "agent_benign",  direction),
     ]
+    extra_arms = [
+        (f"control_{k + 1}", "agent_harmful",
+         random_orthogonal_direction(direction, seed + k))
+        for k in range(1, max(int(n_random_controls), 1))
+    ]
+    extra_doses = {float(d) for d in extra_control_doses}
 
     records: List[Dict] = []
     for dose in doses:
         alpha = float(dose) * float(dose_unit)
-        for arm, variant, vec in arms:
+        dose_arms = arms + (extra_arms if float(dose) in extra_doses else [])
+        for arm, variant, vec in dose_arms:
             if variant not in prompts:
                 continue
             pids = eligible(variant)
@@ -575,8 +591,10 @@ def summarise_causal(records: List[Dict], doses: List[float],
     per_dose: Dict[str, Dict] = {}
     for dose in doses:
         rows = [r for r in records if r["dose"] == float(dose)]
+        extra = sorted({r["arm"] for r in rows if r["arm"].startswith("control_")},
+                       key=lambda a: int(a.split("_")[1]))
         arms = {arm: {r["pair_id"]: r for r in rows if r["arm"] == arm}
-                for arm in ("restore", "control", "benign")}
+                for arm in ("restore", "control", "benign", *extra)}
         entry: Dict = {"alpha": float(dose) * dose_unit}
         for arm, by_pid in arms.items():
             rs = list(by_pid.values())
@@ -608,6 +626,28 @@ def summarise_causal(records: List[Dict], doses: List[float],
             "n_pairs": len(shared), "only_restore_refuses": b,
             "only_control_refuses": c, "mcnemar_p": exact_mcnemar(b, c),
         }
+
+        # Every random direction run at this dose: their spread is what one
+        # random push does, which the single "control" cannot show.
+        controls = ["control", *extra]
+        ctrl_rates = [entry[a]["rate"] for a in controls
+                      if not math.isnan(entry[a]["rate"])]
+        entry["random_controls"] = {
+            "arms": controls,
+            "rates": [entry[a]["rate"] for a in controls],
+            "mean": float(np.mean(ctrl_rates)) if ctrl_rates else float("nan"),
+            "min": float(min(ctrl_rates)) if ctrl_rates else float("nan"),
+            "max": float(max(ctrl_rates)) if ctrl_rates else float("nan"),
+            "mcnemar_p": {
+                a: exact_mcnemar(
+                    sum(arms["restore"][p]["behavior"] == "refuse"
+                        and arms[a][p]["behavior"] != "refuse"
+                        for p in arms["restore"] if p in arms[a]),
+                    sum(arms["restore"][p]["behavior"] != "refuse"
+                        and arms[a][p]["behavior"] == "refuse"
+                        for p in arms["restore"] if p in arms[a]))
+                for a in controls},
+        }
         per_dose[f"{dose:g}"] = entry
 
     rates = [per_dose[f"{d:g}"]["restore"]["rate"] for d in doses]
@@ -618,6 +658,14 @@ def summarise_causal(records: List[Dict], doses: List[float],
         "per_dose": per_dose,
         "restore_rates": rates,
         "control_rates": [per_dose[f"{d:g}"]["control"]["rate"] for d in doses],
+        # Mean and range over every random direction run at each dose (one
+        # direction where no extra controls were run).
+        "random_control_mean": [per_dose[f"{d:g}"]["random_controls"]["mean"] for d in doses],
+        "random_control_range": [[per_dose[f"{d:g}"]["random_controls"]["min"],
+                                  per_dose[f"{d:g}"]["random_controls"]["max"]]
+                                 for d in doses],
+        "n_random_directions": [len(per_dose[f"{d:g}"]["random_controls"]["arms"])
+                                for d in doses],
         "benign_refusal_rates": [per_dose[f"{d:g}"]["benign"]["rate"] for d in doses],
         "restore_rate_non_decreasing": bool(
             all(b >= a for a, b in zip(finite, finite[1:]))) if finite else False,
@@ -705,10 +753,18 @@ def format_causal_report(summary: Dict, layer: int) -> str:
             f"  {dose:>5g}{e['alpha']:>9.3f}{e['projection_shift_restore']:>8.3f}   "
             f"{cell('restore'):<22}{cell('control'):<20}{cell('benign'):<18}"
             f"{e['restore_vs_control']['mcnemar_p']:>7.3f}")
+        rc = e.get("random_controls") or {}
+        for arm in rc.get("arms", [])[1:]:
+            lines.append(f"  {'':>22}{arm + ':':<22}{cell(arm):<20}{'':<18}"
+                         f"{rc['mcnemar_p'][arm]:>7.3f}")
+        if len(rc.get("arms", [])) > 1:
+            lines.append(f"  {'':>22}{'random mean [min-max]:':<24}"
+                         f"{rc['mean']:.0%} [{rc['min']:.0%}-{rc['max']:.0%}]")
     lines += [
         "-" * 72,
         "  shift : mean change in projection the hook produced (should equal alpha)",
         "  p     : exact McNemar, d_chat vs random direction on the same prompts",
+        "  control_k: further random directions (other seeds) at selected doses",
         "  dg    : degenerate outputs, counted as neither refusal nor compliance",
         "  in    : reasoning that never closed (budget exhausted), likewise",
         "  Reading: a causal role needs d_chat to restore refusal where the",

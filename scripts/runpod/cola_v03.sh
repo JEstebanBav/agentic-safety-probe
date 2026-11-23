@@ -9,17 +9,22 @@
 #   modo:    prueba  4 pares por modelo, todas las etapas (obligatoria antes)
 #            real    corridas completas
 #
-# Las re-corridas (Mistral, Qwen3-8B, Qwen3-32B, Llama) usan los flags de su
-# corrida publicada y FP16, como antes, para que se puedan comparar. Los
-# modelos nuevos van en BF16, su precision nativa, y con el test causal sobre
-# NUEVOS_PARES pares (48 por defecto; el analisis de activaciones usa los 96).
+# Todos los modelos usan los 96 pares en todas las etapas, test causal
+# incluido. Las re-corridas (Mistral, Qwen3-8B, Qwen3-32B, Llama) usan los
+# flags de su corrida publicada y FP16, como antes; los modelos nuevos van en
+# BF16, su precision nativa.
+# Comun a todos: hasta PENSAR tokens de razonamiento (4096; con 1024 el 31-33 %
+# de las respuestas agenticas de Qwen3-8B no terminaba) y 3 direcciones
+# aleatorias en el control causal (las 2 extra en las dosis x1 y x4). Los
+# modelos que no razonan ignoran el limite de razonamiento.
 # Si una corrida falla, se anota y la cola sigue. Una corrida que ya tiene
 # results.json se omite, asi que relanzar la cola continua donde quedo.
 set -u
 cd "$(dirname "$0")/../.."
 MAQUINA="${1:?uso: cola_v03.sh <h200|l40s|glm> <prueba|real> [carpeta-base]}"
 MODO="${2:?falta el modo: prueba o real}"
-NUEVOS="--dtype bfloat16 --intervention-pairs ${NUEVOS_PARES:-48}"
+NUEVOS="--dtype bfloat16"
+COMUN="--thinking-budget ${PENSAR:-4096} --n-random-controls 3 --extra-control-doses 1,4"
 
 case "$MODO" in
   prueba) BASE="${3:-/workspace/out/pruebas}"
@@ -41,7 +46,7 @@ run() {
   # $EXTRA va al final: en modo prueba prevalece sobre los flags del modelo.
   # shellcheck disable=SC2086
   if PROBE_GPU_RESERVE="$reserve" PYTHONUNBUFFERED=1 bash scripts/runpod/run_modelo_v03.sh \
-       "$model" "$out" --no-quantize "$@" $EXTRA > "$out/run.log" 2>&1; then
+       "$model" "$out" --no-quantize $COMUN "$@" $EXTRA > "$out/run.log" 2>&1; then
     echo "    terminado $(date '+%F %T')  $(grep -h 'Generation stages' "$out/run.log" | tail -1)"
   else
     echo "!!! $name FALLO $(date '+%F %T'): ver $out/run.log. Sigo con el siguiente."
