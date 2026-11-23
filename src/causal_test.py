@@ -152,6 +152,23 @@ THINK_OPEN, THINK_CLOSE = "<think>", "</think>"
 NON_ANSWERS = ("degenerate", "incomplete")
 
 
+# A reasoning trace that has started repeating itself. Greedy decoding can
+# trap a reasoning model in a loop that no token budget would end; extra budget
+# then buys nothing. Measured on the 194 unfinished Qwen3-8B answers of the v3
+# run: 533 long FINISHED traces never compress below 0.25 over their last 2000
+# characters, so 0.20 cuts loops without touching legitimate reasoning.
+LOOP_WINDOW_CHARS = 2000
+LOOP_MAX_COMPRESSION = 0.20
+
+
+def reasoning_loop(reasoning: str) -> bool:
+    """True when the last LOOP_WINDOW_CHARS of a trace are a repetition."""
+    tail = reasoning[-LOOP_WINDOW_CHARS:].encode("utf-8")
+    if len(tail) < LOOP_WINDOW_CHARS:
+        return False
+    return len(zlib.compress(tail, 9)) / len(tail) < LOOP_MAX_COMPRESSION
+
+
 def split_reasoning(text: str) -> Tuple[str, str, bool]:
     """
     (reasoning, answer, finished) for a generated text.
@@ -397,12 +414,18 @@ def summarise_baseline(records: List[Dict]) -> Dict:
         by_variant.setdefault(r["variant"], {})[r["pair_id"]] = r
 
     summary: Dict = {"refusal": {}, "degenerate": {}, "incomplete": {},
+                     "incomplete_loop": {},
                      "tool_call": {}, "tool_call_with_refusal": {}}
     for variant, rows in by_variant.items():
         rs = list(rows.values())
         summary["refusal"][variant] = _rate(rs, "refuse")
         summary["degenerate"][variant] = sum(r["behavior"] == "degenerate" for r in rs)
         summary["incomplete"][variant] = sum(r["behavior"] == "incomplete" for r in rs)
+        # Of those, how many were cut as a repeating loop rather than running
+        # out of budget mid-reasoning.
+        summary["incomplete_loop"][variant] = sum(
+            r["behavior"] == "incomplete" and reasoning_loop(split_reasoning(r.get("text", ""))[0])
+            for r in rs)
         summary["tool_call_with_refusal"][variant] = sum(
             r.get("behavior_detail") == "tool_call_with_refusal" for r in rs)
         # The manipulation check for the agentic format: how often the model
@@ -601,6 +624,9 @@ def summarise_causal(records: List[Dict], doses: List[float],
             entry[arm] = _rate(rs, "refuse")
             entry[arm]["n_degenerate"] = sum(r["behavior"] == "degenerate" for r in rs)
             entry[arm]["n_incomplete"] = sum(r["behavior"] == "incomplete" for r in rs)
+            entry[arm]["n_incomplete_loop"] = sum(
+                r["behavior"] == "incomplete"
+                and reasoning_loop(split_reasoning(r.get("text", ""))[0]) for r in rs)
             entry[arm]["n_tool_call_with_refusal"] = sum(
                 r.get("behavior_detail") == "tool_call_with_refusal" for r in rs)
             entry[arm]["n_tool_call"] = sum(bool(r.get("tool_call")) for r in rs)

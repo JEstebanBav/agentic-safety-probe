@@ -16,7 +16,12 @@ El rango es amplio porque casi todo el tiempo se va en generar texto con los mod
 Configuración, igual para todos (la pone la cola):
 
 - **96 pares en todas las etapas, test causal incluido.**
-- Hasta **4096 tokens de razonamiento**. Con 1024, el 31–33 % de las respuestas agénticas de Qwen3-8B no terminaba. Las respuestas que terminan antes no cambian.
+- Hasta **4096 tokens de razonamiento**. Con 1024, el 31–33 % de las respuestas agénticas de Qwen3-8B no terminaba, y el 93 % de esas era razonamiento largo de verdad, no un bucle. El límite solo se usa donde hace falta:
+  - los modelos que no razonan (Mistral, Llama, Gemma) lo ignoran;
+  - una respuesta que termina antes no cambia ni cuesta más;
+  - un **detector de bucles** corta el razonamiento cuando empieza a repetirse (compresión < 0,20 en los últimos 2000 caracteres), porque más tokens no lo resolverían. Con las 940 respuestas reales de Qwen3-8B no cortó ninguna respuesta que terminó.
+
+  Los resultados separan las incompletas por bucle (`incomplete_loop`) de las que se quedaron sin presupuesto.
 - **3 direcciones aleatorias** en el control causal. La original corre en todas las dosis, como antes; las dos nuevas en ×1 y ×4.
 
 | Modelo | Precisión | Otros |
@@ -106,7 +111,7 @@ hf download zai-org/GLM-5.3-Flash
 bash scripts/runpod/cola_v03.sh h200 prueba 2>&1 | tee /workspace/prueba_h200.log    # o l40s / glm
 ```
 
-Cada modelo corre 4 pares con todas las etapas, en 5–20 min. Revisa cada `/workspace/out/pruebas/<modelo>/<versión>/run.log`:
+Cada modelo corre 4 pares con todas las etapas, en 5–20 min. Qwen3-8B no tiene prueba: ya corrió completo con este proceso (v3), así que en la L40S solo se prueba Mistral. Qwen3-32B sí la tiene, porque su corrida anterior nunca terminó y es el costo más incierto del plan. Revisa cada `/workspace/out/pruebas/<modelo>/<versión>/run.log`:
 
 - [ ] `Source: data/v03/dataset_v03_rerun.jsonl`, `Total entries: 384` y `DRY RUN: limited to 4 of 96 pairs`.
 - [ ] `Theme groups: ... 4 pairs in 4 groups` y `Tool catalogue: data/v03/catalogos_neutrales`.
@@ -119,7 +124,9 @@ Cada modelo corre 4 pares con todas las etapas, en 5–20 min. Revisa cada `/wor
 - [ ] `first tokens` con un solo token de inicio, y `last tokens` igual en todas las variantes.
 - [ ] El formato de razonamiento es el esperado: `Reasoning model (<think>)` en Qwen y GLM, `(harmony)` en gpt-oss, `(recipient)` en Muse, y ninguna línea en Mistral, Llama ni Gemma.
 - [ ] En `BEHAVIOURAL BASELINE`, la columna `tool call` es alta en `agent_*` y 0 en `chat_*`.
-- [ ] La columna `incompl.` está en 0, o casi. Con 4096 tokens no debería quedar casi ninguna. Si un modelo sigue dejando respuestas sin terminar (lo más probable es Muse, que razona en modo "high"), relánzalo con `PENSAR=8192`. Cuesta más tiempo solo en esas respuestas.
+- [ ] La columna `incompl.` está en 0, o casi. Con 4096 tokens no debería quedar casi ninguna. Si un modelo deja respuestas sin terminar, mira en `results.json` → `behavior.incomplete_loop` cuántas fueron bucles:
+  - si son bucles, más presupuesto no sirve: déjalo así y repórtalas;
+  - si no son bucles (lo más probable es Muse, que razona en modo "high"), relánzalo con `PENSAR=8192`. Cuesta más tiempo solo en esas respuestas.
 - [ ] En `CAUSAL TEST` aparecen `control_2` y `control_3` en las dosis ×1 y ×4, y la línea `random mean [min-max]`.
 - [ ] Termina en `EXPERIMENT COMPLETE`, y en la carpeta están `run_manifest.json` y `rendered_inputs.jsonl`.
 

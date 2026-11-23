@@ -73,7 +73,12 @@ case "$MAQUINA" in
     ;;
   l40s)
     run "Mistral-7B" "$BASE/mistral7b/v5" 0.12 mistralai/Mistral-7B-Instruct-v0.3
-    run "Qwen3-8B"   "$BASE/qwen3_8b/v4"  0.12 Qwen/Qwen3-8B
+    # Qwen3-8B ya corrio completo con este proceso (v3) y su comportamiento se
+    # conoce: no tiene corrida de prueba. Si la real fallara, se pierde ~1 h
+    # de L40S. Qwen3-32B si la tiene: su corrida anterior nunca termino.
+    if [ "$MODO" = real ]; then
+      run "Qwen3-8B" "$BASE/qwen3_8b/v4" 0.12 Qwen/Qwen3-8B
+    fi
     ;;
   glm)
     # Solo extraccion: sin generacion, y el analisis pesado (sondas,

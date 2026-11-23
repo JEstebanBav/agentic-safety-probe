@@ -59,11 +59,12 @@ class _AnswerBudget(StoppingCriteria):
     """
 
     def __init__(self, n_prompt: int, answer_tokens: int, open_id: int,
-                 close_id: int, opened_in_prompt: bool):
+                 close_id: int, opened_in_prompt: bool, tokenizer=None):
         self.n_prompt = n_prompt
         self.answer_tokens = answer_tokens
         self.open_id, self.close_id = open_id, close_id
         self.opened_in_prompt = opened_in_prompt
+        self.tokenizer = tokenizer
 
     def __call__(self, input_ids, scores, **kwargs):
         gen = input_ids[0, self.n_prompt:].tolist()
@@ -74,9 +75,26 @@ class _AnswerBudget(StoppingCriteria):
             start = len(gen) - gen[::-1].index(self.close_id)
             done = len(gen) - start >= self.answer_tokens
         else:
-            done = False
+            # Still reasoning: stop only if the trace has become a loop, which
+            # more budget would not end (src/causal_test.reasoning_loop).
+            done = _looping(self.tokenizer, gen)
         return torch.full((input_ids.shape[0],), done, dtype=torch.bool,
                           device=input_ids.device)
+
+
+# Checked every few tokens, on enough trailing tokens to cover the window.
+_LOOP_CHECK_EVERY = 32
+_LOOP_TAIL_TOKENS = 1024
+
+
+def _looping(tokenizer, gen_ids, text: Optional[str] = None) -> bool:
+    """True when the reasoning generated so far ends in a repeating loop."""
+    from src.causal_test import reasoning_loop
+    if tokenizer is None or len(gen_ids) < 256 or len(gen_ids) % _LOOP_CHECK_EVERY:
+        return False
+    if text is None:
+        text = tokenizer.decode(gen_ids[-_LOOP_TAIL_TOKENS:], skip_special_tokens=True)
+    return reasoning_loop(text)
 
 
 class _ParsedAnswerBudget(StoppingCriteria):
@@ -94,13 +112,16 @@ class _ParsedAnswerBudget(StoppingCriteria):
         self.answer_tokens, self.parse = answer_tokens, parse
 
     def __call__(self, input_ids, scores, **kwargs):
-        raw = self.tokenizer.decode(input_ids[0, self.n_prompt:],
-                                    skip_special_tokens=False)
+        gen = input_ids[0, self.n_prompt:]
+        raw = self.tokenizer.decode(gen, skip_special_tokens=False)
         p = self.parse(raw)
         done = False
         if p.answer_started:
             done = p.answer_closed or len(self.tokenizer.encode(
                 "".join(p.answer), add_special_tokens=False)) >= self.answer_tokens
+        elif p.reasoning:
+            done = _looping(self.tokenizer, gen.tolist(),
+                            text="\n".join(p.reasoning))
         return torch.full((input_ids.shape[0],), done, dtype=torch.bool,
                           device=input_ids.device)
 
@@ -280,7 +301,8 @@ class ActivationIntervention:
                 opened_in_prompt = last_open > last_close
             budget = max_new_tokens + self.thinking_budget
             extra["stopping_criteria"] = StoppingCriteriaList([_AnswerBudget(
-                n_prompt, max_new_tokens, open_id, close_id, opened_in_prompt)])
+                n_prompt, max_new_tokens, open_id, close_id, opened_in_prompt,
+                tokenizer=self.tokenizer)])
 
         self._seen = set()
         self._recorded = {}
