@@ -48,7 +48,7 @@ Con transformers 5.24.0, la misma versión del pod, y sin descargar pesos:
 
 ## 3. Antes de alquilar
 
-1. Con la cuenta del token de HuggingFace, acepta las condiciones de `meta-llama/Llama-3.3-70B-Instruct`, `mistralai/Mistral-7B-Instruct-v0.3` y `google/gemma-4-31B-it`, y las de cualquier otro modelo cuya página lo pida.
+1. El único repositorio con acceso restringido es `meta-llama/Llama-3.3-70B-Instruct`: su licencia debe estar aceptada con la cuenta del token. Los otros nueve se descargan sin aceptar nada (comprobado el 22 de noviembre de 2026).
 2. Confirma que `main` en GitHub tiene esta versión: debe existir `src/response_formats.py`.
 
 ## 4. Configurar cada pod
