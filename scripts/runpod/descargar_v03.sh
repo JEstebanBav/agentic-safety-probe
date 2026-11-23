@@ -8,11 +8,13 @@
 # su tamano), Mistral un consolidated.safetensors. Bajarlas todas paso de los
 # 600 GB del volumen en el primer pod. Se descarga en segundo plano; el
 # progreso queda en /workspace/descarga.log.
+#   bash scripts/runpod/descargar_v03.sh lista <repo> [<repo>...]   # solo esos
 set -u
-case "${1:?uso: descargar_v03.sh <h200|l40s|glm>}" in
+case "${1:?uso: descargar_v03.sh <h200|l40s|glm|lista repo...>}" in
   h200) MODELOS="meta-llama/Llama-3.3-70B-Instruct Qwen/Qwen3-32B Qwen/Qwen3.8-27B google/gemma-4-31B-it meta-models/Muse-Glimmer-30B openai/gpt-oss-20b openai/gpt-oss-120b" ;;
   l40s) MODELOS="mistralai/Mistral-7B-Instruct-v0.3 Qwen/Qwen3-8B" ;;
   glm)  MODELOS="zai-org/GLM-5.3-Flash" ;;
+  lista) shift; MODELOS="${*:?falta la lista de modelos}" ;;
   *) echo "maquina desconocida: $1"; exit 1 ;;
 esac
 nohup python - $MODELOS > /workspace/descarga.log 2>&1 <<'EOF' &

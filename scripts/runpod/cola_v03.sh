@@ -37,6 +37,13 @@ esac
 run() {
   local name=$1 out=$2 reserve=$3 model=$4
   shift 4
+  # SOLO="qwen38_27b gpt_oss_20b" limita la cola a esas carpetas: asi cada
+  # pod corre su parte cuando la cola h200 se reparte entre varias maquinas.
+  local key; key=$(basename "$(dirname "$out")")
+  if [ -n "${SOLO:-}" ] && [[ " $SOLO " != *" $key "* ]]; then
+    echo "=== $name: no esta en SOLO, lo corre otro pod ==="
+    return
+  fi
   if [ -f "$out/results.json" ]; then
     echo "=== $name: ya existe $out/results.json, se omite ==="
     return
