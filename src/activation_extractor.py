@@ -58,15 +58,10 @@ class ActivationExtractor:
 
     def _get_layer_module(self, layer_idx: int):
         """Get the residual stream output of a specific layer."""
-        # Support common architectures
-        if hasattr(self.model, "model"):  # Mistral, Llama
-            return self.model.model.layers[layer_idx]
-        elif hasattr(self.model, "transformer"):  # GPT-2 style
-            return self.model.transformer.h[layer_idx]
-        else:
-            raise ValueError(
-                f"Unsupported model architecture: {type(self.model)}"
-            )
+        # One lookup for every architecture, multimodal ones included: see
+        # src/architecture.py. Text-only models resolve to model.model.layers.
+        from src.architecture import get_decoder_layers
+        return get_decoder_layers(self.model)[layer_idx]
 
     def _hook_fn(self, layer_idx: int):
         """Create a hook function that captures activations."""

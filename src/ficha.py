@@ -133,7 +133,10 @@ def _precision(config: Dict, log: Dict, model_info: Dict,
     if config.get("quantize"):
         return "4-bit NF4 (bitsandbytes), forzado con --quantize"
     if config.get("no_quantize"):
-        return "FP16, forzado con --no-quantize"
+        dtype = {"bfloat16": "BF16"}.get(config.get("dtype"), "FP16")
+        native = model_info.get("native_quantization")
+        return (f"{dtype}, forzado con --no-quantize"
+                + (f" (pesos nativos {native})" if native else ""))
     q = (log.get("quantize") or "").lower()
     if "4-bit" in q or q == "true":
         return "4-bit NF4 (bitsandbytes), según el log"

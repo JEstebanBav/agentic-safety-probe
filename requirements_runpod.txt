@@ -60,8 +60,19 @@
 # Always verify after installing, BEFORE downloading weights:
 #     python -c "import torch, transformers; print(torch.__version__, transformers.__version__)"
 # and confirm no "Disabling PyTorch" line appears.
-transformers>=4.51.0        # Qwen3 / Llama-3.3 architectures and chat templates
-accelerate>=0.27.0          # device_map="auto" sharding across GPUs
+#
+# CORPUS v0.3 RUNS (November 2026): transformers is PINNED so all ten models run
+# on the same version, recorded in each run_manifest.json. 5.24.0 is the first
+# set that knows every architecture in the plan: gpt_oss, gemma4, qwen3_5
+# (Qwen3.8), muse_glimmer (needs >= 5.15) and glm5_next (GLM-5.3, >= 5.16).
+# The [kernels] extra installs the MXFP4 kernels gpt-oss needs to stay in
+# MXFP4; without them transformers silently dequantizes and gpt-oss-120b no
+# longer fits one H200 (the loader then stops: see _check_placement).
+# Transformers 5.24 needs torch >= 2.6; the MXFP4 triton kernels want >= 2.8:
+#     pip install --upgrade torch torchvision torchaudio \
+#         --index-url https://download.pytorch.org/whl/cu128
+transformers[kernels]==5.24.0
+accelerate>=1.16.0          # device_map="auto" sharding across GPUs
 bitsandbytes>=0.43.0        # 4-bit / 8-bit quantization
 sentencepiece>=0.2.0        # tokenizers for several model families
 protobuf>=4.25.0            # required by some slow tokenizer conversions
@@ -72,7 +83,7 @@ protobuf>=4.25.0            # required by some slow tokenizer conversions
 # HF_HUB_ENABLE_HF_TRANSFER is ignored (it warns). Use HF_XET_HIGH_PERFORMANCE=1
 # instead. The CLI entry point was also renamed: `huggingface-cli` is dead,
 # the command is now `hf`.
-huggingface_hub>=0.23.0
+huggingface_hub>=1.31.0     # required by transformers 5.24
 
 # --- Analysis (all CPU-side; also what you need locally) ---
 scikit-learn>=1.4.0

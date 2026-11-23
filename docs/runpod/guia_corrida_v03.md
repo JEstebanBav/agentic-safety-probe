@@ -1,186 +1,164 @@
-# Guía: correr los cuatro modelos con el corpus v0.3
+# Guía: corridas del corpus v0.3 en RunPod (10 modelos)
 
-Paso a paso para repetir en RunPod las corridas de Mistral-7B, Llama-3.3-70B, Qwen3-8B y Qwen3-32B sobre el corpus v0.3 ([data/v03/](../../data/v03/README.md)). Cada modelo usa los mismos flags que su última corrida publicada; lo único nuevo es el corpus, los grupos temáticos en las particiones y el catálogo neutral de herramientas.
+Plan aprobado el 22 de noviembre de 2026. Corpus: [data/v03/](../../data/v03/README.md). Cola de corridas: [scripts/runpod/cola_v03.sh](../../scripts/runpod/cola_v03.sh).
 
-## 1. Qué se va a correr
+## 1. Plan
 
-| Modelo | Flags (los mismos de su corrida anterior) | Tiempo medido antes | Carpeta nueva |
+| Fase | Máquina | Modelos | Horas | Costo (Community) |
+|---|---|---|---|---|
+| 1A | 1× H200 141 GB · volumen 600 GB | Llama-3.3-70B, Qwen3-32B, Qwen3.8-27B, Gemma-4-31B-it, Muse-Glimmer-30B, gpt-oss-20b, gpt-oss-120b | 26–47 | US$ 93–171 (3,59/h) |
+| 1B | 1× L40S 48 GB · volumen 100 GB, en paralelo con 1A | Mistral-7B, Qwen3-8B | 9,5–11,5 | US$ 7,5–9 (0,79/h) |
+| 2 | 4× H200 · volumen 450 GB, solo si queda presupuesto | GLM-5.3-Flash, solo extracción | 2,3–3,8 | US$ 33–55 (14,36/h) |
+| | | | **Total** | **US$ 140–240** + ~5 de almacenamiento |
+
+Configuración por modelo (la pone la cola; no hay que escribirla a mano):
+
+| Modelo | Precisión | Pares en el test causal | Otros |
 |---|---|---|---|
-| Mistral-7B-Instruct-v0.3 | por defecto | 83 min en la H200 (v4) | `mistral7b/v5` |
-| Llama-3.3-70B-Instruct | 20 capas, causal en 76, 56 y 28 | 115 min en la H200 (v4) | `llama33_70b/v5` |
-| Qwen3-8B | por defecto | 413 min en una GPU de 48 GB (v3) | `qwen3_8b/v4` |
-| Qwen3-32B | por defecto | nunca terminó: la v3 se cortó en la generación | `qwen3_32b/v4` |
+| Mistral, Qwen3-8B, Qwen3-32B | FP16, como sus corridas anteriores | 96 | — |
+| Llama-3.3-70B | FP16, como la v4 | 96 | 20 capas, causal en 76/56/28, `PROBE_GPU_RESERVE=0.04` |
+| Qwen3.8, Gemma 4, Muse, gpt-oss ×2 | BF16 (nativa; gpt-oss mantiene MXFP4) | 48 (`NUEVOS_PARES`) | — |
+| GLM-5.3-Flash | BF16 + FP8 nativo | sin generación | análisis completo después, en el portátil |
 
-Todas en FP16, 96 pares, `--factorial`, 5 folds × 10 repeticiones, 10.000 bootstraps. Qwen3 razona antes de responder (hasta 1024 tokens), por eso tarda mucho más en la etapa de generación.
+El análisis de activaciones usa siempre los 96 pares. El análisis por explicitud sale omitido (`Explicitness strata: SKIPPED`) hasta que se agreguen los estratos (paso 9).
 
-El análisis por explicitud saldrá omitido (`Explicitness strata: SKIPPED`): el corpus v0.3 no trae estratos. Se calcula después, sin GPU, cuando estén las etiquetas (paso 9).
+**Puntos de control del presupuesto:**
+1. **Después de las pruebas:** si la proyección de la Fase 1A pasa de 50 h, relanza los modelos nuevos con `NUEVOS_PARES=24` o deja fuera el más caro.
+2. **Antes de la Fase 2:** si lo gastado supera US$ 240, pospón GLM.
+3. **Si solo hay Secure Cloud:** H200 a ~5,29/h y L40S a ~1,09/h; el total sube a ~US$ 200–350, y GLM es lo primero que sale.
 
-## 2. Qué alquilar
+## 2. Ya verificado en el portátil (Fase 0)
 
-Un solo pod para las cuatro corridas, en cola:
+Con transformers 5.24.0, la misma versión del pod, y sin descargar pesos:
 
-| | |
-|---|---|
-| GPU | **1× H200 (141 GB)**, la de las corridas v4 |
-| Volumen (`/workspace`) | **300 GB**: los cuatro modelos pesan 237 GB |
-| Disco del contenedor | 30 GB |
-| Plantilla | RunPod PyTorch, CUDA 12.x |
-| Puertos | 8888 (JupyterLab) y 22 (SSH) |
+- Los diez tokenizadores renderizan los 768 prompts (corpus + factorial).
+  - El más largo ocupa 1258 de 4096 tokens (Muse).
+  - Las herramientas aparecen en todos los prompts agénticos.
+  - Ningún prompt tiene el token de inicio duplicado.
+- Los diez modelos se construyeron vacíos y el código encuentra sus capas:
+  - los cuatro multimodales (Gemma 4, Qwen3.8, Muse, GLM) en `model.language_model.layers`;
+  - el resto en `model.layers`.
+- Los formatos de razonamiento se detectan bien:
+  - `<think>`: Qwen3, Qwen3.8 y GLM;
+  - *harmony*: gpt-oss;
+  - *recipient*: Muse;
+  - Gemma 4 trae el razonamiento apagado por defecto.
+- Las llamadas a herramientas de gpt-oss, Muse y Gemma 4 se reconocen, y el corte de generación ignora el razonamiento.
+- Tests y una corrida completa de prueba en CPU, en BF16 y con transformers 5.24.0.
 
-Variables de entorno de la plantilla:
+## 3. Antes de alquilar
 
-| Clave | Valor |
-|---|---|
-| `HF_HOME` | `/workspace/hf-cache` |
-| `HF_TOKEN` | tu token de HuggingFace (lectura) |
-| `HF_XET_HIGH_PERFORMANCE` | `1` |
-| `PYTORCH_CUDA_ALLOC_CONF` | `expandable_segments:True` |
+1. Con la cuenta del token de HuggingFace, acepta las condiciones de `meta-llama/Llama-3.3-70B-Instruct`, `mistralai/Mistral-7B-Instruct-v0.3` y `google/gemma-4-31B-it`, y las de cualquier otro modelo cuya página lo pida.
+2. Confirma que `main` en GitHub tiene esta versión: debe existir `src/response_formats.py`.
 
-No uses una H100 de 80 GB para Llama: el modelo en FP16 ocupa 131 GiB. Si no hay H200, usa 2× H100 NVL (94 GB) como en la [guía anterior](guia_runpod_llama33.md) y deja `PROBE_GPU_RESERVE` en 0.12.
+## 4. Configurar cada pod
 
-## 3. Costo estimado
+| | 1A | 1B | 2 |
+|---|---|---|---|
+| GPU | 1× H200 | 1× L40S | 4× H200 |
+| Volumen `/workspace` | 600 GB | 100 GB | 450 GB |
+| Disco del contenedor | 30 GB | 30 GB | 30 GB |
 
-Precios de RunPod en noviembre de 2026 para la H200: unos US$ 3,59/h en Community Cloud y US$ 5,29/h en Secure Cloud. Cambian seguido; revísalos en [runpod.io/pricing](https://www.runpod.io/pricing) el día que alquiles.
+- **Plantilla:** RunPod PyTorch con **CUDA 12.8 o superior**. Filtra por versión de CUDA al elegir la máquina: los kernels de gpt-oss necesitan torch ≥ 2.8.
+- **Puertos:** 8888 y 22.
+- **Variables de entorno:** `HF_HOME=/workspace/hf-cache`, `HF_TOKEN=<tu token>`, `HF_XET_HIGH_PERFORMANCE=1` y `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`.
 
-| Etapa | Horas |
-|---|---|
-| Instalación y verificación | 0,3 |
-| Descarga de los 4 modelos (237 GB) | 0,5-1 |
-| Corridas de prueba (4 × 4 pares) | 1 |
-| Mistral-7B | 1,5 |
-| Llama-3.3-70B | 2 |
-| Qwen3-8B | 3-7 |
-| Qwen3-32B | 8-14 |
-| Empaquetar y descargar | 0,5 |
-| **Total** | **≈ 17-27 h** |
-
-| | Community (US$ 3,59/h) | Secure (US$ 5,29/h) |
-|---|---|---|
-| Estimado | **US$ 60-100** | **US$ 90-145** |
-
-Los tiempos de Mistral y Llama están medidos en la misma GPU. Los de Qwen son estimaciones: Qwen3-8B se midió en una GPU más lenta, y Qwen3-32B nunca terminó. La corrida de prueba da la mejor medida: el tiempo de su etapa de generación multiplicado por 24 (96/4 pares) acota la real. Deja un margen de 20-30 % para repetir algo. El volumen de 300 GB suma alrededor de US$ 1 por día mientras el pod exista.
-
-**Si el presupuesto aprieta:**
-- Mistral y Qwen3-8B caben en una L40S de 48 GB (unos US$ 0,79-1,09/h). Correrlas en un segundo pod ahorra unos US$ 10-20, a cambio de configurar otro pod.
-- En Qwen3-32B, `--intervention-pairs 48` reduce a la mitad la generación. El test causal queda con 48 pares en lugar de 96, así que hay que reportarlo.
-
-## 4. Antes de encender el pod
-
-1. Acepta las licencias de `meta-llama/Llama-3.3-70B-Instruct` y `mistralai/Mistral-7B-Instruct-v0.3` en HuggingFace con la cuenta del token. Sin eso, la descarga responde 403.
-2. Confirma que `main` en GitHub tiene el corpus v0.3: debe existir `data/v03/dataset_v03_rerun.jsonl`.
-
-Las comprobaciones locales ya se hicieron con esta versión: los tests pasan, `validate_corrections.py` termina en `ALL CHECKS PASSED` y los cuatro tokenizadores caben en el presupuesto (máximo 1246 de 4096 tokens, Llama).
-
-## 5. Preparar el pod
-
-Trabaja siempre dentro de `tmux`: si se cae la conexión, la corrida sigue.
+En cada pod, siempre dentro de `tmux`:
 
 ```bash
 cd /workspace
 git clone https://github.com/JEstebanBav/agentic-safety-probe.git
 cd agentic-safety-probe
 pip install -r requirements_runpod.txt
-pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 
 python -c "
-import torch
-p = torch.cuda.get_device_properties(0)
-print(p.name, round(p.total_memory/1024**3), 'GiB')"
-sha256sum data/v03/dataset_v03_rerun.jsonl   # c96d4bd6...3dba
+import torch, transformers
+print('torch', torch.__version__, '| transformers', transformers.__version__)
+for i in range(torch.cuda.device_count()):
+    p = torch.cuda.get_device_properties(i); print(' ', p.name, round(p.total_memory/1024**3), 'GiB')"
+sha256sum data/v03/dataset_v03_rerun.jsonl     # debe empezar con c96d4bd6
 ```
 
-La GPU debe decir alrededor de 140 GiB. El hash debe empezar con `c96d4bd6`.
+Debe decir `transformers 5.24.0`, torch 2.8 o superior, y no mostrar la línea `Disabling PyTorch`.
 
-Descarga los cuatro modelos de una vez (30-60 min):
+Descarga los modelos de esa máquina:
 
 ```bash
-tmux new -s descarga
-for m in mistralai/Mistral-7B-Instruct-v0.3 meta-llama/Llama-3.3-70B-Instruct Qwen/Qwen3-8B Qwen/Qwen3-32B; do
-  hf download "$m" || echo "FALLO $m"
-done
-# salir sin detener: Ctrl-b y luego d      volver: tmux attach -t descarga
+# 1A (~465 GB, 30-60 min)
+for m in meta-llama/Llama-3.3-70B-Instruct Qwen/Qwen3-32B Qwen/Qwen3.8-27B google/gemma-4-31B-it \
+         meta-models/Muse-Glimmer-30B openai/gpt-oss-20b openai/gpt-oss-120b; do hf download "$m" || echo "FALLO $m"; done
+# 1B
+for m in mistralai/Mistral-7B-Instruct-v0.3 Qwen/Qwen3-8B; do hf download "$m" || echo "FALLO $m"; done
+# 2
+hf download zai-org/GLM-5.3-Flash
 ```
 
-## 6. Corridas de prueba (obligatorias)
-
-Cuatro pares, todas las etapas, generación incluida. Una por modelo; cada una tarda entre 5 y 20 min:
+## 5. Pruebas (obligatorias, en cada pod)
 
 ```bash
-P="--limit-pairs 4 --n-repeats 1 --n-label-permutations 0 --n-bootstrap 1000 --n-selection-splits 20"
-bash scripts/runpod/run_modelo_v03.sh mistralai/Mistral-7B-Instruct-v0.3 /workspace/prueba/mistral --no-quantize $P 2>&1 | tee /workspace/prueba/mistral.log
-PROBE_GPU_RESERVE=0.04 bash scripts/runpod/run_modelo_v03.sh meta-llama/Llama-3.3-70B-Instruct /workspace/prueba/llama --no-quantize $P --layers 28,56,76 --intervention-layers 56 2>&1 | tee /workspace/prueba/llama.log
-bash scripts/runpod/run_modelo_v03.sh Qwen/Qwen3-8B  /workspace/prueba/qwen8  --no-quantize $P 2>&1 | tee /workspace/prueba/qwen8.log
-bash scripts/runpod/run_modelo_v03.sh Qwen/Qwen3-32B /workspace/prueba/qwen32 --no-quantize $P 2>&1 | tee /workspace/prueba/qwen32.log
+bash scripts/runpod/cola_v03.sh h200 prueba 2>&1 | tee /workspace/prueba_h200.log    # o l40s / glm
 ```
 
-En cada log revisa:
+Cada modelo corre 4 pares con todas las etapas, en 5–20 min. Revisa cada `/workspace/out/pruebas/<modelo>/<versión>/run.log`:
 
-- [ ] `Source: data/v03/dataset_v03_rerun.jsonl (paired)`, `Total entries: 384` y `DRY RUN: limited to 4 of 96 pairs`.
-- [ ] `Theme groups: data/v03/theme_groups_67.csv - 4 pairs in 4 groups` y `Tool catalogue: data/v03/catalogos_neutrales (85 global tools)`.
-- [ ] `first tokens` con **un solo** token de inicio; `last tokens` igual en todas las variantes.
-- [ ] `Explicitness strata: SKIPPED`. Es lo esperado con este corpus.
-- [ ] En `BEHAVIOURAL BASELINE`, la columna `tool call` es alta en `agent_*` y 0 en `chat_*`. Si en `agent_*` sale cerca de 0, las herramientas no llegan al prompt: no sigas.
-- [ ] Solo Qwen: el log dice `Reasoning model: up to 1024 <think> tokens` y la columna `incompl.` está en 0.
+- [ ] `Source: data/v03/dataset_v03_rerun.jsonl`, `Total entries: 384` y `DRY RUN: limited to 4 of 96 pairs`.
+- [ ] `Theme groups: ... 4 pairs in 4 groups` y `Tool catalogue: data/v03/catalogos_neutrales`.
+- [ ] `Class:`, `Layers:` y `compute dtype:` coinciden con la tabla de la sección 2 (BF16 en los nuevos).
+- [ ] **gpt-oss:**
+  - `Native quantization: mxfp4` **sin** la palabra `DEQUANTIZED`;
+  - `Memory:` cerca de 13 GB (20b) o de 65 GB (120b).
+
+  Si dice `DEQUANTIZED` o la carga se detiene con `modules were placed on ['cpu']`, faltan los kernels de MXFP4: revisa la versión de torch y `pip show kernels`.
+- [ ] `first tokens` con un solo token de inicio, y `last tokens` igual en todas las variantes.
+- [ ] El formato de razonamiento es el esperado: `Reasoning model (<think>)` en Qwen y GLM, `(harmony)` en gpt-oss, `(recipient)` en Muse, y ninguna línea en Mistral, Llama ni Gemma.
+- [ ] En `BEHAVIOURAL BASELINE`, la columna `tool call` es alta en `agent_*` y 0 en `chat_*`.
+- [ ] La columna `incompl.` está en 0. Si no, el razonamiento no cabe en 1024 tokens: relanza ese modelo con `--thinking-budget 2048`. Es probable en Muse, que razona en modo "high" por defecto, y en gpt-oss. Cuesta más tiempo de generación.
 - [ ] Termina en `EXPERIMENT COMPLETE`, y en la carpeta están `run_manifest.json` y `rendered_inputs.jsonl`.
 
-Abre algunas respuestas para confirmar que son texto del modelo y no la continuación de un JSON:
+**Recalcular el costo:** cada log trae `Generation stages: X min for 4 pairs (Y min per pair)`. Tiempo real ≈ Y × 96 (re-corridas) o Y × 48 (nuevos), más ~1 h por modelo de extracción y análisis. Suma por máquina y aplica los puntos de control de la sección 1.
 
-```bash
-head -c 1500 /workspace/prueba/mistral/behavior_generations.jsonl
-```
-
-Con el tiempo de cada prueba, recalcula el costo: (tiempo de generación de la prueba) × 24 + extracción y análisis.
-
-## 7. Corridas reales, en cola
+## 6. Corridas reales
 
 ```bash
 tmux new -s cola
-bash scripts/runpod/cola_v03.sh 2>&1 | tee /workspace/cola_v03.log
+bash scripts/runpod/cola_v03.sh h200 real 2>&1 | tee /workspace/cola_h200.log     # en la 1A
+bash scripts/runpod/cola_v03.sh l40s real 2>&1 | tee /workspace/cola_l40s.log     # en la 1B
 ```
 
-[cola_v03.sh](../../scripts/runpod/cola_v03.sh) corre Mistral → Llama → Qwen3-8B → Qwen3-32B. Cada log queda en `/workspace/out/corridas/<modelo>/<versión>/run.log`. Si una corrida falla, la cola lo anota y sigue con la siguiente. Si la relanzas, omite las que ya tienen `results.json`.
+Para cambiar los pares de los modelos nuevos: `NUEVOS_PARES=24 bash scripts/runpod/cola_v03.sh h200 real`. Si la cola se relanza, omite las corridas que ya tienen `results.json`.
 
-Seguimiento desde otra terminal:
+Seguimiento:
 
 ```bash
-tail -3 /workspace/cola_v03.log                         # en cuál va
-tail -5 /workspace/out/corridas/qwen3_32b/v4/run.log    # detalle de una
+tail -3 /workspace/cola_h200.log
+tail -5 /workspace/out/corridas/qwen3_32b/v4/run.log
 nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv
 ```
 
-El orden interno protege el gasto: `activations.npz` se guarda apenas termina la extracción y `results.json` antes de generar. Si falla la generación, el análisis ya está en disco.
+`activations.npz` se guarda apenas termina la extracción y `results.json` antes de generar. Si falla la generación, el análisis ya está en disco.
 
-## 8. Sacar los resultados y apagar
+## 7. Fase 2: GLM-5.3-Flash (solo con presupuesto)
+
+Mismo procedimiento en el pod de 4× H200: instalación, descarga, `cola_v03.sh glm prueba` y después `cola_v03.sh glm real`. Solo extrae activaciones; el pod no genera texto. En la prueba revisa `Class: Glm5NextForConditionalGeneration`, `Native quantization: fp8` y que no aparezca ningún módulo en `cpu`.
+
+## 8. Sacar resultados y apagar
 
 ```bash
-cd /workspace/out
-tar czf /workspace/resultados_v03.tar.gz corridas ../prueba ../cola_v03.log
-ls -lh /workspace/resultados_v03.tar.gz      # varios GB: incluye las activaciones
+cd /workspace/out && tar czf /workspace/resultados_<maquina>.tar.gz corridas pruebas ../*.log
 ```
 
-Descárgalo desde el explorador de JupyterLab o con `runpodctl send /workspace/resultados_v03.tar.gz`. En el portátil, confirma que cada modelo trae `activations.npz`, `results.json`, `causal_results.json`, `run_manifest.json` y `rendered_inputs.jsonl`.
+Descárgalo con `runpodctl send /workspace/resultados_<maquina>.tar.gz` o desde JupyterLab. Comprueba que cada modelo trae `activations.npz`, `results.json`, `run_manifest.json` y `rendered_inputs.jsonl`, más `causal_results.json` en todos menos GLM. Después **termina** el pod, no solo lo detengas: uno detenido sigue cobrando el volumen.
 
-Después **termina** el pod, no solo lo detengas: un pod detenido sigue cobrando el volumen.
+## 9. En el portátil
 
-## 9. De vuelta en el portátil
-
-1. Copia cada carpeta a `results/corridas/<modelo>/<versión>/` (las de la tabla del paso 1), agrega sus entradas en `results/registro.json` y regenera fichas e índice:
-
+1. Copia cada carpeta a `results/corridas/<modelo>/<versión>/`, agrega las entradas en `results/registro.json` y regenera las fichas con `python scripts/analisis/generar_fichas.py`. Guarda `activations.npz` aparte: no se sube a GitHub.
+2. **GLM:** análisis completo sin GPU:
    ```bash
-   python scripts/analisis/generar_fichas.py
+   python run_experiment.py --load-activations results/corridas/glm53_flash/v1/activations.npz \
+     --n-folds 5 --n-repeats 10 --mlp-n-repeats 1 --n-label-permutations 10 --n-bootstrap 10000 \
+     --output-dir results/corridas/glm53_flash/v1_analisis
    ```
+3. **Explicitud**, cuando estén los estratos (91 del consenso más 5 reanotados): copia del corpus con `subtlety` y reanálisis sin GPU con `--load-activations ... --dataset-path data/v03/dataset_v03_con_estratos.jsonl`, en una carpeta aparte.
 
-   `activations.npz` no se sube a GitHub (está en `.gitignore`). Guárdalo aparte: sin él, cualquier reanálisis vuelve a necesitar GPU.
-
-2. **Explicitud, cuando estén los estratos.** Se crea una copia del corpus con la columna `subtlety` llena según el `pair_id` (91 pares del consenso de la semana 1, más los 5 reanotados) y se reanaliza sin GPU:
-
-   ```bash
-   python run_experiment.py \
-     --load-activations results/corridas/llama33_70b/v5/activations.npz \
-     --dataset-path data/v03/dataset_v03_con_estratos.jsonl \
-     --output-dir results/corridas/llama33_70b/v5_estratos
-   ```
-
-   Usa una carpeta distinta: con `--load-activations` no se regenera texto, así que los resultados conductuales y causales siguen en la carpeta original.
-
-Para leer el test causal y saber qué archivo responde cada pregunta, ver las últimas secciones de la [guía anterior](guia_runpod_llama33.md#qué-archivo-responde-cada-observación); siguen valiendo.
+Para comparar entre modelos usa las métricas sin escala (AUROC, d de Cohen, separación estandarizada) y la profundidad relativa de la capa, no el ΔP crudo. En gpt-oss y GLM, que son MoE, interpreta la "rotación" teniendo en cuenta el enrutamiento de expertos ([runpod_large_models.md](runpod_large_models.md)).

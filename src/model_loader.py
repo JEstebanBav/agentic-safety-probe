@@ -485,10 +485,71 @@ def _dtype_kwarg() -> str:
     return "dtype" if major >= 5 else "torch_dtype"
 
 
+DTYPES = {"float16": torch.float16, "bfloat16": torch.bfloat16}
+
+
+def _model_class(model_name: str):
+    """
+    The class the checkpoint itself declares (config.architectures[0]).
+
+    For text-only models this is the same XForCausalLM that AutoModelForCausalLM
+    picks. Multimodal checkpoints (Gemma 4, Qwen3.8, Muse Glimmer, GLM-5.3)
+    store their weights under a ForConditionalGeneration layout; loading them
+    through a text-only class can leave layers unmatched - and randomly
+    initialised - with only a warning. Loading the declared class cannot.
+    """
+    import transformers
+    from transformers import AutoConfig
+
+    try:
+        config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
+        arch = (getattr(config, "architectures", None) or [None])[0]
+    except Exception:                                   # noqa: BLE001
+        arch = None
+    cls = getattr(transformers, arch, None) if arch else None
+    return cls or AutoModelForCausalLM
+
+
+def _check_placement(model) -> None:
+    """
+    Refuse to run a model that did not land entirely on the GPUs.
+
+    A module offloaded to CPU or disk still computes the same numbers, hours
+    or days later. The usual cause is a native MXFP4/FP8 checkpoint that was
+    silently dequantized (missing kernels) and no longer fits. Set
+    PROBE_ALLOW_OFFLOAD=1 to run anyway.
+    """
+    import os
+
+    qcfg = getattr(model.config, "quantization_config", None)
+    method = (qcfg.get("quant_method") if isinstance(qcfg, dict)
+              else getattr(qcfg, "quant_method", None))
+    dequant = (qcfg.get("dequantize") if isinstance(qcfg, dict)
+               else getattr(qcfg, "dequantize", False))
+    if method:
+        print(f"  Native quantization: {method}"
+              + ("  (DEQUANTIZED to the compute dtype)" if dequant else ""))
+    if dequant:
+        print("  WARNING: the checkpoint's quantized weights were expanded. "
+              "Install the kernels it needs (requirements_runpod.txt) to keep "
+              "them quantized; memory use is now several times larger.")
+
+    devmap = getattr(model, "hf_device_map", None) or {}
+    off = sorted({str(d) for d in devmap.values() if str(d) in ("cpu", "disk")})
+    if off and os.environ.get("PROBE_ALLOW_OFFLOAD", "") != "1":
+        n = sum(str(d) in ("cpu", "disk") for d in devmap.values())
+        raise RuntimeError(
+            f"{n} modules were placed on {off}: the model does not fit the "
+            "GPU budget. Generation would take many times longer. Use a "
+            "larger pod, lower PROBE_GPU_RESERVE, or fix a dequantized "
+            "checkpoint; PROBE_ALLOW_OFFLOAD=1 overrides.")
+
+
 def load_model_and_tokenizer(
     model_name: str = "mistralai/Mistral-7B-Instruct-v0.3",
     quantize: Optional[bool] = None,
     device_map: str = "auto",
+    dtype: str = "float16",
 ) -> Tuple:
     """
     Load model and tokenizer for activation extraction.
@@ -497,18 +558,25 @@ def load_model_and_tokenizer(
         model_name: HuggingFace model identifier.
         quantize: Whether to use 4-bit quantization.
                   None = auto-detect based on available VRAM.
-                  True = force 4-bit. False = force FP16.
+                  True = force 4-bit. False = no bitsandbytes quantization
+                  (native MXFP4/FP8 checkpoints keep their own format).
         device_map: Device placement strategy.
+        dtype: compute dtype, "float16" (every run up to corpus v0.3) or
+               "bfloat16" (the native precision of the newer models; Gemma
+               and gpt-oss overflow in float16).
 
     Returns:
         Tuple of (model, tokenizer)
     """
     print(f"Loading model: {model_name}")
-    
+    if dtype not in DTYPES:
+        raise ValueError(f"dtype must be one of {sorted(DTYPES)}, got {dtype!r}")
+
     if quantize is None:
         quantize = auto_detect_quantize(model_name)
-    
-    print(f"  Quantization: {'4-bit' if quantize else 'full FP16'}")
+
+    print(f"  Quantization: {'4-bit' if quantize else 'none (bitsandbytes off)'}"
+          f"  |  compute dtype: {dtype}")
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     if tokenizer.pad_token is None:
@@ -516,7 +584,7 @@ def load_model_and_tokenizer(
 
     load_kwargs = {
         "device_map": device_map,
-        _dtype_kwarg(): torch.float16,
+        _dtype_kwarg(): DTYPES[dtype],
         "trust_remote_code": True,
     }
 
@@ -544,16 +612,21 @@ def load_model_and_tokenizer(
                     print(f"  Device map: {n_gpu} modules planned at 4-bit "
                           "across the GPUs")
 
-    model = AutoModelForCausalLM.from_pretrained(model_name, **load_kwargs)
+    model_cls = _model_class(model_name)
+    print(f"  Class: {model_cls.__name__}")
+    model = model_cls.from_pretrained(model_name, **load_kwargs)
     model.eval()
 
     for param in model.parameters():
         param.requires_grad = False
 
-    n_layers = model.config.num_hidden_layers
-    hidden_dim = model.config.hidden_size
-    print(f"  Layers: {n_layers}")
+    from src.architecture import text_config, decoder_layers_path
+    tcfg = text_config(model.config)
+    n_layers = tcfg.num_hidden_layers
+    hidden_dim = tcfg.hidden_size
+    print(f"  Layers: {n_layers}  ({decoder_layers_path(model)})")
     print(f"  Hidden dim: {hidden_dim}")
+    _check_placement(model)
     print(f"  Device: {next(model.parameters()).device}")
     print(f"  Memory: {model.get_memory_footprint() / 1e9:.2f} GB")
 
@@ -770,22 +843,28 @@ def format_agent_prompt(
     # native tool format.
     if tools:
         try:
-            return tokenizer.apply_chat_template(
+            rendered = tokenizer.apply_chat_template(
                 messages,
                 tools=tools,
                 tokenize=False,
                 add_generation_prompt=True,
             )
+            # A template without a `tools` slot may also ignore the argument
+            # WITHOUT raising, which would leave the agent arm tool-less.
+            names = [t["function"]["name"] for t in tools]
+            if all(n in rendered for n in names):
+                return rendered
         except Exception:
-            # Template has no `tools` slot — inline the specs instead, so the
-            # manipulation is never silently dropped.
-            messages[0] = {
-                "role": "system",
-                "content": (
-                    f"{system_message}\n\nAvailable tools:\n"
-                    f"{render_tool_specs(tools)}"
-                ),
-            }
+            pass
+        # Template has no `tools` slot — inline the specs instead, so the
+        # manipulation is never silently dropped.
+        messages[0] = {
+            "role": "system",
+            "content": (
+                f"{system_message}\n\nAvailable tools:\n"
+                f"{render_tool_specs(tools)}"
+            ),
+        }
 
     return tokenizer.apply_chat_template(
         messages,
@@ -886,12 +965,29 @@ def encode_prompt(tokenizer, prompt: str, max_length: Optional[int] = None):
 
 
 def get_model_info(model) -> Dict:
-    """Get model architecture information."""
-    return {
-        "num_layers": model.config.num_hidden_layers,
-        "hidden_size": model.config.hidden_size,
-        "num_attention_heads": model.config.num_attention_heads,
-        "vocab_size": model.config.vocab_size,
+    """Get model architecture information (language-model part)."""
+    from src.architecture import text_config, decoder_layers_path
+    cfg = text_config(model.config)
+    info = {
+        "num_layers": cfg.num_hidden_layers,
+        "hidden_size": cfg.hidden_size,
+        "num_attention_heads": cfg.num_attention_heads,
+        "vocab_size": cfg.vocab_size,
         "model_type": model.config.model_type,
         "memory_gb": model.get_memory_footprint() / 1e9,
+        "dtype": str(getattr(model, "dtype", "")),
+        "architecture": type(model).__name__,
     }
+    qcfg = getattr(model.config, "quantization_config", None)
+    if qcfg is not None:
+        method = (qcfg.get("quant_method") if isinstance(qcfg, dict)
+                  else getattr(qcfg, "quant_method", None))
+        dequant = (qcfg.get("dequantize") if isinstance(qcfg, dict)
+                   else getattr(qcfg, "dequantize", False))
+        if method:
+            info["native_quantization"] = str(method) + (" (dequantized)" if dequant else "")
+    try:
+        info["decoder_layers_path"] = decoder_layers_path(model)
+    except ValueError:
+        info["decoder_layers_path"] = None
+    return info

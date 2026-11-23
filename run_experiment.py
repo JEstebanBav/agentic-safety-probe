@@ -184,6 +184,16 @@ def parse_args():
         help="Force 4-bit even when FP16 fits. Quantization control: same "
              "model and same prompts, only the precision changes",
     )
+    parser.add_argument(
+        "--dtype",
+        choices=["float16", "bfloat16"],
+        default="float16",
+        help="Compute dtype. float16 is what every run up to corpus v0.3 "
+             "used (keep it to compare with them); bfloat16 is the native "
+             "precision of gpt-oss, Gemma 4, Qwen3.8, Muse Glimmer and GLM, "
+             "and Gemma/gpt-oss overflow in float16. Native MXFP4/FP8 "
+             "weights keep their own format either way",
+    )
 
     parser.add_argument(
         "--layers",
@@ -1597,6 +1607,7 @@ def run_behavior_and_causal(
     print("\n" + "=" * 60)
     print("BEHAVIOUR AND CAUSAL TEST")
     print("=" * 60)
+    t_generation = time.time()
 
     refusal_directions = results["refusal_directions"]
 
@@ -1648,10 +1659,13 @@ def run_behavior_and_causal(
 
     intervention = ActivationIntervention(
         model, tokenizer, thinking_budget=thinking_budget)
-    reasoning = intervention.reasoning_ids is not None
+    reasoning = (intervention.reasoning_ids is not None
+                 or intervention.response_format is not None)
     if reasoning:
-        print(f"  Reasoning model: up to {thinking_budget} <think> tokens, then "
-              f"{max_new_tokens} answer tokens. Labels read the answer only.")
+        fmt = intervention.response_format or "<think>"
+        print(f"  Reasoning model ({fmt}): up to {thinking_budget} <think> "
+              f"tokens, then {max_new_tokens} answer tokens. Labels read the "
+              "answer only.")
     record_all = {l: refusal_directions[l] for l in intervention_layers}
     primary = intervention_layers[0]
     out_path = f"{output_dir}/behavior_generations.jsonl"
@@ -1739,7 +1753,14 @@ def run_behavior_and_causal(
         all_records += res["records"]
         write_generations(out_path, all_records)
 
+    # Printed so a dry run can be scaled to the real one: generation time
+    # grows with the number of pairs, the rest of the run does not.
+    gen_minutes = (time.time() - t_generation) / 60
+    print(f"\n  Generation stages: {gen_minutes:.1f} min for {len(pair_ids)} "
+          f"pairs ({gen_minutes / max(len(pair_ids), 1):.2f} min per pair)")
+
     out = {
+        "generation_minutes": round(gen_minutes, 2),
         "intervention_layers": [int(l) for l in intervention_layers],
         "n_pairs": len(pair_ids),
         "max_new_tokens": int(max_new_tokens),
@@ -2945,7 +2966,8 @@ def _write_run_manifest(args, output_dir: str, model=None, tokenizer=None,
             "thinking_budget": args.thinking_budget,
             "seed": args.seed,
             "quantize": ("4bit" if args.quantize else
-                         "fp16" if args.no_quantize else "auto"),
+                         "none" if args.no_quantize else "auto"),
+            "dtype": args.dtype,
             "agency_level": args.agency_level,
             "toolbox": args.toolbox,
             "include_history": args.include_history,
@@ -2981,7 +3003,7 @@ def main():
     print("=" * 60)
     print(f"Model: {args.model}")
     print(f"Dataset: {args.dataset}")
-    print(f"Quantize: {'4-bit (forzado)' if args.quantize else 'FP16 (forzado)' if args.no_quantize else 'auto'}")
+    print(f"Quantize: {'4-bit (forzado)' if args.quantize else 'none (forzado)' if args.no_quantize else 'auto'}  |  dtype: {args.dtype}")
     print(f"Samples per category: {args.n_samples}")
     print(f"Decompose: {args.decompose}")
     print(f"Factorial: {args.factorial}")
@@ -3055,6 +3077,7 @@ def main():
         model, tokenizer = load_model_and_tokenizer(
             model_name=args.model,
             quantize=quantize_flag,
+            dtype=args.dtype,
         )
         model_info = get_model_info(model)
 

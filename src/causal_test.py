@@ -122,7 +122,11 @@ CLARIFICATION_PHRASES = (
 _TOOL_CALL = re.compile(
     r'"name"\s*:\s*"[^"]+"\s*,\s*"(?:arguments|parameters)"\s*:'
     r'|"tool"\s*:\s*"[^"]+"'
-    r"|<tool_call>|<function=|\[TOOL_CALLS\]|<\|python_tag\|>",
+    r"|<tool_call>|<function=|\[TOOL_CALLS\]|<\|python_tag\|>"
+    # Muse Glimmer (ATEM protocol) and Gemma 4 (call:NAME{...}; its
+    # <|tool_call> markers are special tokens, removed when decoding).
+    r"|<atem:function_calls>|<atem:invoke\b"
+    r"|(?:^|[\s>])call:[A-Za-z_][\w.\-]*\{",
     re.IGNORECASE,
 )
 
@@ -208,7 +212,9 @@ def _outside_tool_payloads(text: str) -> str:
     Sending an email whose body says "I cannot attend" is not the assistant
     refusing. Keep prose before/after a call, but don't scan its arguments.
     """
-    text = re.sub(r"<tool_call>.*?</tool_call>|<function=[^>]*>.*?</function>",
+    text = re.sub(r"<tool_call>.*?</tool_call>|<function=[^>]*>.*?</function>"
+                  r"|<atem:function_calls>.*?(?:</atem:function_calls>|$)"
+                  r"|(?:^|(?<=[\s>]))call:[A-Za-z_][\w.\-]*\{.*?(?:\}|$)",
                   " ", text, flags=re.DOTALL | re.IGNORECASE)
     decoder = json.JSONDecoder()
     pieces, start, cursor = [], 0, 0

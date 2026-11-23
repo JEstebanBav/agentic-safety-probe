@@ -79,6 +79,32 @@ class _AnswerBudget(StoppingCriteria):
                           device=input_ids.device)
 
 
+class _ParsedAnswerBudget(StoppingCriteria):
+    """
+    _AnswerBudget for structured-message formats (harmony, recipient).
+
+    The generation so far is decoded with its special tokens and parsed. Stop
+    once the answer message has closed (a final answer, a tool call ending in
+    <|eom|>, which is not an end-of-sequence token) or has run
+    `answer_tokens` tokens. Reasoning messages never count.
+    """
+
+    def __init__(self, tokenizer, n_prompt: int, answer_tokens: int, parse):
+        self.tokenizer, self.n_prompt = tokenizer, n_prompt
+        self.answer_tokens, self.parse = answer_tokens, parse
+
+    def __call__(self, input_ids, scores, **kwargs):
+        raw = self.tokenizer.decode(input_ids[0, self.n_prompt:],
+                                    skip_special_tokens=False)
+        p = self.parse(raw)
+        done = False
+        if p.answer_started:
+            done = p.answer_closed or len(self.tokenizer.encode(
+                "".join(p.answer), add_special_tokens=False)) >= self.answer_tokens
+        return torch.full((input_ids.shape[0],), done, dtype=torch.bool,
+                          device=input_ids.device)
+
+
 @dataclass
 class InterventionResult:
     """Result of a single intervention experiment."""
@@ -113,6 +139,13 @@ class ActivationIntervention:
         # models that do not reason.
         self.thinking_budget = int(thinking_budget)
         self.reasoning_ids = reasoning_token_ids(tokenizer)
+        # Structured-message formats (gpt-oss harmony, Muse recipients) are
+        # parsed into the same <think>...</think>answer form; see
+        # src/response_formats.py. None for every <think> or plain model.
+        from src.response_formats import detect_format, parser_for
+        self.response_format = (None if self.reasoning_ids
+                                else detect_format(tokenizer))
+        self._parse = parser_for(self.response_format)
         if max_length is None:
             max_length = min(
                 getattr(model.config, "max_position_embeddings", 8192), 8192
@@ -182,19 +215,14 @@ class ActivationIntervention:
         return hook
 
     def _get_layer_module(self, layer_idx: int):
-        """Get layer module (supports Mistral/Llama and GPT-2 architectures)."""
-        if hasattr(self.model, "model"):
-            return self.model.model.layers[layer_idx]
-        elif hasattr(self.model, "transformer"):
-            return self.model.transformer.h[layer_idx]
-        else:
-            raise ValueError(f"Unsupported architecture: {type(self.model)}")
+        """Decoder layer of the language model (src/architecture.py)."""
+        from src.architecture import get_decoder_layers
+        return get_decoder_layers(self.model)[layer_idx]
 
     def _get_num_layers(self) -> int:
-        """Get total number of layers in the model."""
-        if hasattr(self.model, "config"):
-            return self.model.config.num_hidden_layers
-        raise ValueError("Cannot determine number of layers")
+        """Get total number of layers in the language model."""
+        from src.architecture import num_text_layers
+        return num_text_layers(self.model)
 
     def _register_hooks(self, layer_indices: List[int]):
         """Register hooks on multiple layers. They persist until explicitly removed."""
@@ -236,7 +264,11 @@ class ActivationIntervention:
             pad_id = self.tokenizer.eos_token_id
 
         budget, extra, opened_in_prompt = max_new_tokens, {}, False
-        if self.reasoning_ids and self.thinking_budget > 0:
+        if self._parse is not None:
+            budget = max_new_tokens + max(self.thinking_budget, 0)
+            extra["stopping_criteria"] = StoppingCriteriaList([_ParsedAnswerBudget(
+                self.tokenizer, n_prompt, max_new_tokens, self._parse)])
+        elif self.reasoning_ids and self.thinking_budget > 0:
             open_id, close_id = self.reasoning_ids
             # Some templates open the block in the prompt itself; an empty
             # <think></think> there means reasoning was switched off.
@@ -264,6 +296,11 @@ class ActivationIntervention:
                 do_sample=False,
                 pad_token_id=pad_id,
             )
+
+        if self._parse is not None:
+            raw = self.tokenizer.decode(outputs[0, n_prompt:],
+                                        skip_special_tokens=False)
+            return self._parse(raw).canonical(), n_prompt
 
         text = self.tokenizer.decode(
             outputs[0, n_prompt:], skip_special_tokens=True
