@@ -88,6 +88,37 @@ class ThemeGroupPartitionTests(unittest.TestCase):
         for g, w in zip(got, want):
             self.assertTrue(np.array_equal(g, w))
 
+    def test_subset_partitions_keep_groups_and_restore_map(self):
+        _, clusters = _clusters()
+        re_.set_pair_clusters(clusters)
+        full = re_.get_pair_clusters(96).copy()
+        _, half = re_.pair_halves(96, np.random.default_rng(5))
+        with re_.pair_clusters_subset(half):
+            folds = re_.pair_folds(len(half), 5, np.random.default_rng(6))
+            _assert_whole(self, clusters[half], folds)
+        self.assertTrue(np.array_equal(re_.get_pair_clusters(96), full))
+        with self.assertRaises(RuntimeError):
+            with re_.pair_clusters_subset(half):
+                raise RuntimeError
+        self.assertTrue(np.array_equal(re_.get_pair_clusters(96), full))
+
+    def test_split_sample_selection_runs_with_map(self):
+        # All eight v0.3 runs lost this stage: the inference half (48 pairs)
+        # was partitioned against the 96-pair map.
+        _, clusters = _clusters()
+        re_.set_pair_clusters(clusters)
+        rng = np.random.default_rng(2)
+        arms = {k: {l: rng.normal(size=(96, 8)) for l in (0, 1, 2)}
+                for k in ("chat_harmful", "chat_benign", "agent_harmful", "agent_benign")}
+        for l in (0, 1, 2):
+            arms["chat_harmful"][l][:, 0] += 1.0 + l
+        sel = re_.select_layer_and_test(
+            arms["chat_harmful"], arms["chat_benign"], arms["agent_harmful"],
+            n_folds=5, n_permutations=200, seed=0,
+            agent_benign=arms["agent_benign"], n_splits=5)
+        self.assertIn(sel["selected_layer"], (0, 1, 2))
+        self.assertEqual(sel["n_selection"] + sel["n_inference"], 96)
+
     def test_length_mismatch_is_an_error(self):
         re_.set_pair_clusters(["a", "a", "b"])
         with self.assertRaises(ValueError):

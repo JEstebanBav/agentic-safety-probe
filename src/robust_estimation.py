@@ -49,6 +49,7 @@ agent observations always travel together.
 from __future__ import annotations
 
 import numpy as np
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -530,6 +531,24 @@ def get_pair_clusters(n_pairs: int) -> Optional[np.ndarray]:
             f"Theme-group map covers {len(_PAIR_CLUSTERS)} pairs but this "
             f"partition is over {n_pairs}; cannot keep groups together.")
     return _PAIR_CLUSTERS
+
+
+@contextmanager
+def pair_clusters_subset(idx: Sequence[int]):
+    """
+    Restrict the registered map to the pairs `idx`, in that order, inside the
+    block. A routine that partitions a subset of the pairs (the inference half
+    of the split-sample selection) needs the theme groups of those rows only;
+    without this the length check above rejects it. No-op without a map.
+    """
+    global _PAIR_CLUSTERS
+    saved = _PAIR_CLUSTERS
+    if saved is not None:
+        _PAIR_CLUSTERS = saved[np.asarray(idx, dtype=np.int64)]
+    try:
+        yield
+    finally:
+        _PAIR_CLUSTERS = saved
 
 
 def _balanced_cluster_blocks(
@@ -1328,34 +1347,37 @@ def select_layer_and_test(
     chosen, selection_scores, _ = _select(sel_idx, sel_idx_b)
     k_inf = max(2, min(n_folds, len(inf_idx)))
 
-    # --- Inference half: cross-fitted test on the pre-committed layer only ---
-    result = cross_fitted_projection_gap(
-        chat_harmful[chosen][inf_idx],
-        chat_benign[chosen][inf_idx_b],
-        agent_harmful[chosen][inf_idx],
-        layer_idx=chosen,
-        n_folds=k_inf,
-        n_permutations=n_permutations,
-        seed=seed,
-    )
-
-    # --- Same half, harmful-vs-benign interaction, paired by prompt ---
-    interaction: Optional[PairedTestResult] = None
-    if paired and agent_benign is not None and chosen in agent_benign:
-        held = crossfit_condition_projections(
-            {
-                "chat_harmful": chat_harmful[chosen][inf_idx],
-                "chat_benign": chat_benign[chosen][inf_idx],
-                "agent_harmful": agent_harmful[chosen][inf_idx],
-                "agent_benign": agent_benign[chosen][inf_idx],
-            },
-            n_folds=k_inf, seed=seed, layer_idx=chosen,
-        ).projections
-        interaction = run_paired_suite(
-            held["chat_harmful"] - held["agent_harmful"],
-            held["chat_benign"] - held["agent_benign"],
-            n_permutations, n_permutations, "greater", seed,
+    # The folds below partition the inference half only, so the theme-group
+    # map must be restricted to its rows.
+    with pair_clusters_subset(inf_idx):
+        # --- Inference half: cross-fitted test on the pre-committed layer only ---
+        result = cross_fitted_projection_gap(
+            chat_harmful[chosen][inf_idx],
+            chat_benign[chosen][inf_idx_b],
+            agent_harmful[chosen][inf_idx],
+            layer_idx=chosen,
+            n_folds=k_inf,
+            n_permutations=n_permutations,
+            seed=seed,
         )
+
+        # --- Same half, harmful-vs-benign interaction, paired by prompt ---
+        interaction: Optional[PairedTestResult] = None
+        if paired and agent_benign is not None and chosen in agent_benign:
+            held = crossfit_condition_projections(
+                {
+                    "chat_harmful": chat_harmful[chosen][inf_idx],
+                    "chat_benign": chat_benign[chosen][inf_idx],
+                    "agent_harmful": agent_harmful[chosen][inf_idx],
+                    "agent_benign": agent_benign[chosen][inf_idx],
+                },
+                n_folds=k_inf, seed=seed, layer_idx=chosen,
+            ).projections
+            interaction = run_paired_suite(
+                held["chat_harmful"] - held["agent_harmful"],
+                held["chat_benign"] - held["agent_benign"],
+                n_permutations, n_permutations, "greater", seed,
+            )
 
     # --- Stability across partitions ---
     stability: Dict = {}
