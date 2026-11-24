@@ -1,0 +1,87 @@
+{
+  "created_utc": "2026-11-24T00:17:02.105881+00:00",
+  "model": "google/gemma-4-31B-it",
+  "model_revision": null,
+  "tokenizer": "google/gemma-4-31B-it",
+  "tokenizer_revision": null,
+  "chat_template_sha256": "ae53464bf3be25802b3a5b37def7fd89667067d7577049b3b2d74c4d8de4c6d4",
+  "activations_source": null,
+  "dataset": {
+    "path": "data/v03/dataset_v03_rerun.jsonl",
+    "sha256": "c96d4bd66528afd3b2e38f98aadc23268b956d642695a8c2b53cb124578d3dba"
+  },
+  "theme_groups": {
+    "path": "data/v03/theme_groups_67.csv",
+    "sha256": "05e785a7e9bdcfcf97d1ae32be8434c983c592f477ae331edcd0e3a05a453aba"
+  },
+  "partition": {
+    "unit": "theme_group",
+    "n_pairs": 96,
+    "n_groups": 67,
+    "max_group_size": 3
+  },
+  "tool_catalogs": {
+    "data/v03/catalogos_neutrales/tool_definitions.json": "3c81f55b400b7b0d63c67bcc85184c84bbdbc2aa819bbeb4da5fba74f4d11c2b",
+    "data/v03/catalogos_neutrales/data/tool_definitions_agentharm.json": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+  },
+  "rendered_inputs": {
+    "path": "/workspace/out/corridas/gemma4_31b/v1/rendered_inputs.jsonl",
+    "sha256": "69f54db46053bd6822014deabff9442c0794630f181da6491adc714878e97420"
+  },
+  "generation": {
+    "max_new_tokens": 64,
+    "thinking_budget": 4096,
+    "intervention_pairs": "all",
+    "n_random_controls": 3,
+    "extra_control_doses": "1,4",
+    "seed": 42,
+    "quantize": "none",
+    "dtype": "bfloat16",
+    "agency_level": null,
+    "toolbox": 0,
+    "include_history": false,
+    "factorial": true,
+    "decompose": false
+  },
+  "versions": {
+    "python": "3.12.3",
+    "numpy": "2.5.4",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.24.0",
+    "sklearn": "1.9.1"
+  },
+  "argv": [
+    "--model",
+    "google/gemma-4-31B-it",
+    "--dataset-path",
+    "data/dataset_v2.jsonl",
+    "--n-folds",
+    "5",
+    "--n-repeats",
+    "10",
+    "--mlp-n-repeats",
+    "1",
+    "--n-label-permutations",
+    "10",
+    "--n-bootstrap",
+    "10000",
+    "--factorial",
+    "--output-dir",
+    "/workspace/out/corridas/gemma4_31b/v1",
+    "--dataset-path",
+    "data/v03/dataset_v03_rerun.jsonl",
+    "--theme-groups",
+    "data/v03/theme_groups_67.csv",
+    "--tool-catalog-dir",
+    "data/v03/catalogos_neutrales",
+    "--no-quantize",
+    "--thinking-budget",
+    "4096",
+    "--n-random-controls",
+    "3",
+    "--extra-control-doses",
+    "1,4",
+    "--dtype",
+    "bfloat16"
+  ]
+}

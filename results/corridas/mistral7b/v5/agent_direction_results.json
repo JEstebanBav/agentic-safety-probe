@@ -1,0 +1,114 @@
+{
+  "best_layer": 30,
+  "best_auroc_w_agent": 1.0,
+  "best_auroc_d_chat": 0.7763671875,
+  "best_cosine": 0.08828573878714212,
+  "monitor_threshold": 1.148928757090877,
+  "monitor_precision": 1.0,
+  "monitor_recall": 1.0,
+  "monitor_f1": 1.0,
+  "monitor_fpr": 0.0,
+  "in_sample_warning": "best_auroc_w_agent, monitor_* and best_cosine are IN-SAMPLE: the direction and threshold were fitted on the same activations they are scored on. At n << d these saturate at 1.0 for any labelling (Cover's theorem). Report cross_validated.* instead.",
+  "cross_validated": {
+    "n_folds": 5,
+    "auroc_w_agent_oof": 0.894005540166205,
+    "auroc_w_agent_oof_sd": 0.05584919518973377,
+    "auroc_w_agent_oof_folds": [
+      0.88,
+      0.8282548476454293,
+      0.9445983379501385,
+      0.9584487534626038,
+      0.8587257617728531
+    ],
+    "cosine_with_d_chat_oof": 0.09050539169113944,
+    "cosine_with_d_chat_oof_sd": 0.012916658010267729,
+    "split_half_reliability": 0.31396803151159614,
+    "attenuation_factor": 0.5603285032118178,
+    "monitor_f1_oof": 0.7912087912087912,
+    "monitor_precision_oof": 0.8372093023255814,
+    "monitor_recall_oof": 0.75,
+    "monitor_fpr_oof": 0.14583333333333334
+  },
+  "per_layer": {
+    "0": {
+      "cosine": 0.26975443557757456,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.565212673611111
+    },
+    "2": {
+      "cosine": 0.40600366571838586,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8177083333333334
+    },
+    "4": {
+      "cosine": 0.4006108732634528,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7913411458333333
+    },
+    "6": {
+      "cosine": 0.36799032788912367,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7978515625
+    },
+    "8": {
+      "cosine": 0.4176489169916616,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8703342013888888
+    },
+    "10": {
+      "cosine": 0.39779316414118293,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8961588541666666
+    },
+    "12": {
+      "cosine": 0.3336038244179007,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.899631076388889
+    },
+    "14": {
+      "cosine": 0.23120876817683533,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8559027777777778
+    },
+    "16": {
+      "cosine": 0.15044992773322677,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8687065972222222
+    },
+    "18": {
+      "cosine": 0.07643554417295215,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.830295138888889
+    },
+    "20": {
+      "cosine": 0.06299414399445652,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.8005642361111112
+    },
+    "22": {
+      "cosine": 0.052899507338663276,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.790798611111111
+    },
+    "24": {
+      "cosine": 0.06389236607844098,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7915581597222223
+    },
+    "26": {
+      "cosine": 0.07453145283354917,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7815755208333334
+    },
+    "28": {
+      "cosine": 0.06068342197048106,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7737630208333333
+    },
+    "30": {
+      "cosine": 0.08828573878714212,
+      "auroc_w_agent": 1.0,
+      "auroc_d_chat": 0.7763671875
+    }
+  }
+}

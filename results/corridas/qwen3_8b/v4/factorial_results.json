@@ -1,0 +1,1408 @@
+{
+  "by_layer": {
+    "0": {
+      "harmful": {
+        "system": {
+          "delta": 0.005659307974080208,
+          "ci_lower": 0.0031702158274129043,
+          "ci_upper": 0.008182830805890261,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.454183175398629,
+          "n_positive": 64,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": -0.19273755140602594,
+          "ci_lower": -0.20268872813321648,
+          "ci_upper": -0.18241801979020242,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -3.7813610445409704,
+          "n_positive": 0,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": -0.19305402630319202,
+          "ci_lower": -0.2031513087839509,
+          "ci_upper": -0.18262535199367752,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -3.7512808659948624,
+          "n_positive": 0,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.005975782871246338,
+          "ci_lower": -0.008363400981761516,
+          "ci_upper": -0.0036082561981553834,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.5061911977755049,
+          "n_positive": 32,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.013205390113095444,
+          "ci_lower": 0.010688854839342336,
+          "ci_upper": 0.0157264767990758,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0522641349752457,
+          "n_positive": 83,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.042903115041553974,
+          "ci_lower": 0.03523968318477273,
+          "ci_upper": 0.05062648636909822,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0994789723831868,
+          "n_positive": 86,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.04374308635791141,
+          "ci_lower": 0.03597901989705861,
+          "ci_upper": 0.05162264886312186,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.1046307605207388,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.012365418796737984,
+          "ci_lower": -0.014722890065362055,
+          "ci_upper": -0.009979267472711705,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.043004663387096,
+          "n_positive": 12,
+          "n_pairs": 96
+        }
+      }
+    },
+    "2": {
+      "harmful": {
+        "system": {
+          "delta": 0.11585838495132823,
+          "ci_lower": 0.10507340588374063,
+          "ci_upper": 0.12664093549052874,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.1443258397553544,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.13463969016447663,
+          "ci_lower": 0.10902476876120394,
+          "ci_upper": 0.15956108416624673,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0433521306367446,
+          "n_positive": 82,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.13958354317583144,
+          "ci_lower": 0.11269786893972196,
+          "ci_upper": 0.16560287385752112,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0352459496740696,
+          "n_positive": 80,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.11091453193997342,
+          "ci_lower": -0.12110803183168173,
+          "ci_upper": -0.10052136700833217,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -2.1777781422546987,
+          "n_positive": 1,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.027303801771874234,
+          "ci_lower": 0.015738704117635886,
+          "ci_upper": 0.038892584523030856,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.462897472130736,
+          "n_positive": 67,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.10745667844700317,
+          "ci_lower": 0.08255198973347434,
+          "ci_upper": 0.1317258430664272,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.866556121349958,
+          "n_positive": 80,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.10977372232203682,
+          "ci_lower": 0.0852084819751326,
+          "ci_upper": 0.13396236100428116,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.8912693812991239,
+          "n_positive": 83,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.024986757974450782,
+          "ci_lower": -0.03722220420798597,
+          "ci_upper": -0.0126530452456791,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.404171545442311,
+          "n_positive": 30,
+          "n_pairs": 96
+        }
+      }
+    },
+    "4": {
+      "harmful": {
+        "system": {
+          "delta": 0.3731403785447278,
+          "ci_lower": 0.3561317232126991,
+          "ci_upper": 0.38944048893948396,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 4.441258347537547,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.3255131517847376,
+          "ci_lower": 0.27285745839277903,
+          "ci_upper": 0.37915205825120213,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.2252530921826217,
+          "n_positive": 85,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.39335767800609256,
+          "ci_lower": 0.34062139578163625,
+          "ci_upper": 0.4469312734281023,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4816830273719597,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.30529585232337314,
+          "ci_lower": -0.3213826096306244,
+          "ci_upper": -0.28837997519100705,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -3.703063181912212,
+          "n_positive": 0,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.06423144787549973,
+          "ci_lower": 0.0505868174135685,
+          "ci_upper": 0.07821666092301408,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.914643059251772,
+          "n_positive": 78,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.26700470720728237,
+          "ci_lower": 0.23185640818749867,
+          "ci_upper": 0.3026362077333033,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.502473054832707,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.26449351261059445,
+          "ci_lower": 0.22906996936847768,
+          "ci_upper": 0.3001410243411859,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.489156719043795,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.06674264247218764,
+          "ci_lower": -0.08058292111381889,
+          "ci_upper": -0.05321883462990326,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.9560084585898726,
+          "n_positive": 17,
+          "n_pairs": 96
+        }
+      }
+    },
+    "6": {
+      "harmful": {
+        "system": {
+          "delta": 0.8005157262086868,
+          "ci_lower": 0.7664341824750105,
+          "ci_upper": 0.833866170545419,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 4.67928154421883,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 1.3135672211647034,
+          "ci_lower": 1.2144179115692775,
+          "ci_upper": 1.4144543933371703,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.62321629309311,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 1.4244121412436161,
+          "ci_lower": 1.325401721149683,
+          "ci_upper": 1.5241923882315556,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.8268188484773873,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.6896708061297734,
+          "ci_lower": -0.723249255741636,
+          "ci_upper": -0.6558635278294483,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -4.078033236834806,
+          "n_positive": 0,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.09651799996693933,
+          "ci_lower": 0.07289926384886107,
+          "ci_upper": 0.11943694353103636,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.803763260796066,
+          "n_positive": 74,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.4118798325459162,
+          "ci_lower": 0.34752606935799124,
+          "ci_upper": 0.47785867316027464,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.283903184222061,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.40855227410793304,
+          "ci_lower": 0.34509790589412054,
+          "ci_upper": 0.47131981539229556,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3144283458494468,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.09984555840492249,
+          "ci_lower": -0.12834448280433813,
+          "ci_upper": -0.0708381038159132,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.6834605361581365,
+          "n_positive": 21,
+          "n_pairs": 96
+        }
+      }
+    },
+    "8": {
+      "harmful": {
+        "system": {
+          "delta": 1.1560060267026229,
+          "ci_lower": 1.0928797841304914,
+          "ci_upper": 1.2192163560772316,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 3.5960091003933283,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 1.696040554282566,
+          "ci_lower": 1.5284343350523462,
+          "ci_upper": 1.864195463969372,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.0170190097476466,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 1.8660990803812942,
+          "ci_lower": 1.6991240312422935,
+          "ci_upper": 2.033029245732662,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.2271714843900905,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.9859475071231525,
+          "ci_lower": -1.0487838856565455,
+          "ci_upper": -0.9232198131270708,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -3.081217147299859,
+          "n_positive": 0,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.27060857911904657,
+          "ci_lower": 0.2273201526142657,
+          "ci_upper": 0.31323811520511907,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.2462771207707237,
+          "n_positive": 88,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 0.8229694589972497,
+          "ci_lower": 0.7103968059644103,
+          "ci_upper": 0.9371487125443915,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4450975380633,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 0.8246823971470196,
+          "ci_lower": 0.7126472254283727,
+          "ci_upper": 0.9368735378918546,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4741428698896937,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.2688956384857496,
+          "ci_lower": -0.31393392191578945,
+          "ci_upper": -0.22327781279260916,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.1670412923506204,
+          "n_positive": 9,
+          "n_pairs": 96
+        }
+      }
+    },
+    "10": {
+      "harmful": {
+        "system": {
+          "delta": 1.6625577105830112,
+          "ci_lower": 1.4769790593612317,
+          "ci_upper": 1.844673197863934,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8557523454455882,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 2.364872852340341,
+          "ci_lower": 2.0220566550192114,
+          "ci_upper": 2.707557321673569,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4089023593994037,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 2.466021810347835,
+          "ci_lower": 2.1224226003279907,
+          "ci_upper": 2.810449423175305,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4635115583228073,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -1.56140873581171,
+          "ci_lower": -1.7432974621653556,
+          "ci_upper": -1.3800555928299827,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.758896603526524,
+          "n_positive": 4,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 0.9418322903414568,
+          "ci_lower": 0.817797865252942,
+          "ci_upper": 1.067648901666204,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4955135662780583,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 1.8899839197595913,
+          "ci_lower": 1.6549244814241926,
+          "ci_upper": 2.1291386825342973,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.5894430984853818,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 1.9033235982060432,
+          "ci_lower": 1.6651510011404753,
+          "ci_upper": 2.1443481729676326,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.591382608553068,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -0.9284926156202953,
+          "ci_lower": -1.0530424234767755,
+          "ci_upper": -0.8052484456449751,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.4936830654656492,
+          "n_positive": 7,
+          "n_pairs": 96
+        }
+      }
+    },
+    "12": {
+      "harmful": {
+        "system": {
+          "delta": 2.835481288532416,
+          "ci_lower": 2.597605614674588,
+          "ci_upper": 3.07492837656755,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.401463746770761,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 4.0245510675013065,
+          "ci_lower": 3.5393341923831034,
+          "ci_upper": 4.522971839574166,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.672232274969851,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 4.1167085800940795,
+          "ci_lower": 3.6259779824099194,
+          "ci_upper": 4.619628196023404,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7015415814637571,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -2.743323766936858,
+          "ci_lower": -2.9817922176793217,
+          "ci_upper": -2.506306200505545,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -2.357357880790548,
+          "n_positive": 0,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 1.3130421141783395,
+          "ci_lower": 1.1289580968829493,
+          "ci_upper": 1.5017693969731527,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4029424496366514,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 2.9935623196264105,
+          "ci_lower": 2.629835324905192,
+          "ci_upper": 3.3635649839260924,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.5969969889967432,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 3.0362590346485376,
+          "ci_lower": 2.668331058913221,
+          "ci_upper": 3.413108947795505,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.6024822664964773,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -1.2703454351673522,
+          "ci_lower": -1.4518691195330273,
+          "ci_upper": -1.0891122613412638,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.3827937238463035,
+          "n_positive": 7,
+          "n_pairs": 96
+        }
+      }
+    },
+    "14": {
+      "harmful": {
+        "system": {
+          "delta": 3.451000371327003,
+          "ci_lower": 3.0486496358178554,
+          "ci_upper": 3.8581258428438256,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7347949762289443,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 3.5065226120253405,
+          "ci_lower": 2.7526200617974004,
+          "ci_upper": 4.27833693777211,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.9365138954478467,
+          "n_positive": 81,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 3.8523034068445368,
+          "ci_lower": 3.0930023986535766,
+          "ci_upper": 4.633848002599552,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0164933180308853,
+          "n_positive": 83,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -3.1052195094525814,
+          "ci_lower": -3.5002738477662203,
+          "ci_upper": -2.7162265888880937,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.6063649186462439,
+          "n_positive": 5,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 2.3707591922332845,
+          "ci_lower": 2.035470397165045,
+          "ci_upper": 2.708973929751664,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4088715503945577,
+          "n_positive": 88,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 4.7185994392881785,
+          "ci_lower": 4.130632216266046,
+          "ci_upper": 5.310365266989296,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.5797902798533268,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 4.826414008314411,
+          "ci_lower": 4.222654031480974,
+          "ci_upper": 5.429125635745004,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.5825519796176508,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -2.262944584091504,
+          "ci_lower": -2.587549994358172,
+          "ci_upper": -1.9365062874741852,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.395523126291671,
+          "n_positive": 6,
+          "n_pairs": 96
+        }
+      }
+    },
+    "16": {
+      "harmful": {
+        "system": {
+          "delta": 6.151420852790276,
+          "ci_lower": 5.35278561366722,
+          "ci_upper": 6.937844498548657,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.5742899055450745,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 9.957206327468157,
+          "ci_lower": 8.404000145072738,
+          "ci_upper": 11.515311465288201,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3096910927949512,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 10.33098350589474,
+          "ci_lower": 8.736672304353368,
+          "ci_upper": 11.92898528203368,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3226881188550317,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -5.777643671880165,
+          "ci_lower": -6.5257491490493225,
+          "ci_upper": -5.014750854081163,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.5400576169869584,
+          "n_positive": 6,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 5.0392798123260345,
+          "ci_lower": 4.266050860937685,
+          "ci_upper": 5.7937294105378285,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3211884655201385,
+          "n_positive": 88,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 10.798939357201258,
+          "ci_lower": 9.46507570138201,
+          "ci_upper": 12.083205399724344,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.627524780187098,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 11.120674250026545,
+          "ci_lower": 9.741767993103712,
+          "ci_upper": 12.452413833886382,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.6252653547302525,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -4.717544866104921,
+          "ci_lower": -5.446504824919005,
+          "ci_upper": -3.973720721093317,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.2825392128858664,
+          "n_positive": 7,
+          "n_pairs": 96
+        }
+      }
+    },
+    "18": {
+      "harmful": {
+        "system": {
+          "delta": 8.11691448527078,
+          "ci_lower": 7.195228639415776,
+          "ci_upper": 9.045472281131271,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7840880152989897,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 17.614707668001454,
+          "ci_lower": 15.735360668133945,
+          "ci_upper": 19.37674427628517,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.9564541513815643,
+          "n_positive": 91,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 18.608134953305125,
+          "ci_lower": 16.680059437469268,
+          "ci_upper": 20.436320230333756,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.9908413484552008,
+          "n_positive": 91,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -7.123487253983818,
+          "ci_lower": -8.031487707731625,
+          "ci_upper": -6.209994813861946,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.5959650584950724,
+          "n_positive": 9,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 6.124263184145094,
+          "ci_lower": 4.9850886890199035,
+          "ci_upper": 7.311863358753422,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.0548311729415571,
+          "n_positive": 77,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 15.724837459623815,
+          "ci_lower": 13.831227664758142,
+          "ci_upper": 17.596240590745584,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.6932714900232433,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 16.47935310999552,
+          "ci_lower": 14.523560960482186,
+          "ci_upper": 18.408293516328555,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7103320079636042,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -5.369747502108414,
+          "ci_lower": -6.533088910890122,
+          "ci_upper": -4.245819022320213,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.9417305458931589,
+          "n_positive": 21,
+          "n_pairs": 96
+        }
+      }
+    },
+    "20": {
+      "harmful": {
+        "system": {
+          "delta": 9.739582069218159,
+          "ci_lower": 8.478619384051612,
+          "ci_upper": 11.036576032297065,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.538875158416424,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 28.274697722246252,
+          "ci_lower": 25.94831040877228,
+          "ci_upper": 30.517502336173006,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.515900419062392,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 29.85079145307342,
+          "ci_lower": 27.428725517044466,
+          "ci_upper": 32.19310955526307,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.540665997245751,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -8.163488335907463,
+          "ci_lower": -9.5610366480425,
+          "ci_upper": -6.80362839937831,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.1913006508276704,
+          "n_positive": 9,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 4.0251977766553555,
+          "ci_lower": 2.2623240146475547,
+          "ci_upper": 5.85810108811905,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.4515822271468759,
+          "n_positive": 63,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 20.561670732994873,
+          "ci_lower": 17.983831942174582,
+          "ci_upper": 23.299967920035126,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.566674303009248,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 22.39748191088438,
+          "ci_lower": 19.6599166049622,
+          "ci_upper": 25.234145453417053,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.6295101670254324,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -2.1893863913913556,
+          "ci_lower": -4.042381063103676,
+          "ci_upper": -0.3489058260185067,
+          "p_permutation": 0.0202,
+          "cohens_d_paired": -0.23979790121586686,
+          "n_positive": 37,
+          "n_pairs": 96
+        }
+      }
+    },
+    "22": {
+      "harmful": {
+        "system": {
+          "delta": 12.07521372164289,
+          "ci_lower": 10.508113773881147,
+          "ci_upper": 13.739539654987553,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.506527319815529,
+          "n_positive": 88,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 37.31402101740241,
+          "ci_lower": 34.58576148642848,
+          "ci_upper": 39.91970385238528,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.8325173974939295,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 38.87426381185651,
+          "ci_lower": 36.01268929553528,
+          "ci_upper": 41.57270265165717,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.8239562174287776,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -10.51497102777163,
+          "ci_lower": -12.312684502700964,
+          "ci_upper": -8.825183640420436,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.2168393501578492,
+          "n_positive": 13,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 5.683921391765277,
+          "ci_lower": 3.217894628768166,
+          "ci_upper": 8.236630363389844,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.4651224575522372,
+          "n_positive": 64,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 25.221324130892754,
+          "ci_lower": 22.10675563874344,
+          "ci_upper": 28.451407776152095,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.6114406457060173,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 27.488900497555733,
+          "ci_lower": 24.26298550417026,
+          "ci_upper": 30.847207809239624,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.690386366872307,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -3.4163448711236306,
+          "ci_lower": -5.987212300300598,
+          "ci_upper": -0.8697940774261953,
+          "p_permutation": 0.0092,
+          "cohens_d_paired": -0.2725839870029821,
+          "n_positive": 36,
+          "n_pairs": 96
+        }
+      }
+    },
+    "24": {
+      "harmful": {
+        "system": {
+          "delta": 16.47414710869392,
+          "ci_lower": 14.386172236067555,
+          "ci_upper": 18.618832939490673,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.566405121718146,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 50.63976952433586,
+          "ci_lower": 46.81089363836994,
+          "ci_upper": 54.244805004137255,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.7647986941411062,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 51.09812667469184,
+          "ci_lower": 47.0284039499859,
+          "ci_upper": 54.838765028119084,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.649738556517631,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -16.015790641307824,
+          "ci_lower": -18.237459556758402,
+          "ci_upper": -13.860502249499161,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.4639145230803374,
+          "n_positive": 8,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 10.728955740729969,
+          "ci_lower": 7.376596044252316,
+          "ci_upper": 14.205732735370585,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.6445245967307826,
+          "n_positive": 69,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 37.18909289439519,
+          "ci_lower": 32.96752242942651,
+          "ci_upper": 41.64358254422744,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7490071614106615,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 39.54413648446401,
+          "ci_lower": 35.174927695592245,
+          "ci_upper": 44.25019004195928,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7866487734366483,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -8.373912086089454,
+          "ci_lower": -11.897058275838692,
+          "ci_upper": -4.969373470544816,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.4948439403248492,
+          "n_positive": 30,
+          "n_pairs": 96
+        }
+      }
+    },
+    "26": {
+      "harmful": {
+        "system": {
+          "delta": 28.025594328840572,
+          "ci_lower": 24.865941541145247,
+          "ci_upper": 31.16226118393242,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.7688934640079665,
+          "n_positive": 91,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 76.38257465759912,
+          "ci_lower": 70.27857319638133,
+          "ci_upper": 81.93024983455736,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.675877385973466,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 76.26752342780432,
+          "ci_lower": 70.06248359642923,
+          "ci_upper": 82.02107400782407,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.564027176981128,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -28.140645345052093,
+          "ci_lower": -31.37443799972534,
+          "ci_upper": -24.914224191506705,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.76408913764603,
+          "n_positive": 6,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 22.177340497573216,
+          "ci_lower": 17.179901131739218,
+          "ci_upper": 27.39921870703498,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.8824186636517766,
+          "n_positive": 73,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 58.724459687868745,
+          "ci_lower": 52.27089344163736,
+          "ci_upper": 65.61052461266517,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8111444575865905,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 61.13956983884175,
+          "ci_lower": 54.48495443264644,
+          "ci_upper": 68.19910299380619,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8236682910181092,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -19.762230485677726,
+          "ci_lower": -25.04265151719252,
+          "ci_upper": -14.766222304602465,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.7836951226541655,
+          "n_positive": 24,
+          "n_pairs": 96
+        }
+      }
+    },
+    "28": {
+      "harmful": {
+        "system": {
+          "delta": 38.035295416911445,
+          "ci_lower": 33.748233401527,
+          "ci_upper": 42.25924333284298,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.80856173541568,
+          "n_positive": 90,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 105.26117406288783,
+          "ci_lower": 97.33263311932484,
+          "ci_upper": 112.72224928538004,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.7696761605535585,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 104.87415603796642,
+          "ci_lower": 96.63884286880494,
+          "ci_upper": 112.56526384751001,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.660079730065035,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -38.42231233914694,
+          "ci_lower": -42.71786423722903,
+          "ci_upper": -34.19055207471053,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.8124758971766521,
+          "n_positive": 5,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 29.632962514956795,
+          "ci_lower": 23.31590219885111,
+          "ci_upper": 36.187168246756,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.9439130112942232,
+          "n_positive": 77,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 75.0799246231715,
+          "ci_lower": 66.831502866745,
+          "ci_upper": 83.6933637022972,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8272786974826598,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 78.37145400047302,
+          "ci_lower": 69.78742909133433,
+          "ci_upper": 87.2376136124134,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.843141488658183,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -26.341431945562363,
+          "ci_lower": -32.89341784417629,
+          "ci_upper": -20.072490706046434,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.8348608254789772,
+          "n_positive": 24,
+          "n_pairs": 96
+        }
+      }
+    },
+    "30": {
+      "harmful": {
+        "system": {
+          "delta": 50.0912017300725,
+          "ci_lower": 42.34634709352007,
+          "ci_upper": 57.478147321070225,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.314952989550175,
+          "n_positive": 87,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 147.13214382280907,
+          "ci_lower": 135.87915494653086,
+          "ci_upper": 157.89258931937317,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.694424859236869,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 146.41189591834944,
+          "ci_lower": 134.6807318078354,
+          "ci_upper": 157.64266158795607,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.585042004908649,
+          "n_positive": 93,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -50.81144881248474,
+          "ci_lower": -58.15525275667508,
+          "ci_upper": -43.177253836393355,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.3576441140855162,
+          "n_positive": 7,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 66.87860093514125,
+          "ci_lower": 56.16561927398047,
+          "ci_upper": 77.8434102276961,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.2474653379615948,
+          "n_positive": 88,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 113.82683531443277,
+          "ci_lower": 101.30244567592939,
+          "ci_upper": 126.82247132658956,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8123171914985006,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 119.25131193796794,
+          "ci_lower": 106.24194073279699,
+          "ci_upper": 132.87682633797328,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.8210818046235473,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -61.45412458976111,
+          "ci_lower": -72.15773578087489,
+          "ci_upper": -50.962644471724836,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.1641012980618899,
+          "n_positive": 9,
+          "n_pairs": 96
+        }
+      }
+    },
+    "32": {
+      "harmful": {
+        "system": {
+          "delta": 70.60055261353652,
+          "ci_lower": 59.41421576620391,
+          "ci_upper": 81.21948368238904,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3011917664543122,
+          "n_positive": 85,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 180.70158449808756,
+          "ci_lower": 164.27756721482922,
+          "ci_upper": 196.55564786524823,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.280023755204658,
+          "n_positive": 92,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 178.20567115147907,
+          "ci_lower": 161.51684763021765,
+          "ci_upper": 194.49314084270347,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.19612300974045,
+          "n_positive": 91,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -73.09646590550742,
+          "ci_lower": -83.53005077242851,
+          "ci_upper": -62.08521820704143,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.3761953416245358,
+          "n_positive": 9,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 105.56264355281988,
+          "ci_lower": 91.14752512685953,
+          "ci_upper": 120.61814499944448,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.4171095927623376,
+          "n_positive": 89,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 171.28074391682944,
+          "ci_lower": 153.4076786895593,
+          "ci_upper": 189.55695405602452,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.9383122465658897,
+          "n_positive": 96,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 176.5120968023936,
+          "ci_lower": 158.23475581010183,
+          "ci_upper": 195.20654401381807,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.9363641481008573,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -100.33129000663757,
+          "ci_lower": -114.99350510736306,
+          "ci_upper": -86.03281370798747,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.3766892777294122,
+          "n_positive": 7,
+          "n_pairs": 96
+        }
+      }
+    },
+    "34": {
+      "harmful": {
+        "system": {
+          "delta": 64.27006808916728,
+          "ci_lower": 45.45419567277035,
+          "ci_upper": 82.25895162175097,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 0.6967675936031721,
+          "n_positive": 80,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 166.8333134154479,
+          "ci_lower": 141.3141936098536,
+          "ci_upper": 192.20100409810738,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.3226154688386478,
+          "n_positive": 84,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 158.8043803870678,
+          "ci_lower": 133.74429742942255,
+          "ci_upper": 183.4485682489971,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.2604904671895125,
+          "n_positive": 84,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -72.29900197188061,
+          "ci_lower": -90.45508603950341,
+          "ci_upper": -53.23633187909921,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -0.7743144157305316,
+          "n_positive": 16,
+          "n_pairs": 96
+        }
+      },
+      "interaction": {
+        "system": {
+          "delta": 178.3284797668457,
+          "ci_lower": 157.7539950147271,
+          "ci_upper": 200.265512081484,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.655185468778605,
+          "n_positive": 95,
+          "n_pairs": 96
+        },
+        "tools": {
+          "delta": 259.83363286654156,
+          "ci_lower": 233.79775936603545,
+          "ci_upper": 285.87348068257165,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 2.012653928117002,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "total": {
+          "delta": 264.014297803243,
+          "ci_lower": 237.1942432383696,
+          "ci_upper": 291.24494871695833,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": 1.9839066298977144,
+          "n_positive": 94,
+          "n_pairs": 96
+        },
+        "non_additive": {
+          "delta": -174.14781761169434,
+          "ci_lower": -195.4105008761088,
+          "ci_upper": -153.5389920115471,
+          "p_permutation": 0.0002,
+          "cohens_d_paired": -1.632137675970961,
+          "n_positive": 2,
+          "n_pairs": 96
+        }
+      }
+    }
+  }
+}

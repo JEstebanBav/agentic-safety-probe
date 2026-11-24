@@ -1,0 +1,624 @@
+{
+  "per_layer": {
+    "0": {
+      "delta_p_harmful": 0.25350692868232727,
+      "delta_p_benign": 0.2336939573287964,
+      "interaction": 0.019812971353530884,
+      "interaction_p": 0.6472,
+      "interaction_cohens_d": 0.04717039270939478,
+      "interaction_ci": [
+        -0.06215315138300259,
+        0.10277650505304335
+      ],
+      "common_shift_fraction": 0.9218444582303359,
+      "is_specific": false,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 49,
+      "shift_correlation": 0.501235287238317,
+      "interaction_p_two_sample": 0.7467,
+      "interaction_ci_two_sample": [
+        -0.09835680971542994,
+        0.1375492252409458
+      ],
+      "separation_chat": 0.592025736967722,
+      "separation_agent": 0.5722127656141911,
+      "separation_loss_raw": 0.03346640207740004,
+      "cohens_d_chat": 0.6861662151388181,
+      "cohens_d_agent": 0.7090668150357834,
+      "separation_loss_standardised": -0.033374712120345595,
+      "scale_contraction": 0.9353176409159493,
+      "auroc_chat": 0.6956380208333333,
+      "auroc_agent": 0.6971571180555556
+    },
+    "2": {
+      "delta_p_harmful": 1.9408111572265625,
+      "delta_p_benign": 0.903133233388265,
+      "interaction": 1.0376779238382974,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 0.4368938146241456,
+      "interaction_ci": [
+        0.5655156274636587,
+        1.512414546807607
+      ],
+      "common_shift_fraction": 0.46533802633268606,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 61,
+      "shift_correlation": 0.636704161340067,
+      "interaction_p_two_sample": 0.0119,
+      "interaction_ci_two_sample": [
+        0.24508385658264153,
+        1.8267738799254098
+      ],
+      "separation_chat": 2.419894218444824,
+      "separation_agent": 1.3822162946065362,
+      "separation_loss_raw": 0.42881127444701483,
+      "cohens_d_chat": 0.6326392414662582,
+      "cohens_d_agent": 0.3712599846480836,
+      "separation_loss_standardised": 0.41315688260560623,
+      "scale_contraction": 0.9733244007173251,
+      "auroc_chat": 0.6743706597222222,
+      "auroc_agent": 0.6013454861111112
+    },
+    "4": {
+      "delta_p_harmful": 12.328050096829733,
+      "delta_p_benign": 10.333837469418844,
+      "interaction": 1.9942126274108887,
+      "interaction_p": 0.0005,
+      "interaction_cohens_d": 0.3730809157195123,
+      "interaction_ci": [
+        0.9395942558844887,
+        3.0631341367959974
+      ],
+      "common_shift_fraction": 0.8382377901008272,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 73,
+      "shift_correlation": 0.35080239414879494,
+      "interaction_p_two_sample": 0.0037,
+      "interaction_ci_two_sample": [
+        0.632650451858839,
+        3.2988038371006634
+      ],
+      "separation_chat": 5.384483098983772,
+      "separation_agent": 3.390270471572876,
+      "separation_loss_raw": 0.3703628724895188,
+      "cohens_d_chat": 0.9290402593931073,
+      "cohens_d_agent": 0.5776167412503601,
+      "separation_loss_standardised": 0.378265112399234,
+      "scale_contraction": 1.0127099830929696,
+      "auroc_chat": 0.743381076388889,
+      "auroc_agent": 0.6651475694444445
+    },
+    "6": {
+      "delta_p_harmful": 5.30276624361674,
+      "delta_p_benign": 2.8947246968746185,
+      "interaction": 2.4080415467421217,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 0.8181523327192551,
+      "interaction_ci": [
+        1.8234484128654005,
+        2.9801706008613102
+      ],
+      "common_shift_fraction": 0.5458895534682815,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 79,
+      "shift_correlation": 0.6668059894654482,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        1.3797040427724516,
+        3.419751223176718
+      ],
+      "separation_chat": 9.340790510177612,
+      "separation_agent": 6.93274896343549,
+      "separation_loss_raw": 0.2577984747777342,
+      "cohens_d_chat": 1.184331371931955,
+      "cohens_d_agent": 0.9321153810198092,
+      "separation_loss_standardised": 0.21296066024217142,
+      "scale_contraction": 0.9430297670388885,
+      "auroc_chat": 0.8083767361111112,
+      "auroc_agent": 0.7508680555555556
+    },
+    "8": {
+      "delta_p_harmful": 13.674291769663492,
+      "delta_p_benign": 9.698996305465698,
+      "interaction": 3.975295464197794,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 0.8836460477751987,
+      "interaction_ci": [
+        3.0589107950528467,
+        4.873834639787674
+      ],
+      "common_shift_fraction": 0.7092869209492068,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 83,
+      "shift_correlation": 0.6983723633809087,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        2.340469978253047,
+        5.594099881251653
+      ],
+      "separation_chat": 17.055516044298813,
+      "separation_agent": 13.080220580101013,
+      "separation_loss_raw": 0.23307975284199223,
+      "cohens_d_chat": 1.6196254874367286,
+      "cohens_d_agent": 1.354364322592217,
+      "separation_loss_standardised": 0.163779322381696,
+      "scale_contraction": 0.9171266242092035,
+      "auroc_chat": 0.8736979166666667,
+      "auroc_agent": 0.8311631944444445
+    },
+    "10": {
+      "delta_p_harmful": 41.70634651184082,
+      "delta_p_benign": 28.64127469062805,
+      "interaction": 13.065071821212769,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 1.0002767908578765,
+      "interaction_ci": [
+        10.532740104198457,
+        15.648358611265817
+      ],
+      "common_shift_fraction": 0.6867366021259265,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 82,
+      "shift_correlation": 0.572840210753044,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        9.241110216081141,
+        16.818369666735332
+      ],
+      "separation_chat": 40.71503559748332,
+      "separation_agent": 27.649963776270546,
+      "separation_loss_raw": 0.32089059065001413,
+      "cohens_d_chat": 1.8440460773067506,
+      "cohens_d_agent": 1.7429419337862797,
+      "separation_loss_standardised": 0.05482734122790178,
+      "scale_contraction": 0.7185030195776473,
+      "auroc_chat": 0.9216579861111112,
+      "auroc_agent": 0.9161241319444445
+    },
+    "12": {
+      "delta_p_harmful": 35.829896211624146,
+      "delta_p_benign": 21.355352242787678,
+      "interaction": 14.474543968836468,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 0.5077742693944031,
+      "interaction_ci": [
+        8.810394968589147,
+        20.18475173513095
+      ],
+      "common_shift_fraction": 0.5960204884952875,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 71,
+      "shift_correlation": 0.42291662488989085,
+      "interaction_p_two_sample": 0.0004,
+      "interaction_ci_two_sample": [
+        6.903448077042896,
+        21.813894901672995
+      ],
+      "separation_chat": 92.56965176264447,
+      "separation_agent": 78.095107793808,
+      "separation_loss_raw": 0.15636381571306202,
+      "cohens_d_chat": 1.8527829331263606,
+      "cohens_d_agent": 1.816141922191682,
+      "separation_loss_standardised": 0.019776202748614025,
+      "scale_contraction": 0.8606567057977483,
+      "auroc_chat": 0.9048394097222222,
+      "auroc_agent": 0.9267578125
+    },
+    "14": {
+      "delta_p_harmful": 33.59767746925354,
+      "delta_p_benign": -5.380579034487407,
+      "interaction": 38.978256503740944,
+      "interaction_p": 0.0001,
+      "interaction_cohens_d": 0.7854562160533838,
+      "interaction_ci": [
+        29.07653413414955,
+        48.89628982891638
+      ],
+      "common_shift_fraction": -0.16014735064384647,
+      "is_specific": true,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 79,
+      "shift_correlation": 0.4789642532465035,
+      "interaction_p_two_sample": 0.0,
+      "interaction_ci_two_sample": [
+        25.53315518548091,
+        52.051052676637966
+      ],
+      "separation_chat": 156.76892747481665,
+      "separation_agent": 117.7906709710757,
+      "separation_loss_raw": 0.24863509071338397,
+      "cohens_d_chat": 1.9039956115114889,
+      "cohens_d_agent": 1.7798941341193983,
+      "separation_loss_standardised": 0.06517949760061292,
+      "scale_contraction": 0.8037531348083414,
+      "auroc_chat": 0.9114583333333334,
+      "auroc_agent": 0.9116753472222222
+    },
+    "16": {
+      "delta_p_harmful": 109.65680209795634,
+      "delta_p_benign": 103.33827137947083,
+      "interaction": 6.318530718485519,
+      "interaction_p": 0.5305,
+      "interaction_cohens_d": 0.06470468251060496,
+      "interaction_ci": [
+        -13.052745642264682,
+        26.188327189286525
+      ],
+      "common_shift_fraction": 0.9423790353393565,
+      "is_specific": false,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 51,
+      "shift_correlation": 0.3700043510971756,
+      "interaction_p_two_sample": 0.6138,
+      "interaction_ci_two_sample": [
+        -17.871008382240927,
+        30.794050606091805
+      ],
+      "separation_chat": 256.0726351737976,
+      "separation_agent": 249.75410445531207,
+      "separation_loss_raw": 0.0246747596212189,
+      "cohens_d_chat": 1.9802020113855208,
+      "cohens_d_agent": 2.082124537673042,
+      "separation_loss_standardised": -0.05147077202300565,
+      "scale_contraction": 0.9275818846607383,
+      "auroc_chat": 0.9131944444444444,
+      "auroc_agent": 0.9329427083333334
+    },
+    "18": {
+      "delta_p_harmful": 31.92992130915324,
+      "delta_p_benign": 34.66625086466471,
+      "interaction": -2.736329555511471,
+      "interaction_p": 0.8588,
+      "interaction_cohens_d": -0.019186981686785714,
+      "interaction_ci": [
+        -30.746618847052254,
+        26.298823300997416
+      ],
+      "common_shift_fraction": 1.085697973666069,
+      "is_specific": false,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 54,
+      "shift_correlation": 0.32321112234723864,
+      "interaction_p_two_sample": 0.8756,
+      "interaction_ci_two_sample": [
+        -37.002604333559674,
+        30.834083207448316
+      ],
+      "separation_chat": 345.0942870775858,
+      "separation_agent": 347.8306166330974,
+      "separation_loss_raw": -0.007929222992023588,
+      "cohens_d_chat": 2.0141026034690515,
+      "cohens_d_agent": 2.1064311470571484,
+      "separation_loss_standardised": -0.04584103283967367,
+      "scale_contraction": 0.9637499307665224,
+      "auroc_chat": 0.9193793402777778,
+      "auroc_agent": 0.9383680555555556
+    },
+    "20": {
+      "delta_p_harmful": 68.20127932230632,
+      "delta_p_benign": 49.30862935384115,
+      "interaction": 18.89264996846517,
+      "interaction_p": 0.5009,
+      "interaction_cohens_d": 0.06864892814859894,
+      "interaction_ci": [
+        -35.073114649454745,
+        74.6284347852071
+      ],
+      "common_shift_fraction": 0.7229868683374385,
+      "is_specific": false,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 48,
+      "shift_correlation": 0.22646211046008136,
+      "interaction_p_two_sample": 0.5545,
+      "interaction_ci_two_sample": [
+        -43.2582524617513,
+        79.74441712697346
+      ],
+      "separation_chat": 550.6190172831218,
+      "separation_agent": 531.7263673146565,
+      "separation_loss_raw": 0.03431165538321923,
+      "cohens_d_chat": 2.085615666620449,
+      "cohens_d_agent": 1.8497011604323743,
+      "separation_loss_standardised": 0.11311504318067989,
+      "scale_contraction": 1.0888541261090696,
+      "auroc_chat": 0.9261067708333333,
+      "auroc_agent": 0.9035373263888888
+    },
+    "22": {
+      "delta_p_harmful": 69.03851668039958,
+      "delta_p_benign": 40.3105271657308,
+      "interaction": 28.727989514668785,
+      "interaction_p": 0.6595,
+      "interaction_cohens_d": 0.044725151931342064,
+      "interaction_ci": [
+        -100.98063934644063,
+        157.20037845373145
+      ],
+      "common_shift_fraction": 0.5838846067962404,
+      "is_specific": false,
+      "interaction_tested_within_pairs": true,
+      "n_pairs_interaction_positive": 49,
+      "shift_correlation": 0.11694103467048461,
+      "interaction_p_two_sample": 0.6728,
+      "interaction_ci_two_sample": [
+        -106.7608252565066,
+        163.64060155550624
+      ],
+      "separation_chat": 797.6298473676046,
+      "separation_agent": 768.9018578529358,
+      "separation_loss_raw": 0.036016693218638984,
+      "cohens_d_chat": 1.599791750016057,
+      "cohens_d_agent": 1.444446047028697,
+      "separation_loss_standardised": 0.09710370301997162,
+      "scale_contraction": 1.0676567286914942,
+      "auroc_chat": 0.8838975694444444,
+      "auroc_agent": 0.847873263888889
+    }
+  },
+  "by_stratum_skipped": "no explicitness labels in the corpus",
+  "held_out": {
+    "per_layer": {
+      "0": {
+        "delta_p_harmful": 0.08499763324772691,
+        "delta_p_benign": 0.1308167130782133,
+        "interaction": -0.04581907983048639,
+        "interaction_p": 0.5771,
+        "interaction_ci": [
+          -0.2046419087505316,
+          0.11453000898068856
+        ],
+        "common_shift_fraction": 1.5390630077539451,
+        "is_specific": false,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 44,
+        "separation_loss_raw": -0.3533098589604591,
+        "separation_loss_standardised": -0.2979434168500754,
+        "cohens_d_chat": 0.014440056679948278,
+        "cohens_d_agent": 0.018742376506680824,
+        "scale_contraction": 1.0426570537602864,
+        "auroc_chat": 0.5202907986111112,
+        "auroc_agent": 0.5163845486111112
+      },
+      "2": {
+        "delta_p_harmful": 1.6946107285227654,
+        "delta_p_benign": 1.1926167276930435,
+        "interaction": 0.5019940008297219,
+        "interaction_p": 0.0312,
+        "interaction_ci": [
+          0.05127390198940306,
+          0.9518086705081735
+        ],
+        "common_shift_fraction": 0.7037703158722932,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 55,
+        "separation_loss_raw": 0.35840076735536575,
+        "separation_loss_standardised": 0.3727450196428782,
+        "cohens_d_chat": 0.09372639234822915,
+        "cohens_d_agent": 0.05879034639133236,
+        "scale_contraction": 1.0228682955683281,
+        "auroc_chat": 0.5294053819444444,
+        "auroc_agent": 0.5195312500000001
+      },
+      "4": {
+        "delta_p_harmful": 11.713100684816963,
+        "delta_p_benign": 10.48767619127004,
+        "interaction": 1.2254244935469227,
+        "interaction_p": 0.0297,
+        "interaction_ci": [
+          0.13443918599621382,
+          2.3333343010325613
+        ],
+        "common_shift_fraction": 0.8953800085458693,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 65,
+        "separation_loss_raw": 0.3337329191924394,
+        "separation_loss_standardised": 0.36367148430483454,
+        "cohens_d_chat": 0.17730986613731053,
+        "cohens_d_agent": 0.1128273239372633,
+        "scale_contraction": 1.0470489132169227,
+        "auroc_chat": 0.5745442708333333,
+        "auroc_agent": 0.5473090277777778
+      },
+      "6": {
+        "delta_p_harmful": 4.677502206273066,
+        "delta_p_benign": 3.115736180205257,
+        "interaction": 1.5617660260678088,
+        "interaction_p": 0.0001,
+        "interaction_ci": [
+          0.9866346451744183,
+          2.150508513896634
+        ],
+        "common_shift_fraction": 0.6661111086226102,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 74,
+        "separation_loss_raw": 0.22638222628619353,
+        "separation_loss_standardised": 0.20898201310157516,
+        "cohens_d_chat": 0.14294168613539127,
+        "cohens_d_agent": 0.11306944481068369,
+        "scale_contraction": 0.9780027591371917,
+        "auroc_chat": 0.5736762152777778,
+        "auroc_agent": 0.5603298611111112
+      },
+      "8": {
+        "delta_p_harmful": 12.62443004138771,
+        "delta_p_benign": 9.886936370487467,
+        "interaction": 2.7374936709002426,
+        "interaction_p": 0.0001,
+        "interaction_ci": [
+          1.8411771162554589,
+          3.6120619031165573
+        ],
+        "common_shift_fraction": 0.7831590288095628,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 70,
+        "separation_loss_raw": 0.1926985567714976,
+        "separation_loss_standardised": 0.18900376500062688,
+        "cohens_d_chat": 0.40374368561862595,
+        "cohens_d_agent": 0.3274346089414762,
+        "scale_contraction": 0.9954441320299425,
+        "auroc_chat": 0.633029513888889,
+        "auroc_agent": 0.6196831597222223
+      },
+      "10": {
+        "delta_p_harmful": 39.201756439068085,
+        "delta_p_benign": 29.128615396760214,
+        "interaction": 10.07314104230787,
+        "interaction_p": 0.0001,
+        "interaction_ci": [
+          7.1373007708667995,
+          12.986264501868432
+        ],
+        "common_shift_fraction": 0.7430436297423378,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 75,
+        "separation_loss_raw": 0.2864140341808685,
+        "separation_loss_standardised": 0.21395356072175142,
+        "cohens_d_chat": 0.7817034059340332,
+        "cohens_d_agent": 0.6144551788061261,
+        "scale_contraction": 0.9078165489488755,
+        "auroc_chat": 0.7061631944444445,
+        "auroc_agent": 0.691623263888889
+      },
+      "12": {
+        "delta_p_harmful": 34.26911678703445,
+        "delta_p_benign": 22.404353827592285,
+        "interaction": 11.864762959442164,
+        "interaction_p": 0.0001,
+        "interaction_ci": [
+          6.360449708551901,
+          17.43201243349749
+        ],
+        "common_shift_fraction": 0.6537768092135033,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 68,
+        "separation_loss_raw": 0.1352475565661675,
+        "separation_loss_standardised": 0.05040471304948546,
+        "cohens_d_chat": 1.4619055535535508,
+        "cohens_d_agent": 1.3882186236212348,
+        "scale_contraction": 0.9106536809074292,
+        "auroc_chat": 0.8473307291666667,
+        "auroc_agent": 0.8346354166666667
+      },
+      "14": {
+        "delta_p_harmful": 31.52191103506478,
+        "delta_p_benign": -3.819126583301667,
+        "interaction": 35.34103761836644,
+        "interaction_p": 0.0001,
+        "interaction_ci": [
+          25.668810053751045,
+          45.11104346479071
+        ],
+        "common_shift_fraction": -0.1211578377673008,
+        "is_specific": true,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 77,
+        "separation_loss_raw": 0.23572762818259552,
+        "separation_loss_standardised": 0.10851700420168797,
+        "cohens_d_chat": 1.667920748063444,
+        "cohens_d_agent": 1.4869229852377606,
+        "scale_contraction": 0.8573044863665717,
+        "auroc_chat": 0.8850911458333334,
+        "auroc_agent": 0.8492838541666666
+      },
+      "16": {
+        "delta_p_harmful": 106.1053860283331,
+        "delta_p_benign": 106.41745315054023,
+        "interaction": -0.3120671222071252,
+        "interaction_p": 0.9735,
+        "interaction_ci": [
+          -19.346754519224998,
+          19.391277887208616
+        ],
+        "common_shift_fraction": 1.0029411053848274,
+        "is_specific": false,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 46,
+        "separation_loss_raw": -0.001274059340153677,
+        "separation_loss_standardised": -0.04217195620374303,
+        "cohens_d_chat": 1.7868587579428676,
+        "cohens_d_agent": 1.8622140872251087,
+        "scale_contraction": 0.9607570548985355,
+        "auroc_chat": 0.8953993055555556,
+        "auroc_agent": 0.8995225694444445
+      },
+      "18": {
+        "delta_p_harmful": 28.639313732882513,
+        "delta_p_benign": 44.301789907054136,
+        "interaction": -15.662476174171623,
+        "interaction_p": 0.281,
+        "interaction_ci": [
+          -43.09996502242666,
+          13.241474118452755
+        ],
+        "common_shift_fraction": 1.5468872725182865,
+        "is_specific": false,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 50,
+        "separation_loss_raw": -0.048543153681599005,
+        "separation_loss_standardised": -0.03289792570214445,
+        "cohens_d_chat": 1.657020843820591,
+        "cohens_d_agent": 1.7115333924275054,
+        "scale_contraction": 1.0151469255481556,
+        "auroc_chat": 0.8805338541666666,
+        "auroc_agent": 0.8892144097222221
+      },
+      "20": {
+        "delta_p_harmful": 59.03280569321483,
+        "delta_p_benign": 62.35402309972769,
+        "interaction": -3.321217406512858,
+        "interaction_p": 0.9062,
+        "interaction_ci": [
+          -57.60319084850373,
+          51.6961703843188
+        ],
+        "common_shift_fraction": 1.0562605379756598,
+        "is_specific": false,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 44,
+        "separation_loss_raw": -0.006490910696584917,
+        "separation_loss_standardised": 0.037215486446317114,
+        "cohens_d_chat": 1.4021099308689093,
+        "cohens_d_agent": 1.3499297277404108,
+        "scale_contraction": 1.0453958248472235,
+        "auroc_chat": 0.8337673611111112,
+        "auroc_agent": 0.837131076388889
+      },
+      "22": {
+        "delta_p_harmful": 57.529735909064904,
+        "delta_p_benign": 77.33872614571813,
+        "interaction": -19.808990236653223,
+        "interaction_p": 0.7485,
+        "interaction_ci": [
+          -142.7324876808156,
+          102.11018683974551
+        ],
+        "common_shift_fraction": 1.3443261110734899,
+        "is_specific": false,
+        "interaction_tested_within_pairs": true,
+        "n_pairs_interaction_positive": 48,
+        "separation_loss_raw": -0.027290678519719558,
+        "separation_loss_standardised": -0.002525656807738752,
+        "cohens_d_chat": 1.192739457173898,
+        "cohens_d_agent": 1.195751907703768,
+        "scale_contraction": 1.0247026313429604,
+        "auroc_chat": 0.8006727430555556,
+        "auroc_agent": 0.8024088541666666
+      }
+    },
+    "by_stratum": []
+  },
+  "best_layer": 16,
+  "by_stratum": []
+}
