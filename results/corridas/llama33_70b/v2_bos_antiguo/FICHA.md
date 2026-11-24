@@ -1,6 +1,6 @@
 # Ficha · Llama-3.3-70B · V2 · token inicial antiguo (solo log)
 
-> Generada por `scripts/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
+> Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
 ## Identificación
 

@@ -1,6 +1,6 @@
 # Ficha · Qwen3-8B · V2 (96 pares)
 
-> Generada por `scripts/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
+> Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
 ## Identificación
 

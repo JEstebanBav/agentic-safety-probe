@@ -1,4 +1,4 @@
-# Ficha · v1
+# Ficha · Muse-Glimmer-30B · V1 (corpus v0.3)
 
 > Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
@@ -6,11 +6,11 @@
 
 | | |
 |---|---|
-| Carpeta | `results/v1/` |
-| Tipo | no registrado |
-| Fecha | 2026-11-24 (fecha del archivo results.json) |
-| Carpeta anterior | no registrado |
-| Relación con otras versiones | no registrado |
+| Carpeta | `results/corridas/muse_glimmer_30b/v1/` |
+| Tipo | corrida principal |
+| Fecha | 2026-11-24 (inicio de la corrida, UTC, según run_manifest.json) |
+| Carpeta anterior | `/workspace/out/corridas/muse_glimmer_30b/v1 (pod RunPod 1× H200)` |
+| Relación con otras versiones | Primera corrida del modelo. Corpus v0.3, BF16 (su precisión nativa). |
 | Citada en | no |
 
 ## El modelo en esta corrida
@@ -18,14 +18,14 @@
 | | |
 |---|---|
 | Modelo | `meta-models/Muse-Glimmer-30B` |
-| Parámetros | no registrado |
+| Parámetros | 29.80 mil millones |
 | Arquitectura | muse_glimmer, 52 capas, dimensión 6656 |
 | Precisión de carga | BF16, forzado con --no-quantize |
 | Memoria ocupada | 59.6 GB |
 | Posición de lectura | último token del prompt (cabecera del asistente), antes de generar |
 | Capas analizadas | 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50 |
 | Capa de referencia (máximo ΔP) | 50 |
-| Capa por selección en muestra dividida | no registrado |
+| Capa por selección en muestra dividida | 50 |
 
 Longitud de los prompts (tokens):
 
@@ -74,6 +74,8 @@ Longitud de los prompts (tokens):
 | Semilla | `42` |
 | Carpeta de salida original | `/workspace/out/corridas/muse_glimmer_30b/v1` |
 
+Duración registrada: 31685.2s (528.1 min).
+
 ## Etapas ejecutadas
 
 - [x] Activaciones guardadas (activations.npz, solo local)
@@ -116,6 +118,14 @@ Test causal (dosis en unidades del ΔP medido):
 | 50 | ×2 | 4/20 | 3/20 | 1/95 |
 | 50 | ×4 | 5/20 | 1/20 | 2/95 |
 
+## Notas
+
+- Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.
+- Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles y esfuerzo de razonamiento «high», su valor por defecto. Línea base: 0/384 respuestas incompletas (0 cortadas por bucle), etiquetadas aparte de las negativas.
+- La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.
+- El test causal corrió en la capa de máximo ΔP (50) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.
+- Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus.
+
 ## Archivos
 
 - `activations.npz`
@@ -125,6 +135,7 @@ Test causal (dosis en unidades del ΔP medido):
 - `directions.npz`
 - `factorial_results.json`
 - `format_effect_results.json`
+- `rehacer_robusto.log`
 - `rendered_inputs.jsonl`
 - `results.json`
 - `robust_results.json`

@@ -1,4 +1,4 @@
-# Ficha · v1
+# Ficha · gpt-oss-20b · V1 (corpus v0.3)
 
 > Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
@@ -6,11 +6,11 @@
 
 | | |
 |---|---|
-| Carpeta | `results/v1/` |
-| Tipo | no registrado |
-| Fecha | 2026-11-24 (fecha del archivo results.json) |
-| Carpeta anterior | no registrado |
-| Relación con otras versiones | no registrado |
+| Carpeta | `results/corridas/gpt_oss_20b/v1/` |
+| Tipo | corrida principal |
+| Fecha | 2026-11-24 (inicio de la corrida, UTC, según run_manifest.json) |
+| Carpeta anterior | `/workspace/out/corridas/gpt_oss_20b/v1 (pod RunPod 1× H200)` |
+| Relación con otras versiones | Primera corrida del modelo. Corpus v0.3; cálculo en BF16 con los expertos en su formato nativo MXFP4. |
 | Citada en | no |
 
 ## El modelo en esta corrida
@@ -18,14 +18,14 @@
 | | |
 |---|---|
 | Modelo | `openai/gpt-oss-20b` |
-| Parámetros | no registrado |
+| Parámetros | 20.90 mil millones |
 | Arquitectura | gpt_oss, 24 capas, dimensión 2880 |
-| Precisión de carga | BF16, forzado con --no-quantize (pesos nativos QuantizationMethod.MXFP4) |
-| Memoria ocupada | 3.6 GB |
+| Precisión de carga | BF16, forzado con --no-quantize (pesos nativos MXFP4) |
+| Memoria ocupada | 3.6 GB sin contar los pesos que el kernel cuantizado guarda fuera de los parámetros (en gpt-oss, los expertos MXFP4): la medida de esta corrida no los ve, así que el modelo ocupaba más |
 | Posición de lectura | último token del prompt (cabecera del asistente), antes de generar |
 | Capas analizadas | 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22 |
 | Capa de referencia (máximo ΔP) | 16 |
-| Capa por selección en muestra dividida | no registrado |
+| Capa por selección en muestra dividida | 16 |
 
 Longitud de los prompts (tokens):
 
@@ -74,6 +74,8 @@ Longitud de los prompts (tokens):
 | Semilla | `42` |
 | Carpeta de salida original | `/workspace/out/corridas/gpt_oss_20b/v1` |
 
+Duración registrada: 10662.8s (177.7 min).
+
 ## Etapas ejecutadas
 
 - [x] Activaciones guardadas (activations.npz, solo local)
@@ -116,6 +118,14 @@ Test causal (dosis en unidades del ΔP medido):
 | 16 | ×2 | 3/10 | 3/10 | 9/80 |
 | 16 | ×4 | 5/10 | 1/10 | 16/80 |
 
+## Notas
+
+- Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.
+- Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles (formato harmony). Línea base: 27/384 respuestas incompletas (27 cortadas por bucle), etiquetadas aparte de las negativas.
+- La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.
+- El test causal corrió en la capa de máximo ΔP (16) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.
+- Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus.
+
 ## Archivos
 
 - `activations.npz`
@@ -125,6 +135,7 @@ Test causal (dosis en unidades del ΔP medido):
 - `directions.npz`
 - `factorial_results.json`
 - `format_effect_results.json`
+- `rehacer_robusto.log`
 - `rendered_inputs.jsonl`
 - `results.json`
 - `robust_results.json`

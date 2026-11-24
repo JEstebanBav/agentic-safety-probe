@@ -527,7 +527,7 @@ def _check_placement(model) -> None:
     dequant = (qcfg.get("dequantize") if isinstance(qcfg, dict)
                else getattr(qcfg, "dequantize", False))
     if method:
-        print(f"  Native quantization: {method}"
+        print(f"  Native quantization: {getattr(method, 'value', method)}"
               + ("  (DEQUANTIZED to the compute dtype)" if dequant else ""))
     if dequant:
         print("  WARNING: the checkpoint's quantized weights were expanded. "
@@ -628,7 +628,13 @@ def load_model_and_tokenizer(
     print(f"  Hidden dim: {hidden_dim}")
     _check_placement(model)
     print(f"  Device: {next(model.parameters()).device}")
-    print(f"  Memory: {model.get_memory_footprint() / 1e9:.2f} GB")
+    # get_memory_footprint counts parameters and buffers only; a quantized
+    # kernel can hold weights outside them (gpt-oss MXFP4 experts), so the
+    # allocator total right after loading is recorded as well.
+    if torch.cuda.is_available():
+        model._probe_loaded_gpu_gb = sum(
+            torch.cuda.memory_allocated(i) for i in range(torch.cuda.device_count())) / 1e9
+    print(f"  Memory: {_memory_gb(model):.2f} GB")
 
     return model, tokenizer
 
@@ -964,6 +970,12 @@ def encode_prompt(tokenizer, prompt: str, max_length: Optional[int] = None):
     return tokenizer(prompt, **kwargs)
 
 
+def _memory_gb(model) -> float:
+    """Weights in memory: the larger of the footprint and the GPU allocation at load."""
+    gb = model.get_memory_footprint() / 1e9
+    return max(gb, getattr(model, "_probe_loaded_gpu_gb", 0.0))
+
+
 def get_model_info(model) -> Dict:
     """Get model architecture information (language-model part)."""
     from src.architecture import text_config, decoder_layers_path
@@ -974,7 +986,9 @@ def get_model_info(model) -> Dict:
         "num_attention_heads": cfg.num_attention_heads,
         "vocab_size": cfg.vocab_size,
         "model_type": model.config.model_type,
-        "memory_gb": model.get_memory_footprint() / 1e9,
+        "memory_gb": _memory_gb(model),
+        "memory_source": ("gpu_allocated" if getattr(model, "_probe_loaded_gpu_gb", 0.0)
+                          > model.get_memory_footprint() / 1e9 else "footprint"),
         "dtype": str(getattr(model, "dtype", "")),
         "architecture": type(model).__name__,
     }
@@ -985,7 +999,8 @@ def get_model_info(model) -> Dict:
         dequant = (qcfg.get("dequantize") if isinstance(qcfg, dict)
                    else getattr(qcfg, "dequantize", False))
         if method:
-            info["native_quantization"] = str(method) + (" (dequantized)" if dequant else "")
+            info["native_quantization"] = (str(getattr(method, "value", method))
+                                           + (" (dequantized)" if dequant else ""))
     try:
         info["decoder_layers_path"] = decoder_layers_path(model)
     except ValueError:

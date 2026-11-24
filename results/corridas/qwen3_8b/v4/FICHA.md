@@ -1,4 +1,4 @@
-# Ficha · v4
+# Ficha · Qwen3-8B · V4 (corpus v0.3)
 
 > Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
@@ -6,11 +6,11 @@
 
 | | |
 |---|---|
-| Carpeta | `results/v4/` |
-| Tipo | no registrado |
-| Fecha | 2026-11-23 (fecha del archivo results.json) |
-| Carpeta anterior | no registrado |
-| Relación con otras versiones | no registrado |
+| Carpeta | `results/corridas/qwen3_8b/v4/` |
+| Tipo | corrida principal |
+| Fecha | 2026-11-23 (inicio de la corrida, UTC, según run_manifest.json) |
+| Carpeta anterior | `/workspace/out/corridas/qwen3_8b/v4 (pod RunPod 1× A40)` |
+| Relación con otras versiones | Repite V3 (pipeline actual, dataset_v2) sobre el corpus v0.3, con 4096 tokens de razonamiento en lugar de 1024: con 1024, el 31–33 % de las respuestas agénticas no terminaba. V3 no está en results/corridas. |
 | Citada en | no |
 
 ## El modelo en esta corrida
@@ -25,7 +25,7 @@
 | Posición de lectura | último token del prompt (cabecera del asistente), antes de generar |
 | Capas analizadas | 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34 |
 | Capa de referencia (máximo ΔP) | 32 |
-| Capa por selección en muestra dividida | no registrado |
+| Capa por selección en muestra dividida | 32 |
 
 Longitud de los prompts (tokens):
 
@@ -74,6 +74,8 @@ Longitud de los prompts (tokens):
 | Semilla | `42` |
 | Carpeta de salida original | `/workspace/out/corridas/qwen3_8b/v4` |
 
+Duración registrada: 58035.3s (967.3 min).
+
 ## Etapas ejecutadas
 
 - [x] Activaciones guardadas (activations.npz, solo local)
@@ -116,6 +118,14 @@ Test causal (dosis en unidades del ΔP medido):
 | 32 | ×2 | 14/71 | 7/71 | 2/93 |
 | 32 | ×4 | 22/71 | 13/71 | 5/93 |
 
+## Notas
+
+- Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.
+- Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles. Línea base: 6/384 respuestas incompletas (4 cortadas por bucle), etiquetadas aparte de las negativas.
+- La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.
+- El test causal corrió en la capa de máximo ΔP (32) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.
+- Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus.
+
 ## Archivos
 
 - `activations.npz`
@@ -125,6 +135,7 @@ Test causal (dosis en unidades del ΔP medido):
 - `directions.npz`
 - `factorial_results.json`
 - `format_effect_results.json`
+- `rehacer_robusto.log`
 - `rendered_inputs.jsonl`
 - `results.json`
 - `robust_results.json`

@@ -95,6 +95,22 @@
       "citada_en": "no",
       "uso": "Complementaria"
     },
+    "corridas/llama33_70b/v5": {
+      "etiqueta": "Llama-3.3-70B · V5 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "meta-llama/Llama-3.3-70B-Instruct",
+      "fecha": "2026-11-23 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/llama33_70b/v5 (pod RunPod 1× H200)",
+      "relacion": "Repite V4 (96 pares de dataset_v2) sobre el corpus v0.3 con los mismos flags (capas cada 4, test causal en 76, 56 y 28) y en FP16. V4 no está en results/corridas.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "Test causal en las capas 76, 56 y 28, fijadas por flag como en la versión anterior; no depende de la selección de capa.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
     "corridas/llama31_70b/v0_hackathon": {
       "etiqueta": "Llama-3.1-70B · hackathon",
       "tipo": "corrida exploratoria",
@@ -176,6 +192,22 @@
       "uso": "Tesis, desde el log",
       "notas": ["No hay results.json: las cifras salen de run.log y están redondeadas."]
     },
+    "corridas/mistral7b/v5": {
+      "etiqueta": "Mistral-7B · V5 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "fecha": "2026-11-23 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/mistral7b/v5 (pod RunPod 1× A40)",
+      "relacion": "Repite V4 (96 pares de dataset_v2) sobre el corpus v0.3, con los mismos flags y en FP16. V4 no está en results/corridas.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (30) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
     "corridas/qwen3_8b/v1": {
       "etiqueta": "Qwen3-8B · V1",
       "tipo": "corrida principal",
@@ -199,6 +231,23 @@
       "notas": [
         "Versión anterior del pipeline: sin línea base de comportamiento, test causal calibrado, factorial ni PCA, y sin activations.npz. Para tener esas etapas hay que repetirla (V3).",
         "Qwen3 razona antes de responder; esta versión del pipeline no lo manejaba. Las activaciones no se ven afectadas."
+      ]
+    },
+    "corridas/qwen3_8b/v4": {
+      "etiqueta": "Qwen3-8B · V4 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-8B",
+      "fecha": "2026-11-23 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/qwen3_8b/v4 (pod RunPod 1× A40)",
+      "relacion": "Repite V3 (pipeline actual, dataset_v2) sobre el corpus v0.3, con 4096 tokens de razonamiento en lugar de 1024: con 1024, el 31–33 % de las respuestas agénticas no terminaba. V3 no está en results/corridas.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles. Línea base: 6/384 respuestas incompletas (4 cortadas por bucle), etiquetadas aparte de las negativas.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (32) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
       ]
     },
     "corridas/qwen3_32b/v1": {
@@ -225,6 +274,91 @@
       "notas": [
         "Cargado en 4 bits (memoria ocupada 18,7 GB). Los demás modelos de la comparativa están en FP16: es una diferencia a declarar.",
         "Versión anterior del pipeline: sin línea base de comportamiento, test causal calibrado, factorial ni PCA, y sin activations.npz."
+      ]
+    },
+    "corridas/qwen3_32b/v4": {
+      "etiqueta": "Qwen3-32B · V4 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "Qwen/Qwen3-32B",
+      "fecha": "2026-11-23 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/qwen3_32b/v4 (pod RunPod 1× H200)",
+      "relacion": "Primera corrida completa de Qwen3-32B con el pipeline actual (V3 no terminó). Corpus v0.3 y FP16: V1 y V2 se cargaron en 4 bits.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles. Línea base: 3/384 respuestas incompletas (2 cortadas por bucle), etiquetadas aparte de las negativas.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (62) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
+    "corridas/gemma4_31b/v1": {
+      "etiqueta": "Gemma-4-31B-it · V1 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "google/gemma-4-31B-it",
+      "fecha": "2026-11-24 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/gemma4_31b/v1 (pod RunPod 1× H200)",
+      "relacion": "Primera corrida del modelo. Corpus v0.3, BF16 (su precisión nativa).",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razonamiento desactivado, su valor por defecto en Gemma 4.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (52) porque en el pod la selección no estaba disponible. La partición reportada elige la capa 50, en empate práctico con la 52: puntuación 15.85 frente a 15.76, ΔP cross-fit 14.29 frente a 14.29, y en las 200 particiones de estabilidad se elige la 52 el 70 % de las veces y la 50 el 30 %. Hay que declarar que el test causal no está en la capa de la partición reportada; con este empate no se justifica repetir la generación.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
+    "corridas/gpt_oss_20b/v1": {
+      "etiqueta": "gpt-oss-20b · V1 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "openai/gpt-oss-20b",
+      "fecha": "2026-11-24 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/gpt_oss_20b/v1 (pod RunPod 1× H200)",
+      "relacion": "Primera corrida del modelo. Corpus v0.3; cálculo en BF16 con los expertos en su formato nativo MXFP4.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles (formato harmony). Línea base: 27/384 respuestas incompletas (27 cortadas por bucle), etiquetadas aparte de las negativas.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (16) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
+    "corridas/gpt_oss_120b/v1": {
+      "etiqueta": "gpt-oss-120b · V1 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "openai/gpt-oss-120b",
+      "fecha": "2026-11-24 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/gpt_oss_120b/v1 (pod RunPod 1× H200)",
+      "relacion": "Primera corrida del modelo. Corpus v0.3; cálculo en BF16 con los expertos en su formato nativo MXFP4.",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles (formato harmony). Línea base: 4/384 respuestas incompletas (4 cortadas por bucle), etiquetadas aparte de las negativas.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (34) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
+      ]
+    },
+    "corridas/muse_glimmer_30b/v1": {
+      "etiqueta": "Muse-Glimmer-30B · V1 (corpus v0.3)",
+      "tipo": "corrida principal",
+      "modelo": "meta-models/Muse-Glimmer-30B",
+      "fecha": "2026-11-24 (inicio de la corrida, UTC, según run_manifest.json)",
+      "origen": "/workspace/out/corridas/muse_glimmer_30b/v1 (pod RunPod 1× H200)",
+      "relacion": "Primera corrida del modelo. Corpus v0.3, BF16 (su precisión nativa).",
+      "citada_en": "no",
+      "uso": "Comparativa del corpus v0.3",
+      "notas": [
+        "Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.",
+        "Razona antes de responder: hasta 4096 tokens de razonamiento, con corte de bucles y esfuerzo de razonamiento «high», su valor por defecto. Línea base: 0/384 respuestas incompletas (0 cortadas por bucle), etiquetadas aparte de las negativas.",
+        "La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.",
+        "El test causal corrió en la capa de máximo ΔP (50) porque en el pod la selección no estaba disponible; la selección recalculada elige la misma capa, así que el test quedó en la capa pre-registrada.",
+        "Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus."
       ]
     },
     "pruebas/llama33_70b/v2": {

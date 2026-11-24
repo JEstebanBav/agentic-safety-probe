@@ -38,6 +38,11 @@ PARAMS_B = {
     "mistralai/Mistral-7B-Instruct-v0.3": 7.25,
     "Qwen/Qwen3-8B": 8.2,
     "Qwen/Qwen3-32B": 32.8,
+    "openai/gpt-oss-20b": 20.9,           # model card; 3.6 active per token
+    "openai/gpt-oss-120b": 116.8,         # model card; 5.1 active per token
+    # Vision tower included; BF16 footprint of the run / 2 bytes.
+    "google/gemma-4-31B-it": 31.3,
+    "meta-models/Muse-Glimmer-30B": 29.8,
 }
 
 # Configuration keys shown in the parameter table, with a Spanish label.
@@ -135,6 +140,8 @@ def _precision(config: Dict, log: Dict, model_info: Dict,
     if config.get("no_quantize"):
         dtype = {"bfloat16": "BF16"}.get(config.get("dtype"), "FP16")
         native = model_info.get("native_quantization")
+        if native:  # runs before the fix stored the enum's repr
+            native = native.replace("QuantizationMethod.", "")
         return (f"{dtype}, forzado con --no-quantize"
                 + (f" (pesos nativos {native})" if native else ""))
     q = (log.get("quantize") or "").lower()
@@ -267,6 +274,20 @@ def _fmt(v, nd=3) -> str:
     return str(v)
 
 
+def _memory_text(mi: Dict) -> str:
+    if not mi.get("memory_gb"):
+        return NO
+    text = f"{mi['memory_gb']:.1f} GB"
+    native = mi.get("native_quantization") or ""
+    # Runs before memory_source existed measured get_memory_footprint, which
+    # does not see weights a quantized kernel keeps outside the parameters.
+    if native and "dequantized" not in native and not mi.get("memory_source"):
+        text += (" sin contar los pesos que el kernel cuantizado guarda fuera de "
+                 "los parámetros (en gpt-oss, los expertos MXFP4): la medida de "
+                 "esta corrida no los ve, así que el modelo ocupaba más")
+    return text
+
+
 def render(d: Dict) -> str:
     reg = d["registro"]
     mi = d["model_info"]
@@ -293,7 +314,7 @@ def render(d: Dict) -> str:
           f"| Arquitectura | " + (f"{mi.get('model_type')}, {mi.get('num_layers')} capas, "
                                   f"dimensión {mi.get('hidden_size')}" if mi else NO) + " |",
           f"| Precisión de carga | {d['precision']} |",
-          f"| Memoria ocupada | " + (f"{mi['memory_gb']:.1f} GB" if mi.get("memory_gb") else NO) + " |",
+          f"| Memoria ocupada | {_memory_text(mi)} |",
           f"| Posición de lectura | último token del prompt (cabecera del asistente), "
           f"antes de generar |",
           f"| Capas analizadas | {', '.join(map(str, d['capas'])) or NO} |",

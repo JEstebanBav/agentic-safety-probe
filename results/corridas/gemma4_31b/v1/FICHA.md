@@ -1,4 +1,4 @@
-# Ficha · v1
+# Ficha · Gemma-4-31B-it · V1 (corpus v0.3)
 
 > Generada por `scripts/analisis/generar_fichas.py` a partir de los archivos de esta carpeta y de `results/registro.json`. No la edites a mano: corrige el registro y regenera.
 
@@ -6,11 +6,11 @@
 
 | | |
 |---|---|
-| Carpeta | `results/v1/` |
-| Tipo | no registrado |
-| Fecha | 2026-11-24 (fecha del archivo results.json) |
-| Carpeta anterior | no registrado |
-| Relación con otras versiones | no registrado |
+| Carpeta | `results/corridas/gemma4_31b/v1/` |
+| Tipo | corrida principal |
+| Fecha | 2026-11-24 (inicio de la corrida, UTC, según run_manifest.json) |
+| Carpeta anterior | `/workspace/out/corridas/gemma4_31b/v1 (pod RunPod 1× H200)` |
+| Relación con otras versiones | Primera corrida del modelo. Corpus v0.3, BF16 (su precisión nativa). |
 | Citada en | no |
 
 ## El modelo en esta corrida
@@ -18,14 +18,14 @@
 | | |
 |---|---|
 | Modelo | `google/gemma-4-31B-it` |
-| Parámetros | no registrado |
+| Parámetros | 31.30 mil millones |
 | Arquitectura | gemma4, 60 capas, dimensión 5376 |
 | Precisión de carga | BF16, forzado con --no-quantize |
 | Memoria ocupada | 62.5 GB |
 | Posición de lectura | último token del prompt (cabecera del asistente), antes de generar |
 | Capas analizadas | 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58 |
 | Capa de referencia (máximo ΔP) | 52 |
-| Capa por selección en muestra dividida | no registrado |
+| Capa por selección en muestra dividida | 50 |
 
 Longitud de los prompts (tokens):
 
@@ -74,6 +74,8 @@ Longitud de los prompts (tokens):
 | Semilla | `42` |
 | Carpeta de salida original | `/workspace/out/corridas/gemma4_31b/v1` |
 
+Duración registrada: 3836.8s (63.9 min).
+
 ## Etapas ejecutadas
 
 - [x] Activaciones guardadas (activations.npz, solo local)
@@ -116,6 +118,14 @@ Test causal (dosis en unidades del ΔP medido):
 | 52 | ×2 | 4/20 | 0/20 | 2/77 |
 | 52 | ×4 | 4/20 | 0/20 | 8/77 |
 
+## Notas
+
+- Corpus v0.3 (data/v03): 96 pares en 67 grupos temáticos —todas las particiones dejan fuera grupos completos— y catálogos de herramientas neutrales.
+- Razonamiento desactivado, su valor por defecto en Gemma 4.
+- La selección de capa en muestra dividida falló en el pod por un error con los grupos temáticos (corregido en 09626bc). Se recalculó en el portátil desde activations.npz con scripts/analisis/rehacer_analisis_robusto.py, que solo añade robust.layer_selection: ver robust_recomputed en results.json y rehacer_robusto.log.
+- El test causal corrió en la capa de máximo ΔP (52) porque en el pod la selección no estaba disponible. La partición reportada elige la capa 50, en empate práctico con la 52: puntuación 15.85 frente a 15.76, ΔP cross-fit 14.29 frente a 14.29, y en las 200 particiones de estabilidad se elige la 52 el 70 % de las veces y la 50 el 30 %. Hay que declarar que el test causal no está en la capa de la partición reportada; con este empate no se justifica repetir la generación.
+- Sin análisis por explicitud: el corpus v0.3 no trae la etiqueta subtlety. Se puede añadir después con --load-activations y una copia etiquetada del corpus.
+
 ## Archivos
 
 - `activations.npz`
@@ -125,6 +135,7 @@ Test causal (dosis en unidades del ΔP medido):
 - `directions.npz`
 - `factorial_results.json`
 - `format_effect_results.json`
+- `rehacer_robusto.log`
 - `rendered_inputs.jsonl`
 - `results.json`
 - `robust_results.json`
