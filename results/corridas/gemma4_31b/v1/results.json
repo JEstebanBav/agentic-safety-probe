@@ -392276,6 +392276,82 @@
           "angle_deg_normalised": 67.7971735921419
         }
       }
+    },
+    "layer_selection": {
+      "selected_layer": 50,
+      "selection_scores": {
+        "0": -0.7130367159843445,
+        "2": 1.1648398637771606,
+        "4": 1.2830244302749634,
+        "6": 1.363222599029541,
+        "8": 1.3390260934829712,
+        "10": 1.4998722076416016,
+        "12": 2.072681427001953,
+        "14": 2.0781548023223877,
+        "16": 2.2726802825927734,
+        "18": 1.8173794746398926,
+        "20": -2.691690444946289,
+        "22": 1.9109073877334595,
+        "24": -0.4227465093135834,
+        "26": 3.286991834640503,
+        "28": 5.148245334625244,
+        "30": 9.065638542175293,
+        "32": 11.750849723815918,
+        "34": 6.3858771324157715,
+        "36": 4.677358150482178,
+        "38": 4.825681209564209,
+        "40": 4.2231059074401855,
+        "42": 5.862171649932861,
+        "44": 7.519686222076416,
+        "46": 10.154341697692871,
+        "48": 14.098362922668457,
+        "50": 15.846244812011719,
+        "52": 15.764605522155762,
+        "54": 14.618904113769531,
+        "56": 11.877274513244629,
+        "58": 6.8349690437316895
+      },
+      "bonferroni_alpha": 0.0016666666666666668,
+      "split_over_pairs": true,
+      "n_selection": 48,
+      "n_inference": 48,
+      "delta_p_crossfit": 12.525630646618374,
+      "delta_p_naive": 12.778762151022168,
+      "inference": {
+        "delta_p": 12.525630646618374,
+        "ci_lower": 9.321242713924006,
+        "ci_upper": 15.725503860748596,
+        "n_decreasing": 42,
+        "n_pairs": 48,
+        "sign_test_p": 1.0087482138487759e-07,
+        "p_permutation": 0.0,
+        "p_value_floor": 0.0001,
+        "cohens_d_paired": 1.0918989466017086,
+        "significant_bonferroni": true
+      },
+      "stability": {
+        "n_splits": 200,
+        "selected_layer_frequency": {
+          "50": 0.3,
+          "52": 0.7
+        },
+        "fraction_decreasing_mean": 0.8551041666666666,
+        "fraction_decreasing_p05": 0.790625,
+        "fraction_decreasing_min": 0.7291666666666666,
+        "delta_p_mean": 14.05730728149414,
+        "delta_p_p05": 11.464789247512817,
+        "share_splits_positive": 1.0
+      },
+      "inference_interaction": {
+        "interaction": 20.423747486211223,
+        "ci_lower": 16.20592955451533,
+        "ci_upper": 24.54126703471376,
+        "n_pairs_positive": 45,
+        "n_pairs": 48,
+        "p_permutation": 0.0,
+        "p_value_floor": 0.0001,
+        "cohens_d_paired": 1.35638428528676
+      }
     }
   },
   "agent_direction": {
@@ -398508,5 +398584,23 @@
     0.15,
     0.2,
     0.2
-  ]
+  ],
+  "robust_recomputed": {
+    "fecha": "2026-11-24",
+    "codigo": "09626bc",
+    "motivo": "La selecci\u00f3n de capa en muestra dividida fall\u00f3 en el pod (mapa de grupos tem\u00e1ticos de 96 pares aplicado a la mitad de inferencia de 48). Se recalcul\u00f3 desde activations.npz con el error corregido y solo se a\u00f1adi\u00f3 robust.layer_selection; per_layer y rotation son los del pod.",
+    "particion": {
+      "unit": "theme_group",
+      "n_pairs": 96,
+      "n_groups": 67,
+      "max_group_size": 3
+    },
+    "reproduccion": {
+      "diferencia_relativa_maxima_sin_logistica": 5.224561334731761e-13,
+      "diferencia_relativa_maxima_logistica": 0.0004135910163440265,
+      "nota": "per_layer y rotation recalculados aqu\u00ed y comparados con los del pod; se conservan los del pod"
+    },
+    "capa_seleccionada": 50,
+    "capa_de_referencia_max_delta_p": 52
+  }
 }

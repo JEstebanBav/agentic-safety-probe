@@ -1,0 +1,1644 @@
+
+============================================================
+BIAS-CORRECTED RE-ANALYSIS
+============================================================
+
+  Split-sample layer selection
+    layer chosen on the selection half : 50
+    n selection / n inference          : 48 / 48
+    Bonferroni alpha over 26 layers    : 0.00192
+    split over pairs                   : True
+    inference half, DeltaP (cross-fit) : +85.6784  95% CI [+74.2769, +96.9863]
+    inference half, pairs decreasing   : 48/48  (sign test p=7.11e-15)
+    inference half, permutation p      : 1.00e-04  (Bonferroni alpha 0.00192)
+    inference half, interaction        : +62.2654  95% CI [+50.0801, +74.4845]  (47/48 pairs positive)
+    over 200 random pair splits      : L48 2%, L50 98%
+      inference pairs decreasing        : mean 92.8%, 5th pct 87.5%, worst 85.4%
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 0, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  -1.1568              -1.2378
+mean chat                               -5.9064              -5.9196
+mean agent                              -4.7496              -4.6819
+Cohen d (paired)                        -1.5433              -0.8539
+Cohen d (pooled)                        -1.0591              -0.8873
+implied pair corr r                      0.7645               0.4601
+permutation p                            1.0000               1.0000
+bootstrap CI low                        -1.3095              -1.5339
+bootstrap CI high                       -1.0085              -0.9483
+pairs decreasing                           4/96                26/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.0810  (+6.5% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 0, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.6890 (sd 0.0544)   <- report this one
+  per-fold               : 0.777, 0.698, 0.665, 0.634, 0.670
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.0816 (sd 0.0334)   [DISJOINT halves]
+  attenuation factor     : 0.2856   = sqrt(reliability)
+  cos disattenuated      : nan
+  angle disattenuated    : nan deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.7166   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is NOT reproducible at this sample size.
+             Report only that the alignment differs from chance.
+             Do not quote any angle, corrected or otherwise.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 0, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.6599   <- report this one
+  Precision      : 0.6436
+  Recall         : 0.6771
+  FPR            : 0.3750
+  thresholds     : 1.523, 2.014, 2.546, 3.810, -0.213
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 2, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   1.2811               1.0791
+mean chat                               10.5499               9.9600
+mean agent                               9.2688               8.8808
+Cohen d (paired)                         1.0545               0.7837
+Cohen d (pooled)                         0.7194               0.4547
+implied pair corr r                      0.7673               0.8317
+permutation p                            0.0000               0.0000
+bootstrap CI low                         1.0408               0.8153
+bootstrap CI high                        1.5261               1.3573
+pairs decreasing                          82/96                73/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.2020  (+18.7% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 2, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.7532 (sd 0.0498)   <- report this one
+  per-fold               : 0.730, 0.723, 0.798, 0.814, 0.701
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.1615 (sd 0.0277)   [DISJOINT halves]
+  attenuation factor     : 0.4018   = sqrt(reliability)
+  cos disattenuated      : nan
+  angle disattenuated    : nan deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.7396   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 2, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.6452   <- report this one
+  Precision      : 0.6667
+  Recall         : 0.6250
+  FPR            : 0.3125
+  thresholds     : 0.956, -0.792, 0.186, 0.772, -0.239
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 4, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   2.1472               1.9261
+mean chat                                3.9605               3.5412
+mean agent                               1.8132               1.6150
+Cohen d (paired)                         1.7345               1.4276
+Cohen d (pooled)                         1.1263               0.5707
+implied pair corr r                      0.7892               0.9201
+permutation p                            0.0000               0.0000
+bootstrap CI low                         1.9024               1.6674
+bootstrap CI high                        2.3952               2.1983
+pairs decreasing                          89/96                87/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.2211  (+11.5% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 4, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.7639 (sd 0.0714)   <- report this one
+  per-fold               : 0.722, 0.740, 0.825, 0.850, 0.681
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.1949 (sd 0.0290)   [DISJOINT halves]
+  attenuation factor     : 0.4414   = sqrt(reliability)
+  cos disattenuated      : nan
+  angle disattenuated    : nan deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.7584   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 4, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.7016   <- report this one
+  Precision      : 0.7053
+  Recall         : 0.6979
+  FPR            : 0.2917
+  thresholds     : 1.925, 0.694, -0.014, 2.335, 3.476
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 6, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   0.2759               0.1429
+mean chat                                7.8488               7.2734
+mean agent                               7.5729               7.1305
+Cohen d (paired)                         0.2517               0.1158
+Cohen d (pooled)                         0.1159               0.0456
+implied pair corr r                      0.8941               0.9223
+permutation p                            0.0064               0.1268
+bootstrap CI low                         0.0584              -0.0963
+bootstrap CI high                        0.4943               0.3873
+pairs decreasing                          59/96                58/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1330  (+93.1% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 6, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.8166 (sd 0.0620)   <- report this one
+  per-fold               : 0.770, 0.776, 0.837, 0.917, 0.784
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.2695 (sd 0.0271)   [DISJOINT halves]
+  attenuation factor     : 0.5191   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.7880   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 6, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.7423   <- report this one
+  Precision      : 0.7347
+  Recall         : 0.7500
+  FPR            : 0.2708
+  thresholds     : 0.567, 2.229, 1.927, 5.488, 3.406
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 8, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  -0.5017              -0.6201
+mean chat                                6.0258               5.5060
+mean agent                               6.5275               6.1261
+Cohen d (paired)                        -0.3847              -0.4592
+Cohen d (pooled)                        -0.1502              -0.1548
+implied pair corr r                      0.9237               0.9432
+permutation p                            1.0000               1.0000
+bootstrap CI low                        -0.7647              -0.8884
+bootstrap CI high                       -0.2459              -0.3573
+pairs decreasing                          35/96                35/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1183  (+19.1% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 8, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.8791 (sd 0.0697)   <- report this one
+  per-fold               : 0.803, 0.864, 0.953, 0.950, 0.825
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3324 (sd 0.0241)   [DISJOINT halves]
+  attenuation factor     : 0.5766   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8134   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 8, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.7958   <- report this one
+  Precision      : 0.8000
+  Recall         : 0.7917
+  FPR            : 0.1979
+  thresholds     : -0.499, 1.503, 3.945, 6.372, 5.472
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 10, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   0.2132               0.0804
+mean chat                                4.3390               3.8530
+mean agent                               4.1259               3.7726
+Cohen d (paired)                         0.1692               0.0644
+Cohen d (pooled)                         0.0678               0.0201
+implied pair corr r                      0.9196               0.9512
+permutation p                            0.0496               0.2665
+bootstrap CI low                        -0.0372              -0.1706
+bootstrap CI high                        0.4591               0.3236
+pairs decreasing                          53/96                51/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1328  (+165.2% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 10, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.8852 (sd 0.0602)   <- report this one
+  per-fold               : 0.828, 0.842, 0.953, 0.947, 0.856
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3459 (sd 0.0221)   [DISJOINT halves]
+  attenuation factor     : 0.5882   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8187   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 10, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.7958   <- report this one
+  Precision      : 0.8000
+  Recall         : 0.7917
+  FPR            : 0.1979
+  thresholds     : 6.789, 7.634, 11.123, 12.708, 10.313
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 12, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   2.0609               1.9054
+mean chat                                8.9902               8.4996
+mean agent                               6.9293               6.5942
+Cohen d (paired)                         1.4908               1.4048
+Cohen d (pooled)                         0.5897               0.4954
+implied pair corr r                      0.9218               0.9378
+permutation p                            0.0000               0.0000
+bootstrap CI low                         1.7843               1.6365
+bootstrap CI high                        2.3341               2.1741
+pairs decreasing                          92/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1555  (+8.2% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 12, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9113 (sd 0.0366)   <- report this one
+  per-fold               : 0.872, 0.886, 0.936, 0.961, 0.900
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3563 (sd 0.0218)   [DISJOINT halves]
+  attenuation factor     : 0.5969   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8231   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 12, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8211   <- report this one
+  Precision      : 0.8298
+  Recall         : 0.8125
+  FPR            : 0.1667
+  thresholds     : 12.156, 13.900, 16.462, 15.021, 14.181
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 14, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   3.7879               3.6086
+mean chat                               11.4176              10.8790
+mean agent                               7.6297               7.2704
+Cohen d (paired)                         2.1803               2.1258
+Cohen d (pooled)                         0.8398               0.7405
+implied pair corr r                      0.9258               0.9393
+permutation p                            0.0000               0.0000
+bootstrap CI low                         3.4425               3.2686
+bootstrap CI high                        4.1369               3.9490
+pairs decreasing                          94/96                94/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1794  (+5.0% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 14, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9326 (sd 0.0404)   <- report this one
+  per-fold               : 0.890, 0.903, 0.970, 0.981, 0.920
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3929 (sd 0.0241)   [DISJOINT halves]
+  attenuation factor     : 0.6268   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8372   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 14, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8261   <- report this one
+  Precision      : 0.8636
+  Recall         : 0.7917
+  FPR            : 0.1250
+  thresholds     : 4.263, 10.893, 11.203, 8.737, 8.914
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 16, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                   6.6912               6.5055
+mean chat                               20.7792              20.2931
+mean agent                              14.0880              13.7877
+Cohen d (paired)                         2.2933               2.2890
+Cohen d (pooled)                         1.0250               0.9320
+implied pair corr r                      0.9001               0.9171
+permutation p                            0.0000               0.0000
+bootstrap CI low                         6.1142               5.9431
+bootstrap CI high                        7.2981               7.0947
+pairs decreasing                          96/96                96/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1858  (+2.9% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 16, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9386 (sd 0.0366)   <- report this one
+  per-fold               : 0.920, 0.914, 0.972, 0.983, 0.903
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.4105 (sd 0.0202)   [DISJOINT halves]
+  attenuation factor     : 0.6407   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8391   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 16, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8360   <- report this one
+  Precision      : 0.8495
+  Recall         : 0.8229
+  FPR            : 0.1458
+  thresholds     : 9.294, 13.980, 18.382, 11.318, 8.666
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 18, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  19.0622              18.8668
+mean chat                               28.6434              28.2674
+mean agent                               9.5813               9.4006
+Cohen d (paired)                         2.9161               2.8981
+Cohen d (pooled)                         1.4457               1.4315
+implied pair corr r                      0.8771               0.8780
+permutation p                            0.0000               0.0000
+bootstrap CI low                        17.7720              17.5789
+bootstrap CI high                       20.3756              20.1621
+pairs decreasing                          96/96                96/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.1954  (+1.0% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 18, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9608 (sd 0.0471)   <- report this one
+  per-fold               : 0.968, 0.878, 0.992, 0.981, 0.986
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.4419 (sd 0.0239)   [DISJOINT halves]
+  attenuation factor     : 0.6648   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8454   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 18, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9081   <- report this one
+  Precision      : 0.9438
+  Recall         : 0.8750
+  FPR            : 0.0521
+  thresholds     : 8.048, 10.910, 18.114, 11.315, 11.933
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 20, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  31.2581              30.9177
+mean chat                               35.4480              34.9767
+mean agent                               4.1899               4.0590
+Cohen d (paired)                         2.7912               2.7598
+Cohen d (pooled)                         2.0941               2.0724
+implied pair corr r                      0.7186               0.7181
+permutation p                            0.0000               0.0000
+bootstrap CI low                        28.9988              28.6462
+bootstrap CI high                       33.4484              33.1155
+pairs decreasing                          95/96                95/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.3405  (+1.1% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 20, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9520 (sd 0.0494)   <- report this one
+  per-fold               : 0.965, 0.864, 0.981, 0.975, 0.975
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.4062 (sd 0.0237)   [DISJOINT halves]
+  attenuation factor     : 0.6373   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8292   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 20, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9032   <- report this one
+  Precision      : 0.9333
+  Recall         : 0.8750
+  FPR            : 0.0625
+  thresholds     : -2.298, 2.685, 10.423, 2.632, 3.882
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 22, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  38.5452              38.0409
+mean chat                               62.1383              61.4408
+mean agent                              23.5931              23.3999
+Cohen d (paired)                         2.4466               2.4259
+Cohen d (pooled)                         2.2628               2.2282
+implied pair corr r                      0.5723               0.5782
+permutation p                            0.0000               0.0000
+bootstrap CI low                        35.3366              34.8367
+bootstrap CI high                       41.5929              41.0730
+pairs decreasing                          92/96                92/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.5043  (+1.3% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 22, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9629 (sd 0.0414)   <- report this one
+  per-fold               : 0.975, 0.889, 0.983, 0.986, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.4050 (sd 0.0215)   [DISJOINT halves]
+  attenuation factor     : 0.6364   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8243   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 22, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8925   <- report this one
+  Precision      : 0.9222
+  Recall         : 0.8646
+  FPR            : 0.0729
+  thresholds     : 8.349, 9.906, 11.122, 9.942, 12.729
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 24, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  41.5311              40.9657
+mean chat                               58.7108              58.0198
+mean agent                              17.1797              17.0541
+Cohen d (paired)                         2.0913               2.0653
+Cohen d (pooled)                         2.1776               2.1296
+implied pair corr r                      0.4579               0.4684
+permutation p                            0.0000               0.0000
+bootstrap CI low                        37.4589              36.9077
+bootstrap CI high                       45.2965              44.7286
+pairs decreasing                          91/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.5654  (+1.4% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 24, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9588 (sd 0.0420)   <- report this one
+  per-fold               : 0.983, 0.886, 0.972, 0.961, 0.992
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3900 (sd 0.0258)   [DISJOINT halves]
+  attenuation factor     : 0.6245   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8177   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 24, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8865   <- report this one
+  Precision      : 0.9213
+  Recall         : 0.8542
+  FPR            : 0.0729
+  thresholds     : 0.545, 1.253, 5.331, 2.534, 6.861
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 26, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  51.2293              50.3927
+mean chat                               58.5383              57.6264
+mean agent                               7.3090               7.2337
+Cohen d (paired)                         2.2093               2.1712
+Cohen d (pooled)                         2.1704               2.1215
+implied pair corr r                      0.5174               0.5226
+permutation p                            0.0000               0.0000
+bootstrap CI low                        46.4315              45.6326
+bootstrap CI high                       55.6863              54.8549
+pairs decreasing                          91/96                92/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.8366  (+1.7% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 26, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9590 (sd 0.0363)   <- report this one
+  per-fold               : 0.975, 0.895, 0.981, 0.967, 0.978
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3474 (sd 0.0282)   [DISJOINT halves]
+  attenuation factor     : 0.5894   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8181   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 26, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8984   <- report this one
+  Precision      : 0.9231
+  Recall         : 0.8750
+  FPR            : 0.0729
+  thresholds     : 2.605, 0.586, 2.151, -1.249, 4.528
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 28, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  45.8621              44.8621
+mean chat                               65.4752              64.3506
+mean agent                              19.6131              19.4885
+Cohen d (paired)                         2.2290               2.1724
+Cohen d (pooled)                         1.8669               1.8168
+implied pair corr r                      0.6493               0.6503
+permutation p                            0.0000               0.0000
+bootstrap CI low                        41.6643              40.6390
+bootstrap CI high                       49.8434              48.8797
+pairs decreasing                          91/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.9999  (+2.2% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 28, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9682 (sd 0.0334)   <- report this one
+  per-fold               : 0.983, 0.909, 0.981, 0.983, 0.986
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3574 (sd 0.0251)   [DISJOINT halves]
+  attenuation factor     : 0.5978   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8266   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 28, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8913   <- report this one
+  Precision      : 0.9318
+  Recall         : 0.8542
+  FPR            : 0.0625
+  thresholds     : 1.104, -2.321, -1.130, 1.641, 0.878
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 30, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  44.9243              43.9004
+mean chat                               51.6966              50.6091
+mean agent                               6.7724               6.7087
+Cohen d (paired)                         2.4739               2.4106
+Cohen d (pooled)                         2.0330               1.9812
+implied pair corr r                      0.6623               0.6623
+permutation p                            0.0000               0.0000
+bootstrap CI low                        41.1820              40.1421
+bootstrap CI high                       48.4556              47.4461
+pairs decreasing                          94/96                93/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +1.0239  (+2.3% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 30, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9628 (sd 0.0296)   <- report this one
+  per-fold               : 0.978, 0.911, 0.964, 0.983, 0.978
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3379 (sd 0.0208)   [DISJOINT halves]
+  attenuation factor     : 0.5813   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8153   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 30, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9022   <- report this one
+  Precision      : 0.9432
+  Recall         : 0.8646
+  FPR            : 0.0521
+  thresholds     : -3.947, -8.348, -5.070, -5.072, -7.188
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 32, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  36.1621              35.3297
+mean chat                               26.3796              25.5625
+mean agent                              -9.7825              -9.7672
+Cohen d (paired)                         2.4118               2.3516
+Cohen d (pooled)                         2.0070               1.9350
+implied pair corr r                      0.6537               0.6614
+permutation p                            0.0000               0.0000
+bootstrap CI low                        33.0580              32.1906
+bootstrap CI high                       39.0749              38.2573
+pairs decreasing                          94/96                93/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.8324  (+2.4% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 32, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9623 (sd 0.0309)   <- report this one
+  per-fold               : 0.975, 0.909, 0.964, 0.983, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3330 (sd 0.0251)   [DISJOINT halves]
+  attenuation factor     : 0.5770   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8124   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 32, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9043   <- report this one
+  Precision      : 0.9239
+  Recall         : 0.8854
+  FPR            : 0.0729
+  thresholds     : -15.215, -13.610, -16.778, -12.978, -20.114
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 34, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  32.0546              31.2551
+mean chat                               22.0305              21.2394
+mean agent                             -10.0241             -10.0157
+Cohen d (paired)                         2.3292               2.2642
+Cohen d (pooled)                         1.9267               1.8760
+implied pair corr r                      0.6579               0.6568
+permutation p                            0.0000               0.0000
+bootstrap CI low                        29.1756              28.3735
+bootstrap CI high                       34.7266              33.9318
+pairs decreasing                          93/96                93/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.7994  (+2.6% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 34, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9645 (sd 0.0304)   <- report this one
+  per-fold               : 0.975, 0.911, 0.970, 0.986, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3302 (sd 0.0213)   [DISJOINT halves]
+  attenuation factor     : 0.5746   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8063   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 34, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8984   <- report this one
+  Precision      : 0.9231
+  Recall         : 0.8750
+  FPR            : 0.0729
+  thresholds     : -9.438, -12.340, -13.332, -7.603, -19.490
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 36, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  36.8967              35.9009
+mean chat                               17.3323              16.4164
+mean agent                             -19.5644             -19.4845
+Cohen d (paired)                         2.2557               2.1858
+Cohen d (pooled)                         1.8674               1.8003
+implied pair corr r                      0.6573               0.6608
+permutation p                            0.0000               0.0000
+bootstrap CI low                        33.5058              32.4958
+bootstrap CI high                       40.0895              39.1056
+pairs decreasing                          92/96                93/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +0.9958  (+2.8% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 36, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9656 (sd 0.0320)   <- report this one
+  per-fold               : 0.977, 0.909, 0.978, 0.983, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3545 (sd 0.0209)   [DISJOINT halves]
+  attenuation factor     : 0.5954   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8165   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 36, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9091   <- report this one
+  Precision      : 0.9341
+  Recall         : 0.8854
+  FPR            : 0.0625
+  thresholds     : -10.566, -13.413, -13.240, -4.720, -21.349
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 38, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  43.4504              42.1544
+mean chat                               22.3141              21.1257
+mean agent                             -21.1363             -21.0287
+Cohen d (paired)                         2.2612               2.1832
+Cohen d (pooled)                         1.9369               1.8539
+implied pair corr r                      0.6331               0.6395
+permutation p                            0.0000               0.0000
+bootstrap CI low                        39.5175              38.2121
+bootstrap CI high                       47.1972              45.9169
+pairs decreasing                          92/96                92/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +1.2960  (+3.1% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 38, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9682 (sd 0.0324)   <- report this one
+  per-fold               : 0.982, 0.911, 0.975, 0.992, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3591 (sd 0.0191)   [DISJOINT halves]
+  attenuation factor     : 0.5992   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8205   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 38, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9140   <- report this one
+  Precision      : 0.9444
+  Recall         : 0.8854
+  FPR            : 0.0521
+  thresholds     : -12.766, -17.972, -18.010, -6.623, -22.980
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 40, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  54.9579              53.1245
+mean chat                               32.7909              31.0973
+mean agent                             -22.1670             -22.0271
+Cohen d (paired)                         2.3438               2.2603
+Cohen d (pooled)                         2.0846               1.9853
+implied pair corr r                      0.6045               0.6143
+permutation p                            0.0000               0.0000
+bootstrap CI low                        50.2080              48.3819
+bootstrap CI high                       59.5564              57.7278
+pairs decreasing                          93/96                93/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +1.8335  (+3.5% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 40, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9661 (sd 0.0343)   <- report this one
+  per-fold               : 0.978, 0.906, 0.978, 0.992, 0.978
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3493 (sd 0.0219)   [DISJOINT halves]
+  attenuation factor     : 0.5910   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8166   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 40, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8995   <- report this one
+  Precision      : 0.9140
+  Recall         : 0.8854
+  FPR            : 0.0833
+  thresholds     : -21.554, -23.576, -25.615, -17.166, -32.507
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 42, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  65.1457              62.4987
+mean chat                               38.1211              35.7281
+mean agent                             -27.0247             -26.7705
+Cohen d (paired)                         2.2401               2.1579
+Cohen d (pooled)                         2.1250               2.0015
+implied pair corr r                      0.5501               0.5699
+permutation p                            0.0000               0.0000
+bootstrap CI low                        59.2907              56.6495
+bootstrap CI high                       70.8574              68.1652
+pairs decreasing                          93/96                92/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +2.6471  (+4.2% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 42, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9672 (sd 0.0361)   <- report this one
+  per-fold               : 0.978, 0.903, 0.983, 0.989, 0.983
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3350 (sd 0.0207)   [DISJOINT halves]
+  attenuation factor     : 0.5788   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8119   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 42, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9053   <- report this one
+  Precision      : 0.9149
+  Recall         : 0.8958
+  FPR            : 0.0833
+  thresholds     : -24.634, -25.161, -27.168, -19.666, -33.773
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 44, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  73.3956              69.9586
+mean chat                               50.3460              47.2004
+mean agent                             -23.0496             -22.7582
+Cohen d (paired)                         2.1614               2.0757
+Cohen d (pooled)                         2.0944               1.9517
+implied pair corr r                      0.5305               0.5580
+permutation p                            0.0000               0.0000
+bootstrap CI low                        66.5550              63.1588
+bootstrap CI high                       80.0300              76.5716
+pairs decreasing                          92/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +3.4370  (+4.9% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 44, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9672 (sd 0.0329)   <- report this one
+  per-fold               : 0.978, 0.909, 0.983, 0.986, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3346 (sd 0.0241)   [DISJOINT halves]
+  attenuation factor     : 0.5784   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8102   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 44, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.9043   <- report this one
+  Precision      : 0.9239
+  Recall         : 0.8854
+  FPR            : 0.0729
+  thresholds     : -29.890, -28.456, -30.843, -21.618, -34.484
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 46, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  84.3726              80.2743
+mean chat                               35.9907              32.5188
+mean agent                             -48.3819             -47.7555
+Cohen d (paired)                         2.0946               2.0178
+Cohen d (pooled)                         2.0897               1.9272
+implied pair corr r                      0.5023               0.5439
+permutation p                            0.0000               0.0000
+bootstrap CI low                        76.2057              72.1926
+bootstrap CI high                       92.2572              88.0578
+pairs decreasing                          92/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +4.0983  (+5.1% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 46, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9645 (sd 0.0328)   <- report this one
+  per-fold               : 0.978, 0.906, 0.981, 0.981, 0.978
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3209 (sd 0.0246)   [DISJOINT halves]
+  attenuation factor     : 0.5665   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8063   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 46, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8947   <- report this one
+  Precision      : 0.9043
+  Recall         : 0.8854
+  FPR            : 0.0938
+  thresholds     : -47.369, -35.846, -45.057, -36.336, -36.242
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 48, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  86.4572              81.8344
+mean chat                               45.9732              41.9407
+mean agent                             -40.4840             -39.8937
+Cohen d (paired)                         1.9881               1.9058
+Cohen d (pooled)                         1.9706               1.8169
+implied pair corr r                      0.5088               0.5456
+permutation p                            0.0000               0.0000
+bootstrap CI low                        77.6578              73.1446
+bootstrap CI high                       94.9690              90.2164
+pairs decreasing                          92/96                91/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +4.6228  (+5.6% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 48, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9640 (sd 0.0311)   <- report this one
+  per-fold               : 0.975, 0.909, 0.981, 0.975, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3097 (sd 0.0229)   [DISJOINT halves]
+  attenuation factor     : 0.5565   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8053   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 48, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8973   <- report this one
+  Precision      : 0.9326
+  Recall         : 0.8646
+  FPR            : 0.0625
+  thresholds     : -48.467, -31.996, -40.544, -39.898, -35.652
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+========================================================================
+CROSS-FITTED PROJECTION GAP  (layer 50, K=5)
+========================================================================
+                              naive (in-sample)         cross-fitted
+------------------------------------------------------------------------
+DeltaP                                  88.9955              83.8089
+mean chat                               42.8283              38.3216
+mean agent                             -46.1672             -45.4873
+Cohen d (paired)                         1.8425               1.7602
+Cohen d (pooled)                         1.7959               1.6223
+implied pair corr r                      0.5250               0.5752
+permutation p                            0.0000               0.0000
+bootstrap CI low                        79.3856              74.3269
+bootstrap CI high                       98.3576              93.0678
+pairs decreasing                          89/96                89/96
+------------------------------------------------------------------------
+Own-sample bias in DeltaP : +5.1866  (+6.2% of the cross-fitted estimate)
+
+  Report the CROSS-FITTED value as the estimate of the effect.
+  The naive value is retained only to quantify the bias.
+  Permutation p of 0.0 means p < 0.0001, not zero.
+========================================================================
+========================================================================
+CROSS-VALIDATED AGENT DIRECTION  (layer 50, K=5)
+========================================================================
+  AUROC in-sample        : 1.0000   <- guaranteed by Cover's theorem, NOT evidence
+  AUROC out-of-fold      : 0.9618 (sd 0.0314)   <- report this one
+  per-fold               : 0.975, 0.906, 0.975, 0.972, 0.981
+
+  --- alignment with d_chat ---
+  cos measured           : 0.0000 (sd 0.0000)
+  angle measured         : 90.0 deg   <- UPPER BOUND, attenuated
+  chance cosine sd       : 0.01226  -> measured is 0.0 sd from chance
+
+  --- reliability and disattenuation ---
+  split-half reliability : 0.3047 (sd 0.0213)   [DISJOINT halves]
+  attenuation factor     : 0.5520   = sqrt(reliability)
+  cos disattenuated      : 0.0000
+  angle disattenuated    : 90.0 deg   <- bias-corrected estimate
+
+  inter-fold cos(wi,wj)  : 0.8021   [DIAGNOSTIC ONLY]
+    ^ inflated: K-fold training sets overlap, so their noise is
+      correlated. Never use this as the reliability ceiling.
+
+    VERDICT: w_agent is weakly reproducible. The disattenuated
+             angle is a rough estimate with wide uncertainty;
+             quote it as a range, never to two decimals.
+========================================================================
+========================================================================
+CROSS-VALIDATED SAFETY MONITOR  (layer 50, K=5)
+========================================================================
+  F1 in-sample   : 1.0000   <- threshold calibrated on the evaluation set
+  F1 out-of-fold : 0.8925   <- report this one
+  Precision      : 0.9222
+  Recall         : 0.8646
+  FPR            : 0.0729
+  thresholds     : -53.128, -47.543, -49.351, -44.856, -36.187
+  samples        : 96 harmful + 96 benign
+========================================================================
+
+  ROTATION OF THE HARMFUL/BENIGN DIRECTION, chat -> agent
+  Both directions by the same method, fitted on disjoint halves of
+  the pairs; 'norm.' divides by what the method achieves against
+  itself (1 = no rotation, 0 = a right angle).
+
+    diff_means
+      layer    full   across  rel chat  rel agent   norm.   angle  AUROC oof
+          0   0.878    0.605     0.669      0.610   0.948     19°      0.713
+          2   0.853    0.585     0.652      0.638   0.908     25°      0.728
+          4   0.844    0.555     0.628      0.609   0.897     26°      0.727
+          6   0.901    0.581     0.641      0.598   0.938     20°      0.723
+          8   0.926    0.657     0.708      0.670   0.953     18°      0.713
+         10   0.925    0.669     0.726      0.684   0.950     18°      0.736
+         12   0.936    0.739     0.784      0.770   0.951     18°      0.773
+         14   0.943    0.783     0.833      0.808   0.954     17°      0.812
+         16   0.928    0.821     0.891      0.867   0.934     21°      0.842
+         18   0.904    0.862     0.957      0.942   0.907     25°      0.914
+         20   0.692    0.665     0.966      0.953   0.693     46°      0.909
+         22   0.496    0.478     0.960      0.964   0.497     60°      0.933
+         24   0.350    0.336     0.955      0.961   0.351     69°      0.923
+         26   0.392    0.379     0.947      0.968   0.396     67°      0.927
+         28   0.410    0.397     0.941      0.971   0.416     65°      0.930
+         30   0.416    0.404     0.939      0.969   0.423     65°      0.932
+         32   0.400    0.387     0.935      0.968   0.407     66°      0.933
+         34   0.395    0.381     0.928      0.965   0.402     66°      0.932
+         36   0.422    0.406     0.923      0.960   0.431     64°      0.934
+         38   0.404    0.387     0.913      0.955   0.414     66°      0.932
+         40   0.380    0.362     0.900      0.949   0.391     67°      0.931
+         42   0.333    0.316     0.884      0.944   0.345     70°      0.930
+         44   0.317    0.299     0.872      0.940   0.330     71°      0.931
+         46   0.321    0.302     0.869      0.937   0.335     70°      0.933
+         48   0.331    0.311     0.864      0.935   0.346     70°      0.934
+         50   0.357    0.335     0.858      0.935   0.374     68°      0.939
+
+    logistic
+      layer    full   across  rel chat  rel agent   norm.   angle  AUROC oof
+          0   0.597    0.108     0.146      0.101     n/a     n/a      0.689
+          2   0.600    0.142     0.193      0.164     n/a     n/a      0.753
+          4   0.631    0.171     0.209      0.196     n/a     n/a      0.764
+          6   0.742    0.257     0.293      0.272   0.909     25°      0.817
+          8   0.760    0.317     0.351      0.337   0.922     23°      0.879
+         10   0.769    0.333     0.371      0.355   0.919     23°      0.885
+         12   0.769    0.339     0.370      0.368   0.919     23°      0.911
+         14   0.787    0.367     0.390      0.403   0.925     22°      0.933
+         16   0.752    0.371     0.416      0.412   0.898     26°      0.939
+         18   0.687    0.352     0.411      0.437   0.831     34°      0.961
+         20   0.497    0.232     0.348      0.404   0.618     52°      0.952
+         22   0.385    0.187     0.348      0.404   0.499     60°      0.963
+         24   0.302    0.160     0.320      0.388   0.454     63°      0.959
+         26   0.275    0.160     0.312      0.348   0.485     61°      0.959
+         28   0.245    0.150     0.302      0.363   0.454     63°      0.968
+         30   0.221    0.143     0.279      0.341   0.464     62°      0.963
+         32   0.160    0.113     0.265      0.335   0.379     68°      0.962
+         34   0.206    0.134     0.287      0.329   0.436     64°      0.965
+         36   0.203    0.129     0.284      0.354   0.406     66°      0.966
+         38   0.180    0.121     0.286      0.359   0.378     68°      0.968
+         40   0.161    0.112     0.306      0.347   0.343     70°      0.966
+         42   0.128    0.096     0.298      0.335   0.303     72°      0.967
+         44   0.116    0.087     0.293      0.335   0.277     74°      0.967
+         46   0.104    0.079     0.285      0.320   0.261     75°      0.964
+         48   0.106    0.078     0.271      0.304   0.272     74°      0.964
+         50   0.101    0.074     0.280      0.299   0.257     75°      0.962
+
+    'n/a': the directions are too unreliable at this sample size
+    for an angle to be stated; report agreement, not degrees.
+
+  Saved to C:\Users\38614180\AppData\Local\Temp\tmp14d8_ker/robust_results.json

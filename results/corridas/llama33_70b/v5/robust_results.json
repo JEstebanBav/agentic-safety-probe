@@ -1203,5 +1203,70 @@
         "angle_deg_normalised": 79.05622049069228
       }
     }
+  },
+  "layer_selection": {
+    "selected_layer": 76,
+    "selection_scores": {
+      "0": -0.014039423316717148,
+      "4": -0.03260372206568718,
+      "8": 0.05977991223335266,
+      "12": 0.16461843252182007,
+      "16": 0.6547711491584778,
+      "20": 1.3859516382217407,
+      "24": 2.5697929859161377,
+      "28": 3.123318910598755,
+      "32": 3.0385234355926514,
+      "36": 3.1628973484039307,
+      "40": 3.2079670429229736,
+      "44": 3.8424558639526367,
+      "48": 4.760532379150391,
+      "52": 5.7713165283203125,
+      "56": 6.6288299560546875,
+      "60": 7.543173313140869,
+      "64": 8.604918479919434,
+      "68": 9.954996109008789,
+      "72": 11.373679161071777,
+      "76": 15.479863166809082
+    },
+    "bonferroni_alpha": 0.0025,
+    "split_over_pairs": true,
+    "n_selection": 48,
+    "n_inference": 48,
+    "delta_p_crossfit": 14.736350095288415,
+    "delta_p_naive": 15.239516787301419,
+    "inference": {
+      "delta_p": 14.736350095288415,
+      "ci_lower": 13.003220065290504,
+      "ci_upper": 16.334025804240362,
+      "n_decreasing": 47,
+      "n_pairs": 48,
+      "sign_test_p": 3.481659405224491e-13,
+      "p_permutation": 0.0,
+      "p_value_floor": 0.0001,
+      "cohens_d_paired": 2.4783962469878555,
+      "significant_bonferroni": true
+    },
+    "stability": {
+      "n_splits": 200,
+      "selected_layer_frequency": {
+        "76": 1.0
+      },
+      "fraction_decreasing_mean": 0.96625,
+      "fraction_decreasing_p05": 0.9375,
+      "fraction_decreasing_min": 0.8958333333333334,
+      "delta_p_mean": 14.711931147575378,
+      "delta_p_p05": 13.341689205169677,
+      "share_splits_positive": 1.0
+    },
+    "inference_interaction": {
+      "interaction": 17.70782534513616,
+      "ci_lower": 15.823738289095632,
+      "ci_upper": 19.515170786962337,
+      "n_pairs_positive": 47,
+      "n_pairs": 48,
+      "p_permutation": 0.0,
+      "p_value_floor": 0.0001,
+      "cohens_d_paired": 2.687914535961903
+    }
   }
 }
